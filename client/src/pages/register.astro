@@ -1,0 +1,617 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Datos para SEO
+const title = 'Registro | StellarTourism';
+const description = 'Crea una cuenta en StellarTourism para comenzar a explorar el universo y reservar tus viajes espaciales.';
+
+// Obtener parámetros de redirección si existen
+const { redirect } = Astro.url.searchParams;
+---
+
+<Layout title={title} description={description}>
+ <section style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0; background-color: #020617; position: relative; overflow: hidden;">
+   <!-- Fondo con estrellas -->
+   <div style="position: absolute; inset: 0; background-image: url('/images/stars-bg.png'); background-size: cover; background-position: center; opacity: 0.6;"></div>
+   
+   <!-- Overlay gradiente -->
+   <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.95));"></div>
+   
+   <div style="max-width: 500px; width: 100%; padding: 0 1rem; position: relative; z-index: 10;">
+     <div style="background-color: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border-radius: 1rem; border: 1px solid rgba(76, 201, 240, 0.2); box-shadow: 0 0 30px rgba(76, 201, 240, 0.15); overflow: hidden;">
+       <div style="padding: 2rem;">
+         <div style="text-align: center; margin-bottom: 2rem;">
+           <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem; color: white;">Crea tu cuenta</h1>
+           <p style="color: rgba(226, 232, 240, 0.7);">Únete a StellarTourism y comienza tu aventura espacial</p>
+         </div>
+         
+         <form id="register-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
+           <!-- Nombre completo -->
+           <div>
+             <label for="name" style="display: block; font-size: 0.875rem; font-weight: 500; color: rgba(226, 232, 240, 0.9); margin-bottom: 0.5rem;">Nombre completo</label>
+             <input 
+               type="text" 
+               id="name" 
+               name="name" 
+               required 
+               style="width: 100%; background-color: rgba(2, 6, 23, 0.5); border: 1px solid rgba(76, 201, 240, 0.3); border-radius: 0.5rem; padding: 0.75rem 1rem; color: white; outline: none; transition: border-color 0.3s ease;"
+               placeholder="Tu nombre completo"
+             />
+             <div id="name-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: none;"></div>
+           </div>
+           
+           <!-- Email -->
+           <div>
+             <label for="email" style="display: block; font-size: 0.875rem; font-weight: 500; color: rgba(226, 232, 240, 0.9); margin-bottom: 0.5rem;">Correo electrónico</label>
+             <input 
+               type="email" 
+               id="email" 
+               name="email" 
+               required 
+               style="width: 100%; background-color: rgba(2, 6, 23, 0.5); border: 1px solid rgba(76, 201, 240, 0.3); border-radius: 0.5rem; padding: 0.75rem 1rem; color: white; outline: none; transition: border-color 0.3s ease;"
+               placeholder="tu.email@ejemplo.com"
+             />
+             <div id="email-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: none;"></div>
+           </div>
+           
+           <!-- Contraseña -->
+           <div>
+             <label for="password" style="display: block; font-size: 0.875rem; font-weight: 500; color: rgba(226, 232, 240, 0.9); margin-bottom: 0.5rem;">Contraseña</label>
+             <div style="position: relative;">
+               <input 
+                 type="password" 
+                 id="password" 
+                 name="password" 
+                 required 
+                 style="width: 100%; background-color: rgba(2, 6, 23, 0.5); border: 1px solid rgba(76, 201, 240, 0.3); border-radius: 0.5rem; padding: 0.75rem 1rem; color: white; outline: none; transition: border-color 0.3s ease;"
+                 placeholder="Mínimo 8 caracteres"
+               />
+               <button 
+                 type="button" 
+                 id="toggle-password" 
+                 style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(226, 232, 240, 0.7); cursor: pointer;"
+                 aria-label="Mostrar contraseña"
+               >
+                 <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+               </button>
+             </div>
+             <div id="password-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: none;"></div>
+             
+             <!-- Indicador de fortaleza de contraseña -->
+             <div style="margin-top: 0.5rem;">
+               <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                 <span style="font-size: 0.75rem; color: rgba(226, 232, 240, 0.7);">Fortaleza:</span>
+                 <div style="display: flex; gap: 0.25rem; flex-grow: 1;">
+                   <div id="strength-1" style="height: 0.25rem; flex-grow: 1; background-color: rgba(226, 232, 240, 0.2); border-radius: 9999px;"></div>
+                   <div id="strength-2" style="height: 0.25rem; flex-grow: 1; background-color: rgba(226, 232, 240, 0.2); border-radius: 9999px;"></div>
+                   <div id="strength-3" style="height: 0.25rem; flex-grow: 1; background-color: rgba(226, 232, 240, 0.2); border-radius: 9999px;"></div>
+                   <div id="strength-4" style="height: 0.25rem; flex-grow: 1; background-color: rgba(226, 232, 240, 0.2); border-radius: 9999px;"></div>
+                 </div>
+                 <span id="strength-text" style="font-size: 0.75rem; color: rgba(226, 232, 240, 0.7); min-width: 4rem;">Débil</span>
+               </div>
+             </div>
+           </div>
+           
+           <!-- Confirmar contraseña -->
+           <div>
+             <label for="confirm-password" style="display: block; font-size: 0.875rem; font-weight: 500; color: rgba(226, 232, 240, 0.9); margin-bottom: 0.5rem;">Confirmar contraseña</label>
+             <input 
+               type="password" 
+               id="confirm-password" 
+               name="confirm-password" 
+               required 
+               style="width: 100%; background-color: rgba(2, 6, 23, 0.5); border: 1px solid rgba(76, 201, 240, 0.3); border-radius: 0.5rem; padding: 0.75rem 1rem; color: white; outline: none; transition: border-color 0.3s ease;"
+               placeholder="Repite tu contraseña"
+             />
+             <div id="confirm-password-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: none;"></div>
+           </div>
+           
+           <!-- Términos y condiciones -->
+           <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+             <input 
+               type="checkbox" 
+               id="terms" 
+               name="terms" 
+               required 
+               style="margin-top: 0.25rem; accent-color: #4cc9f0;"
+             />
+             <label for="terms" style="font-size: 0.875rem; color: rgba(226, 232, 240, 0.9);">
+               Acepto los <a href="/terminos" style="color: #4cc9f0; text-decoration: underline;">Términos y Condiciones</a> y la <a href="/privacidad" style="color: #4cc9f0; text-decoration: underline;">Política de Privacidad</a>
+             </label>
+           </div>
+           
+           <!-- Mensaje de error general -->
+           <div id="form-error" style="color: #ef4444; font-size: 0.875rem; text-align: center; display: none; padding: 0.5rem; background-color: rgba(239, 68, 68, 0.1); border-radius: 0.5rem;"></div>
+           
+           <!-- Botón de registro -->
+           <button 
+             type="submit" 
+             id="register-button"
+             style="background: linear-gradient(to right, #4cc9f0, #8b5cf6); color: white; border: none; border-radius: 0.5rem; padding: 0.75rem 1.5rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;"
+           >
+             <span id="button-text">Crear cuenta</span>
+             <span id="button-loader" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: inherit; opacity: 0; transition: opacity 0.3s ease;">
+               <svg style="height: 1.5rem; width: 1.5rem; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                 <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+               </svg>
+             </span>
+           </button>
+         </form>
+         
+         <div style="text-align: center; margin-top: 1.5rem;">
+           <p style="color: rgba(226, 232, 240, 0.7); margin-bottom: 1rem;">O regístrate con</p>
+           
+           <button 
+             type="button" 
+             id="google-login"
+             style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: white; color: #333; border: none; border-radius: 0.5rem; padding: 0.75rem 1.5rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease;"
+           >
+             <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem;" viewBox="0 0 24 24">
+               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+             </svg>
+             Continuar con Google
+           </button>
+         </div>
+         
+         <div style="text-align: center; margin-top: 1.5rem;">
+           <p style="color: rgba(226, 232, 240, 0.7);">
+             ¿Ya tienes una cuenta? <a href="/login" style="color: #4cc9f0; text-decoration: underline;">Inicia sesión</a>
+           </p>
+         </div>
+       </div>
+     </div>
+   </div>
+ </section>
+</Layout>
+
+<script>
+ // Modo de desarrollo - Usar simulación local en lugar de Firebase
+ const USE_LOCAL_AUTH = true;
+ 
+ // Referencias a elementos del DOM
+ const registerForm = document.getElementById('register-form');
+ const nameInput = document.getElementById('name');
+ const emailInput = document.getElementById('email');
+ const passwordInput = document.getElementById('password');
+ const confirmPasswordInput = document.getElementById('confirm-password');
+ const termsCheckbox = document.getElementById('terms');
+ const registerButton = document.getElementById('register-button');
+ const buttonText = document.getElementById('button-text');
+ const buttonLoader = document.getElementById('button-loader');
+ const formError = document.getElementById('form-error');
+ const nameError = document.getElementById('name-error');
+ const emailError = document.getElementById('email-error');
+ const passwordError = document.getElementById('password-error');
+ const confirmPasswordError = document.getElementById('confirm-password-error');
+ const togglePasswordButton = document.getElementById('toggle-password');
+ const googleLoginButton = document.getElementById('google-login');
+ 
+ // Indicadores de fortaleza de contraseña
+ const strengthBars = [
+   document.getElementById('strength-1'),
+   document.getElementById('strength-2'),
+   document.getElementById('strength-3'),
+   document.getElementById('strength-4')
+ ];
+ const strengthText = document.getElementById('strength-text');
+ 
+ // Función para mostrar/ocultar contraseña
+ togglePasswordButton.addEventListener('click', () => {
+   const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+   passwordInput.setAttribute('type', type);
+   
+   // Cambiar el icono
+   togglePasswordButton.innerHTML = type === 'password' 
+     ? '<svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+     : '<svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+ });
+ 
+ // Función para evaluar la fortaleza de la contraseña
+ function checkPasswordStrength(password) {
+   let strength = 0;
+   
+   // Longitud mínima
+   if (password.length >= 8) strength += 1;
+   
+   // Contiene números
+   if (/\d/.test(password)) strength += 1;
+   
+   // Contiene letras minúsculas y mayúsculas
+   if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
+   
+   // Contiene caracteres especiales
+   if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+   
+   return strength;
+ }
+ 
+ // Actualizar indicador de fortaleza cuando se escribe la contraseña
+ passwordInput.addEventListener('input', () => {
+   const password = passwordInput.value;
+   const strength = checkPasswordStrength(password);
+   
+   // Resetear todos los indicadores
+   strengthBars.forEach(bar => {
+     bar.style.backgroundColor = 'rgba(226, 232, 240, 0.2)';
+   });
+   
+   // Colorear según fortaleza
+   for (let i = 0; i < strength; i++) {
+     strengthBars[i].style.backgroundColor = 
+       strength === 1 ? '#ef4444' :  // Rojo (débil)
+       strength === 2 ? '#f59e0b' :  // Naranja (media)
+       strength === 3 ? '#10b981' :  // Verde (fuerte)
+       '#4cc9f0';                    // Azul (muy fuerte)
+   }
+   
+   // Actualizar texto
+   strengthText.textContent = 
+     strength === 0 ? 'Débil' :
+     strength === 1 ? 'Débil' :
+     strength === 2 ? 'Media' :
+     strength === 3 ? 'Fuerte' :
+     'Muy fuerte';
+   
+   strengthText.style.color = 
+     strength <= 1 ? '#ef4444' :
+     strength === 2 ? '#f59e0b' :
+     strength === 3 ? '#10b981' :
+     '#4cc9f0';
+ });
+ 
+ // Función para mostrar errores
+ function showError(element, message) {
+   element.textContent = message;
+   element.style.display = 'block';
+ }
+ 
+ // Función para ocultar errores
+ function hideError(element) {
+   element.textContent = '';
+   element.style.display = 'none';
+ }
+ 
+ // Función para mostrar el loader en el botón
+ function showLoader() {
+   buttonText.style.opacity = '0';
+   buttonLoader.style.opacity = '1';
+   registerButton.disabled = true;
+ }
+ 
+ // Función para ocultar el loader en el botón
+ function hideLoader() {
+   buttonText.style.opacity = '1';
+   buttonLoader.style.opacity = '0';
+   registerButton.disabled = false;
+ }
+ 
+ // Simulación local de autenticación
+ const localAuth = {
+   users: JSON.parse(localStorage.getItem('stellar_users') || '[]'),
+   
+   // Registrar usuario
+   register: function(email, password, name) {
+     return new Promise((resolve, reject) => {
+       // Verificar si el email ya existe
+       const existingUser = this.users.find(user => user.email === email);
+       if (existingUser) {
+         return reject({ code: 'auth/email-already-in-use', message: 'Este correo electrónico ya está en uso.' });
+       }
+       
+       // Crear nuevo usuario
+       const newUser = {
+         uid: 'user_' + Date.now(),
+         email,
+         password, // En una aplicación real, esto debería estar encriptado
+         displayName: name,
+         createdAt: new Date().toISOString()
+       };
+       
+       // Guardar usuario
+       this.users.push(newUser);
+       localStorage.setItem('stellar_users', JSON.stringify(this.users));
+       
+       // Simular retraso de red
+       setTimeout(() => {
+         resolve({ user: { ...newUser, password: undefined } });
+       }, 800);
+     });
+   },
+   
+   // Iniciar sesión
+   login: function(email, password) {
+     return new Promise((resolve, reject) => {
+       // Buscar usuario
+       const user = this.users.find(user => user.email === email && user.password === password);
+       
+       if (!user) {
+         return reject({ code: 'auth/user-not-found', message: 'Usuario no encontrado o contraseña incorrecta.' });
+       }
+       
+       // Simular retraso de red
+       setTimeout(() => {
+         resolve({ user: { ...user, password: undefined } });
+       }, 800);
+     });
+   },
+   
+   // Iniciar sesión con Google
+   loginWithGoogle: function() {
+     return new Promise((resolve, reject) => {
+       // Simular usuario de Google
+       const googleUser = {
+         uid: 'google_' + Date.now(),
+         email: 'usuario.google@gmail.com',
+         displayName: 'Usuario Google',
+         photoURL: 'https://via.placeholder.com/150',
+         createdAt: new Date().toISOString()
+       };
+       
+       // Verificar si el usuario ya existe
+       const existingUser = this.users.find(user => user.email === googleUser.email);
+       
+       if (!existingUser) {
+         // Guardar nuevo usuario
+         this.users.push(googleUser);
+         localStorage.setItem('stellar_users', JSON.stringify(this.users));
+       }
+       
+       // Simular retraso de red
+       setTimeout(() => {
+         resolve({ user: existingUser || googleUser });
+       }, 800);
+     });
+   }
+ };
+ 
+ // Validar formulario antes de enviar
+ registerForm.addEventListener('submit', async (e) => {
+   e.preventDefault();
+   
+   // Resetear errores
+   hideError(formError);
+   hideError(nameError);
+   hideError(emailError);
+   hideError(passwordError);
+   hideError(confirmPasswordError);
+   
+   // Obtener valores
+   const name = nameInput.value.trim();
+   const email = emailInput.value.trim();
+   const password = passwordInput.value;
+   const confirmPassword = confirmPasswordInput.value;
+   const acceptTerms = termsCheckbox.checked;
+   
+   // Validar nombre
+   if (!name) {
+     showError(nameError, 'Por favor, introduce tu nombre completo');
+     nameInput.focus();
+     return;
+   }
+   
+   // Validar email
+   if (!email) {
+     showError(emailError, 'Por favor, introduce tu correo electrónico');
+     emailInput.focus();
+     return;
+   }
+   
+   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+     showError(emailError, 'Por favor, introduce un correo electrónico válido');
+     emailInput.focus();
+     return;
+   }
+   
+   // Validar contraseña
+   if (!password) {
+     showError(passwordError, 'Por favor, introduce una contraseña');
+     passwordInput.focus();
+     return;
+   }
+   
+   if (password.length < 8) {
+     showError(passwordError, 'La contraseña debe tener al menos 8 caracteres');
+     passwordInput.focus();
+     return;
+   }
+   
+   const passwordStrength = checkPasswordStrength(password);
+   if (passwordStrength < 2) {
+     showError(passwordError, 'La contraseña es demasiado débil. Incluye números, mayúsculas y caracteres especiales');
+     passwordInput.focus();
+     return;
+   }
+   
+   // Validar confirmación de contraseña
+   if (password !== confirmPassword) {
+     showError(confirmPasswordError, 'Las contraseñas no coinciden');
+     confirmPasswordInput.focus();
+     return;
+   }
+   
+   // Validar términos
+   if (!acceptTerms) {
+     showError(formError, 'Debes aceptar los términos y condiciones');
+     termsCheckbox.focus();
+     return;
+   }
+   
+   // Mostrar loader
+   showLoader();
+   
+   try {
+     let userCredential;
+     
+     if (USE_LOCAL_AUTH) {
+       // Usar autenticación local simulada
+       userCredential = await localAuth.register(email, password, name);
+     } else {
+       // Aquí iría el código para Firebase Auth
+       // Omitido para usar la simulación local
+     }
+     
+     // Registro exitoso, simular redirección
+     setTimeout(() => {
+       const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/';
+       
+       // Guardar información de sesión
+       localStorage.setItem('stellar_current_user', JSON.stringify(userCredential.user));
+       localStorage.setItem('stellar_auth_token', 'simulated_token_' + Date.now());
+       
+       // Mostrar mensaje de éxito antes de redirigir
+       hideLoader();
+       showError(formError, '¡Registro exitoso! Redirigiendo...');
+       formError.style.color = '#10b981';
+       formError.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+       
+       setTimeout(() => {
+         window.location.href = redirectUrl;
+       }, 1500);
+     }, 1000);
+     
+   } catch (error) {
+     // Ocultar loader
+     hideLoader();
+     
+     // Mostrar error
+     let errorMessage = 'Error al crear la cuenta. Por favor, inténtalo de nuevo.';
+     
+     if (error.code === 'auth/email-already-in-use') {
+       errorMessage = 'Este correo electrónico ya está en uso. Por favor, utiliza otro o inicia sesión.';
+     } else if (error.code === 'auth/invalid-email') {
+       errorMessage = 'El formato del correo electrónico no es válido.';
+     } else if (error.code === 'auth/weak-password') {
+       errorMessage = 'La contraseña es demasiado débil. Por favor, elige una contraseña más segura.';
+     } else if (error.code === 'auth/network-request-failed') {
+       errorMessage = 'Error de conexión. Por favor, verifica tu conexión a internet.';
+     }
+     
+     showError(formError, errorMessage);
+     console.error('Error de registro:', error);
+   }
+ });
+ 
+ // Iniciar sesión con Google
+ googleLoginButton.addEventListener('click', async () => {
+   // Resetear errores
+   hideError(formError);
+   
+   // Mostrar loader
+   showLoader();
+   
+   try {
+     let result;
+     
+     if (USE_LOCAL_AUTH) {
+       // Usar autenticación local simulada
+       result = await localAuth.loginWithGoogle();
+     } else {
+       // Aquí iría el código para Firebase Auth
+       // Omitido para usar la simulación local
+     }
+     
+     // Inicio de sesión exitoso, simular redirección
+     setTimeout(() => {
+       const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/';
+       
+       // Guardar información de sesión
+       localStorage.setItem('stellar_current_user', JSON.stringify(result.user));
+       localStorage.setItem('stellar_auth_token', 'simulated_token_' + Date.now());
+       
+       // Mostrar mensaje de éxito antes de redirigir
+       hideLoader();
+       showError(formError, '¡Inicio de sesión exitoso! Redirigiendo...');
+       formError.style.color = '#10b981';
+       formError.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+       
+       setTimeout(() => {
+         window.location.href = redirectUrl;
+       }, 1500);
+     }, 1000);
+     
+   } catch (error) {
+     // Ocultar loader
+     hideLoader();
+     
+     // Mostrar error
+     let errorMessage = 'Error al iniciar sesión con Google. Por favor, inténtalo de nuevo.';
+     
+     if (error.code === 'auth/popup-closed-by-user') {
+       errorMessage = 'Has cerrado la ventana de inicio de sesión. Por favor, inténtalo de nuevo.';
+     } else if (error.code === 'auth/account-exists-with-different-credential') {
+       errorMessage = 'Ya existe una cuenta con este correo electrónico pero con otro método de inicio de sesión.';
+     } else if (error.code === 'auth/network-request-failed') {
+       errorMessage = 'Error de conexión. Por favor, verifica tu conexión a internet.';
+     }
+     
+     showError(formError, errorMessage);
+     console.error('Error de inicio de sesión con Google:', error);
+   }
+ });
+ 
+ // Animación para los inputs
+ const inputs = [nameInput, emailInput, passwordInput, confirmPasswordInput];
+ inputs.forEach(input => {
+   input.addEventListener('focus', () => {
+     input.style.borderColor = '#4cc9f0';
+   });
+   
+   input.addEventListener('blur', () => {
+     input.style.borderColor = 'rgba(76, 201, 240, 0.3)';
+   });
+ });
+ 
+ // Obtener parámetros de URL
+ const urlParams = new URLSearchParams(window.location.search);
+ const errorParam = urlParams.get('error');
+ 
+ // Mostrar error si viene en la URL
+ if (errorParam) {
+   let errorMessage = 'Ha ocurrido un error. Por favor, inténtalo de nuevo.';
+   
+   if (errorParam === 'email_in_use') {
+     errorMessage = 'Este correo electrónico ya está en uso. Por favor, utiliza otro o inicia sesión.';
+   } else if (errorParam === 'invalid_email') {
+     errorMessage = 'El formato del correo electrónico no es válido.';
+   } else if (errorParam === 'weak_password') {
+     errorMessage = 'La contraseña es demasiado débil. Por favor, elige una contraseña más segura.';
+   } else if (errorParam === 'network_error') {
+     errorMessage = 'Error de conexión. Por favor, verifica tu conexión a internet.';
+   }
+   
+   showError(formError, errorMessage);
+ }
+</script>
+
+<style>
+ @keyframes spin {
+   from {
+     transform: rotate(0deg);
+   }
+   to {
+     transform: rotate(360deg);
+   }
+ }
+ 
+ /* Estilos para el hover de los botones */
+ #register-button:hover {
+   box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
+   transform: translateY(-2px);
+ }
+ 
+ #google-login:hover {
+   background-color: #f8f9fa;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+   transform: translateY(-2px);
+ }
+ 
+ /* Animación para las estrellas */
+ @keyframes twinkle {
+   0%, 100% { opacity: 0.5; }
+   50% { opacity: 1; }
+ }
+</style>

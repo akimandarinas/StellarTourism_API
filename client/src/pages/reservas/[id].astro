@@ -1,0 +1,60 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ReservaDetail from '../../components/reservas/ReservaDetail.vue';
+import ReservaPasajeros from '../../components/reservas/ReservaPasajeros.vue';
+import ReservaActividades from '../../components/reservas/ReservaActividades.vue';
+import ReservaPagos from '../../components/reservas/ReservaPagos.vue';
+import AuthGuard from '../../components/auth/AuthGuard.vue';
+
+const { id } = Astro.params;
+---
+
+<Layout 
+  title="Detalles de Reserva" 
+  description="Información detallada sobre tu reserva de viaje espacial."
+>
+  <AuthGuard client:load>
+    <div class="reserva-detail-container">
+      <ReservaDetail reservaId={id} client:load />
+      
+      <div class="reserva-sections">
+        <section class="reserva-section">
+          <h2>Pasajeros</h2>
+          <ReservaPasajeros reservaId={id} client:visible />
+        </section>
+        
+        <section class="reserva-section">
+          <h2>Actividades Reservadas</h2>
+          <ReservaActividades reservaId={id} client:visible />
+        </section>
+        
+        <section class="reserva-section">
+          <h2>Pagos</h2>
+          <ReservaPagos reservaId={id} client:visible />
+        </section>
+      </div>
+    </div>
+  </AuthGuard>
+</Layout>
+
+<style>
+  .reserva-detail-container {
+    width: 100%;
+  }
+  
+  .reserva-sections {
+    margin-top: 3rem;
+  }
+  
+  .reserva-section {
+    margin-bottom: 3rem;
+  }
+  
+  .reserva-section h2 {
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #2a2a4a;
+    padding-bottom: 0.5rem;
+  }
+</style>

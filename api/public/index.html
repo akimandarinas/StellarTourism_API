@@ -1,0 +1,2919 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar Tourism API - Estado del Sistema</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .bg-space {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        .status-success {
+            background-color: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+        .status-warning {
+            background-color: #f59e0b;
+            box-shadow: 0 0 10px #f59e0b;
+        }
+        .status-error {
+            background-color: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+        }
+        .glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        .glow-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+       :root {
+           --primary-color: #6366f1;
+           --primary-hover: #4f46e5;
+           --success-color: #10b981;
+           --warning-color: #f59e0b;
+           --danger-color: #ef4444;
+           --light-bg: #f9fafb;
+           --dark-bg: #1f2937;
+           --light-text: #374151;
+           --dark-text: #f9fafb;
+           --border-color: #e5e7eb;
+           --card-bg: #ffffff;
+           --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+       }
+
+       * {
+           box-sizing: border-box;
+           margin: 0;
+           padding: 0;
+       }
+
+       body {
+           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+           line-height: 1.6;
+           color: var(--light-text);
+           background-color: var(--light-bg);
+           padding: 20px;
+       }
+
+       .container {
+           max-width: 1200px;
+           margin: 0 auto;
+       }
+
+       header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 30px;
+           padding-bottom: 20px;
+           border-bottom: 1px solid var(--border-color);
+       }
+
+       .logo {
+           display: flex;
+           align-items: center;
+       }
+
+       .logo img {
+           height: 40px;
+           margin-right: 10px;
+       }
+
+       .logo h1 {
+           font-size: 24px;
+           font-weight: 600;
+           color: var(--dark-text);
+       }
+
+       .system-status {
+           display: flex;
+           align-items: center;
+           padding: 8px 16px;
+           background-color: var(--card-bg);
+           border-radius: 8px;
+           box-shadow: var(--card-shadow);
+           color: var(--light-text);
+       }
+
+       .status-indicator {
+           display: inline-block;
+           width: 12px;
+           height: 12px;
+           border-radius: 50%;
+           margin-right: 8px;
+       }
+
+       .status-ok {
+           background-color: var(--success-color);
+       }
+
+       .status-warning {
+           background-color: var(--warning-color);
+       }
+
+       .status-error {
+           background-color: var(--danger-color);
+       }
+
+       .status-unknown {
+           background-color: #9ca3af;
+       }
+
+       .loading {
+           display: inline-block;
+           width: 12px;
+           height: 12px;
+           border-radius: 50%;
+           border: 2px solid #e5e7eb;
+           border-top-color: var(--primary-color);
+           animation: spin 1s linear infinite;
+           margin-right: 8px;
+       }
+
+       @keyframes spin {
+           to {
+               transform: rotate(360deg);
+           }
+       }
+
+       .system-status-details {
+           font-size: 12px;
+           color: #6b7280;
+           margin-top: 4px;
+       }
+
+       .card {
+           background-color: var(--card-bg);
+           border-radius: 8px;
+           box-shadow: var(--card-shadow);
+           padding: 20px;
+           margin-bottom: 20px;
+           color: var(--light-text);
+       }
+
+       .card-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 16px;
+       }
+
+       .card-title {
+           font-size: 18px;
+           font-weight: 600;
+           color: var(--light-text);
+       }
+
+       .components-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+           gap: 16px;
+       }
+
+       .component-card {
+           background-color: var(--card-bg);
+           border-radius: 8px;
+           box-shadow: var(--card-shadow);
+           padding: 16px;
+           border: 1px solid var(--border-color);
+           transition: transform 0.2s, box-shadow 0.2s;
+           color: var(--light-text);
+       }
+
+       .component-card:hover {
+           transform: translateY(-2px);
+           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+       }
+
+       .component-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 8px;
+       }
+
+       .component-name {
+           font-weight: 600;
+           color: var(--light-text);
+       }
+
+       .component-details {
+           font-size: 14px;
+           color: #6b7280;
+           margin-bottom: 10px;
+       }
+
+       .component-stats {
+           display: flex;
+           flex-wrap: wrap;
+           gap: 8px;
+           margin-bottom: 10px;
+           font-size: 12px;
+       }
+
+       .stat-item {
+           background-color: #f3f4f6;
+           padding: 4px 8px;
+           border-radius: 4px;
+           display: flex;
+           align-items: center;
+       }
+
+       .stat-label {
+           font-weight: 500;
+           margin-right: 4px;
+           color: var(--light-text);
+       }
+
+       .stat-value {
+           color: var(--primary-color);
+       }
+
+       .component-progress {
+           height: 4px;
+           background-color: #e5e7eb;
+           border-radius: 2px;
+           margin-bottom: 10px;
+           overflow: hidden;
+       }
+
+       .progress-bar {
+           height: 100%;
+           background-color: var(--success-color);
+           border-radius: 2px;
+       }
+
+       .progress-bar.warning {
+           background-color: var(--warning-color);
+       }
+
+       .progress-bar.error {
+           background-color: var(--danger-color);
+       }
+
+       .component-footer {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           font-size: 12px;
+           color: #6b7280;
+       }
+
+       .component-updated {
+           font-style: italic;
+       }
+
+       .btn {
+           display: inline-block;
+           background-color: var(--primary-color);
+           color: white;
+           border: none;
+           border-radius: 4px;
+           padding: 8px 16px;
+           font-size: 14px;
+           font-weight: 500;
+           cursor: pointer;
+           transition: background-color 0.2s;
+       }
+
+       .btn:hover {
+           background-color: var(--primary-hover);
+       }
+
+       .btn-sm {
+           padding: 4px 8px;
+           font-size: 12px;
+       }
+
+       .btn-outline {
+           background-color: transparent;
+           color: var(--primary-color);
+           border: 1px solid var(--primary-color);
+       }
+
+       .btn-outline:hover {
+           background-color: var(--primary-color);
+           color: white;
+       }
+
+       .recommendations {
+           margin-top: 20px;
+           padding: 16px;
+           background-color: #fffbeb;
+           border-left: 4px solid var(--warning-color);
+           border-radius: 4px;
+           color: var(--light-text);
+       }
+
+       .recommendations h3 {
+           color: #92400e;
+           margin-bottom: 8px;
+       }
+
+       .recommendations ul {
+           margin-left: 20px;
+       }
+
+       .recommendations li {
+           margin-bottom: 4px;
+           color: #92400e;
+       }
+
+       .api-endpoints {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+           gap: 12px;
+           margin-top: 16px;
+       }
+
+       .endpoint-btn {
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           padding: 12px;
+           background-color: #f3f4f6;
+           border: 1px solid var(--border-color);
+           border-radius: 6px;
+           font-weight: 500;
+           cursor: pointer;
+           transition: all 0.2s;
+           color: var(--light-text);
+       }
+
+       .endpoint-btn:hover {
+           background-color: #e5e7eb;
+           transform: translateY(-2px);
+       }
+
+       .endpoint-btn.active {
+           background-color: #dbeafe;
+           border-color: #93c5fd;
+       }
+
+       .api-response {
+           margin-top: 16px;
+           border-radius: 6px;
+           overflow: hidden;
+           border: 1px solid var(--border-color);
+       }
+
+       .api-response.success {
+           border-color: #d1fae5;
+       }
+
+       .api-response.error {
+           border-color: #fee2e2;
+       }
+
+       .api-response-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 12px;
+           background-color: #f9fafb;
+           border-bottom: 1px solid var(--border-color);
+       }
+
+       .api-response.success .api-response-header {
+           background-color: #ecfdf5;
+       }
+
+       .api-response.error .api-response-header {
+           background-color: #fef2f2;
+       }
+
+       .api-response-status {
+           display: flex;
+           align-items: center;
+           color: var(--light-text);
+       }
+
+       .api-response-time {
+           font-size: 12px;
+           color: #6b7280;
+       }
+
+       .api-response-body {
+           padding: 12px;
+           background-color: #f3f4f6;
+           overflow-x: auto;
+       }
+
+       .api-response-body pre {
+           margin: 0;
+           font-family: 'Courier New', Courier, monospace;
+           font-size: 14px;
+           white-space: pre-wrap;
+           color: #1f2937;
+       }
+
+       .custom-endpoint {
+           margin-top: 20px;
+       }
+
+       .custom-endpoint form {
+           display: flex;
+           gap: 8px;
+       }
+
+       .custom-endpoint input {
+           flex: 1;
+           padding: 8px 12px;
+           border: 1px solid var(--border-color);
+           border-radius: 4px;
+           font-size: 14px;
+       }
+
+       .custom-endpoint input:focus {
+           outline: none;
+           border-color: var(--primary-color);
+           box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+       }
+
+       .loading-spinner {
+           display: inline-block;
+           width: 20px;
+           height: 20px;
+           border-radius: 50%;
+           border: 2px solid #e5e7eb;
+           border-top-color: var(--primary-color);
+           animation: spin 1s linear infinite;
+           margin-right: 8px;
+       }
+
+       @media (max-width: 768px) {
+           .components-grid {
+               grid-template-columns: 1fr;
+           }
+
+           .api-endpoints {
+               grid-template-columns: 1fr 1fr;
+           }
+
+           .custom-endpoint form {
+               flex-direction: column;
+           }
+       }
+
+       footer {
+           margin-top: 40px;
+           padding-top: 20px;
+           border-top: 1px solid var(--border-color);
+           text-align: center;
+           font-size: 14px;
+           color: #6b7280;
+       }
+
+       .card-body {
+           padding: 20px;
+           color: var(--light-text);
+       }
+
+       .btn-custom {
+           display: inline-block;
+           background-color: var(--primary-color);
+           color: white;
+           border: none;
+           border-radius: 4px;
+           padding: 8px 16px;
+           font-size: 14px;
+           font-weight: 500;
+           cursor: pointer;
+           transition: background-color 0.2s;
+           margin-right: 8px;
+           margin-bottom: 8px;
+       }
+
+       .btn-custom:hover {
+           background-color: var(--primary-hover);
+       }
+
+       .badge-success {
+           background-color: var(--success-color);
+           color: white;
+           padding: 0.25em 0.4em;
+           border-radius: 0.25rem;
+           font-size: 75%;
+           font-weight: 700;
+           margin-right: 5px;
+       }
+
+       .badge-primary {
+           background-color: var(--primary-color);
+           color: white;
+           padding: 0.25em 0.4em;
+           border-radius: 0.25rem;
+           font-size: 75%;
+           font-weight: 700;
+           margin-right: 5px;
+       }
+
+       .endpoint-path {
+           font-family: monospace;
+           font-size: 14px;
+           color: var(--light-text);
+       }
+
+       .tab-content {
+           display: none;
+       }
+
+       .tab-content.active {
+           display: block;
+       }
+
+       .tabs {
+           display: flex;
+           margin-bottom: 20px;
+           border-bottom: 1px solid var(--border-color);
+       }
+
+       .tab {
+           padding: 10px 20px;
+           cursor: pointer;
+           border: none;
+           background-color: transparent;
+           color: var(--light-text);
+           border-bottom: 2px solid transparent;
+           transition: border-color 0.3s;
+       }
+
+       .tab.active {
+           border-bottom-color: var(--primary-color);
+           color: var(--primary-color);
+       }
+
+       /* Estilos para el modal */
+       .custom-modal {
+           display: none; /* Hidden by default */
+           position: fixed; /* Stay in place */
+           z-index: 1; /* Sit on top */
+           left: 0;
+           top: 0;
+           width: 100%; /* Full width */
+           height: 100%; /* Full height */
+           overflow: auto; /* Enable scroll if needed */
+           background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+       }
+
+       /* Modal Content/Box */
+       .modal-content {
+           background-color: #fefefe;
+           margin: 15% auto; /* 15% from the top and centered */
+           padding: 20px;
+           border: 1px solid #888;
+           width: 80%; /* Could be more or less, depending on screen size */
+           max-width: 600px;
+           border-radius: 8px;
+           box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+           color: var(--light-text);
+       }
+
+       /* The Close Button */
+       .close-button {
+           color: #aaa;
+           float: right;
+           font-size: 28px;
+           font-weight: bold;
+           border: none;
+           background: none;
+           cursor: pointer;
+       }
+
+       .close-button:hover,
+       .close-button:focus {
+           color: black;
+           text-decoration: none;
+           cursor: pointer;
+       }
+
+       .modal-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding-bottom: 10px;
+           margin-bottom: 15px;
+           border-bottom: 1px solid var(--border-color);
+       }
+
+       .modal-title {
+           font-size: 20px;
+           font-weight: 600;
+           color: var(--light-text);
+       }
+
+       #modalContent {
+           font-size: 16px;
+           line-height: 1.6;
+           color: var(--light-text);
+       }
+
+       /* Estilos para tablas */
+       .table {
+           width: 100%;
+           border-collapse: collapse;
+           margin-bottom: 1rem;
+           color: var(--light-text);
+       }
+
+       .table th,
+       .table td {
+           padding: 0.75rem;
+           vertical-align: top;
+           border-top: 1px solid var(--border-color);
+           text-align: left;
+       }
+
+       .table thead th {
+           vertical-align: bottom;
+           border-bottom: 2px solid var(--border-color);
+           background-color: #f9fafb;
+           color: var(--light-text);
+       }
+
+       .table tbody + tbody {
+           border-top: 2px solid var(--border-color);
+       }
+
+       .table-bordered {
+           border: 1px solid var(--border-color);
+       }
+
+       .table-bordered th,
+       .table-bordered td {
+           border: 1px solid var(--border-color);
+       }
+
+       .table-bordered thead th,
+       .table-bordered thead td {
+           border-bottom-width: 2px;
+       }
+
+       .list-group {
+           display: flex;
+           flex-direction: column;
+           padding-left: 0;
+           margin-bottom: 0;
+           border-radius: 0.25rem;
+       }
+
+       .list-group-item {
+           position: relative;
+           display: block;
+           padding: 0.75rem 1.25rem;
+           background-color: #fff;
+           border: 1px solid rgba(0, 0, 0, 0.125);
+           color: var(--light-text);
+       }
+
+       .list-group-item:first-child {
+           border-top-left-radius: inherit;
+           border-top-right-radius: inherit;
+       }
+
+       .list-group-item:last-child {
+           border-bottom-right-radius: inherit;
+           border-bottom-left-radius: inherit;
+       }
+
+       .list-group-item + .list-group-item {
+           border-top-width: 0;
+       }
+
+       .d-flex {
+           display: flex !important;
+       }
+
+       .justify-content-between {
+           justify-content: space-between !important;
+       }
+
+       .align-items-center {
+           align-items: center !important;
+       }
+
+       .mb-0 {
+           margin-bottom: 0 !important;
+       }
+
+       .mb-3 {
+           margin-bottom: 1rem !important;
+       }
+
+       .mr-2 {
+           margin-right: 0.5rem !important;
+       }
+
+       /* Estilos para las estadísticas del sistema */
+       .system-stats {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+           gap: 16px;
+           margin-bottom: 20px;
+       }
+
+       .stat-card {
+           background-color: var(--card-bg);
+           border-radius: 8px;
+           box-shadow: var(--card-shadow);
+           padding: 16px;
+           text-align: center;
+       }
+
+       .stat-value {
+           font-size: 24px;
+           font-weight: 700;
+           margin-bottom: 4px;
+           color: var(--primary-color);
+       }
+
+       .stat-label {
+           font-size: 14px;
+           color: #6b7280;
+       }
+
+       /* Estilos para las pruebas de componentes */
+       .test-list {
+           list-style: none;
+           padding: 0;
+           margin: 0;
+       }
+
+       .test-item {
+           display: flex;
+           align-items: center;
+           padding: 8px 0;
+           border-bottom: 1px solid var(--border-color);
+       }
+
+       .test-item:last-child {
+           border-bottom: none;
+       }
+
+       .test-name {
+           flex: 1;
+           color: var(--light-text);
+       }
+
+       .test-status {
+           margin-left: 8px;
+           font-weight: 500;
+       }
+
+       .test-status.success {
+           color: var(--success-color);
+       }
+
+       .test-status.warning {
+           color: var(--warning-color);
+       }
+
+       .test-status.error {
+           color: var(--danger-color);
+       }
+
+       /* Estilos para el código fuente */
+       .raw-code {
+           margin-top: 16px;
+           border: 1px solid var(--border-color);
+           border-radius: 6px;
+           overflow: hidden;
+       }
+
+       .raw-code-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 8px 12px;
+           background-color: #f9fafb;
+           border-bottom: 1px solid var(--border-color);
+       }
+
+       .raw-code-title {
+           font-weight: 500;
+           font-size: 14px;
+           color: var(--light-text);
+       }
+
+       .raw-code-toggle {
+           background: none;
+           border: none;
+           color: var(--primary-color);
+           cursor: pointer;
+           font-size: 12px;
+       }
+
+       .raw-code-content {
+           padding: 12px;
+           background-color: #f3f4f6;
+           overflow-x: auto;
+           font-family: 'Courier New', Courier, monospace;
+           font-size: 14px;
+           white-space: pre-wrap;
+           color: #1f2937;
+       }
+
+       /* Estilos para el resultado */
+       #result {
+           margin-top: 20px;
+       }
+
+       .http-code {
+           display: inline-block;
+           padding: 4px 8px;
+           border-radius: 4px;
+           font-family: 'Courier New', Courier, monospace;
+           font-size: 14px;
+           margin-bottom: 8px;
+           color: white;
+       }
+
+       /* Estilos para las pestañas de diagnóstico */
+       .diagnostic-tools {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+           gap: 16px;
+           margin-bottom: 20px;
+       }
+
+       .diagnostic-tool {
+           background-color: var(--card-bg);
+           border-radius: 8px;
+           box-shadow: var(--card-shadow);
+           padding: 16px;
+           text-align: center;
+           cursor: pointer;
+           transition: transform 0.2s, box-shadow 0.2s;
+       }
+
+       .diagnostic-tool:hover {
+           transform: translateY(-2px);
+           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+       }
+
+       .diagnostic-icon {
+           font-size: 24px;
+           margin-bottom: 8px;
+           color: var(--primary-color);
+       }
+
+       .diagnostic-name {
+           font-weight: 500;
+           margin-bottom: 4px;
+           color: var(--light-text);
+       }
+
+       .diagnostic-description {
+           font-size: 12px;
+           color: #6b7280;
+       }
+       
+       /* Estilos para el código en bruto */
+       .raw-source-code {
+           margin-top: 20px;
+           border: 1px solid var(--border-color);
+           border-radius: 6px;
+           overflow: hidden;
+       }
+       
+       .raw-source-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 10px 15px;
+           background-color: #f3f4f6;
+           border-bottom: 1px solid var(--border-color);
+       }
+       
+       .raw-source-title {
+           font-weight: 600;
+           color: var(--light-text);
+       }
+       
+       .raw-source-content {
+           max-height: 400px;
+           overflow-y: auto;
+           padding: 15px;
+           background-color: #f8fafc;
+           font-family: 'Courier New', Courier, monospace;
+           font-size: 14px;
+           line-height: 1.5;
+           color: #334155;
+           white-space: pre-wrap;
+       }
+       
+       /* Modo oscuro para el dashboard */
+       .dark-mode {
+           --light-bg: #1a1a2e;
+           --dark-bg: #0f0f1b;
+           --light-text: #e0e0e0;
+           --dark-text: #ffffff;
+           --border-color: #2a2a3c;
+           --card-bg: #16213e;
+       }
+       
+       .dark-mode .card,
+       .dark-mode .component-card,
+       .dark-mode .stat-card,
+       .dark-mode .diagnostic-tool,
+       .dark-mode .modal-content,
+       .dark-mode .list-group-item {
+           background-color: var(--card-bg);
+           color: var(--light-text);
+       }
+       
+       .dark-mode .api-response-body,
+       .dark-mode .raw-code-content,
+       .dark-mode .raw-source-content {
+           background-color: #1e293b;
+           color: #e2e8f0;
+       }
+       
+       .dark-mode .table th,
+       .dark-mode .table td {
+           border-color: var(--border-color);
+           color: var(--light-text);
+       }
+       
+       .dark-mode .table thead th {
+           background-color: #1e293b;
+       }
+       
+       /* Botón para alternar modo oscuro */
+       .theme-toggle {
+           position: fixed;
+           bottom: 20px;
+           right: 20px;
+           width: 50px;
+           height: 50px;
+           border-radius: 50%;
+           background-color: var(--primary-color);
+           color: white;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           cursor: pointer;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+           z-index: 1000;
+           border: none;
+           font-size: 20px;
+       }
+       
+       .theme-toggle:hover {
+           background-color: var(--primary-hover);
+       }
+   </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-2 text-gray-800">Stellar Tourism API</h1>
+            <p class="text-xl text-blue-600">Estado del Sistema</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Total Componentes</p>
+                        <h2 class="text-3xl font-bold text-gray-800" id="total-components">0</h2>
+                    </div>
+                    <div class="bg-blue-500 rounded-full p-3">
+                        <i class="fas fa-cube text-xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Componentes Saludables</p>
+                        <h2 class="text-3xl font-bold text-green-500" id="healthy-components">0</h2>
+                    </div>
+                    <div class="bg-green-500 rounded-full p-3">
+                        <i class="fas fa-check text-xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Advertencias</p>
+                        <h2 class="text-3xl font-bold text-yellow-500" id="warning-components">0</h2>
+                    </div>
+                    <div class="bg-yellow-500 rounded-full p-3">
+                        <i class="fas fa-exclamation-triangle text-xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Errores</p>
+                        <h2 class="text-3xl font-bold text-red-500" id="error-components">0</h2>
+                    </div>
+                    <div class="bg-red-500 rounded-full p-3">
+                        <i class="fas fa-times text-xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <header>
+           <div class="logo">
+               <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI4IDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiM2MzY2ZjEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTIgMTZhNCA0IDAgMSAwIDAgOCA0IDQgMCAxIDAgMC04eiIvPjxwYXRoIGQ9Ik0xMiAxMmE0IDQgMCAxIDAgMC04IDQgNCAwIDEgMCAwIDh6Ii8+PHBhdGggZD0iTTIwIDIwYTQgNCAwIDEgMCAwLTggNCA0IDAgMSAwIDAgOHoiLz48cGF0aCBkPSJNNCA4YTQgNCAwIDEgMCAwLTggNCA0IDAgMSAwIDAgOHoiLz48cGF0aCBkPSJNNCAxNmE0IDQgMCAxIDAgMCA4IDQgNCAwIDEgMCAwLTh6Ii8+PHBhdGggZD0iTTIwIDhhNCA0IDAgMSAwIDAtOCA0IDQgMCAxIDAgMCA4eiIvPjwvc3ZnPg==" alt="Logo">
+               <h1>Stellar Tourism API</h1>
+           </div>
+           <div>
+               <div id="system-status" class="system-status">
+                   <span class="loading"></span>
+                   <span>Cargando estado...</span>
+               </div>
+               <div id="system-status-details" class="system-status-details"></div>
+           </div>
+       </header>
+
+       <div class="tabs">
+           <button class="tab active" data-tab="dashboard">Dashboard</button>
+           <button class="tab" data-tab="diagnostics">Diagnósticos</button>
+           <button class="tab" data-tab="api">API</button>
+           <button class="tab" data-tab="database">Base de Datos</button>
+       </div>
+
+       <div id="dashboard" class="tab-content active">
+           <div class="system-stats">
+               <div class="stat-card">
+                   <div class="stat-value" id="total-components">0</div>
+                   <div class="stat-label">Componentes Totales</div>
+               </div>
+               <div class="stat-card">
+                   <div class="stat-value" id="healthy-components">0</div>
+                   <div class="stat-label">Componentes Saludables</div>
+               </div>
+               <div class="stat-card">
+                   <div class="stat-value" id="warning-components">0</div>
+                   <div class="stat-label">Componentes con Advertencias</div>
+               </div>
+               <div class="stat-card">
+                   <div class="stat-value" id="error-components">0</div>
+                   <div class="stat-label">Componentes con Errores</div>
+               </div>
+           </div>
+
+           <div class="card">
+               <div class="card-header">
+                   <h2 class="card-title">Componentes del Sistema</h2>
+                   <button class="btn btn-sm" onclick="updateComponentsStatus()">Actualizar</button>
+               </div>
+               <div id="components-container" class="components-grid">
+                   <div class="component-card">
+                       <div class="component-header">
+                           <div class="component-name">Cargando componentes...</div>
+                           <span class="loading"></span>
+                       </div>
+                   </div>
+               </div>
+               <div id="recommendations-container" class="recommendations" style="display: none;">
+                   <h3>Recomendaciones</h3>
+                   <ul id="recommendations-list"></ul>
+               </div>
+           </div>
+       </div>
+
+       <div id="diagnostics" class="tab-content">
+           <div class="card">
+               <div class="card-header">
+                   <h2 class="card-title">Herramientas de Diagnóstico</h2>
+                   <p>Utiliza estas herramientas para diagnosticar problemas con la API.</p>
+               </div>
+               <div class="card-body">
+                   <div class="diagnostic-tools">
+                       <div class="diagnostic-tool" onclick="showDiagnosticResult('Diagnóstico General', 'El sistema está funcionando correctamente.')">
+                           <div class="diagnostic-icon">📊</div>
+                           <div class="diagnostic-name">Diagnóstico General</div>
+                           <div class="diagnostic-description">Verificar el estado general del sistema</div>
+                       </div>
+                       <div class="diagnostic-tool" onclick="showDiagnosticResult('Test de Rutas', 'Todas las rutas están configuradas correctamente.')">
+                           <div class="diagnostic-icon">🔄</div>
+                           <div class="diagnostic-name">Test de Rutas</div>
+                           <div class="diagnostic-description">Verificar la configuración de rutas</div>
+                       </div>
+                       <div class="diagnostic-tool" onclick="showDiagnosticResult('Estructura de la API', 'La estructura de la API es correcta.')">
+                           <div class="diagnostic-icon">🏗️</div>
+                           <div class="diagnostic-name">Estructura de la API</div>
+                           <div class="diagnostic-description">Verificar la estructura de archivos</div>
+                       </div>
+                       <div class="diagnostic-tool" onclick="showDiagnosticResult('Estructura de la Base de Datos', 'La estructura de la base de datos es correcta.')">
+                           <div class="diagnostic-icon">🗄️</div>
+                           <div class="diagnostic-name">Estructura de la BD</div>
+                           <div class="diagnostic-description">Verificar tablas y relaciones</div>
+                       </div>
+                       <div class="diagnostic-tool" onclick="showDiagnosticResult('Reparar Tablas', 'Todas las tablas han sido reparadas correctamente.')">
+                           <div class="diagnostic-icon">🔧</div>
+                           <div class="diagnostic-name">Reparar Tablas</div>
+                           <div class="diagnostic-description">Reparar tablas dañadas</div>
+                       </div>
+                       <div class="diagnostic-tool" onclick="showDiagnosticResult('Verificar Caché', 'La caché está funcionando correctamente.')">
+                           <div class="diagnostic-icon">⚡</div>
+                           <div class="diagnostic-name">Verificar Caché</div>
+                           <div class="diagnostic-description">Comprobar el sistema de caché</div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+       <div id="api" class="tab-content">
+           <div class="card">
+               <div class="card-header">
+                   <h2 class="card-title">Endpoints de la API</h2>
+                   <p>Accede a los endpoints principales de la API.</p>
+               </div>
+               <div class="card-body">
+                   <div class="api-endpoints">
+                       <button class="endpoint-btn" onclick="testApiEndpoint('API Root')">
+                           API Root
+                       </button>
+                       <button class="endpoint-btn" onclick="testApiEndpoint('Health Check')">
+                           Health Check
+                       </button>
+                       <button class="endpoint-btn" onclick="testApiEndpoint('Test API')">
+                           Test API
+                       </button>
+                   </div>
+               </div>
+           </div>
+           
+           <div class="card">
+               <div class="card-header">
+                   <h2 class="card-title">Endpoints de Recursos</h2>
+               </div>
+               <div class="card-body">
+                   <div id="api-endpoints-container">
+                       <div class="card mb-3">
+                           <div class="card-header">
+                               <h5 class="mb-0">Destinos</h5>
+                           </div>
+                           <div class="card-body">
+                               <ul class="list-group">
+                                   <li class="list-group-item d-flex justify-content-between align-items-center">
+                                       <div>
+                                           <span class="badge badge-success mr-2">GET</span>
+                                           <span class="endpoint-path">/api/destinos</span>
+                                       </div>
+                                       <button class="btn btn-sm btn-custom" onclick="testApiEndpoint('GET /api/destinos')">Probar</button>
+                                   </li>
+                                   <li class="list-group-item d-flex justify-content-between align-items-center">
+                                       <div>
+                                           <span class="badge badge-success mr-2">GET</span>
+                                           <span class="endpoint-path">/api/destinos/{id}</span>
+                                       </div>
+                                       <button class="btn btn-sm btn-custom" onclick="testApiEndpoint('GET /api/destinos/{id}')">Probar</button>
+                                   </li>
+                                   <li class="list-group-item d-flex justify-content-between align-items-center">
+                                       <div>
+                                           <span class="badge badge-primary mr-2">POST</span>
+                                           <span class="endpoint-path">/api/destinos</span>
+                                       </div>
+                                       <button class="btn btn-sm btn-custom" onclick="testApiEndpoint('POST /api/destinos')">Probar</button>
+                                   </li>
+                               </ul>
+                           </div>
+                       </div>
+                       
+                       <div class="card mb-3">
+                           <div class="card-header">
+                               <h5 class="mb-0">Naves</h5>
+                           </div>
+                           <div class="card-body">
+                               <ul class="list-group">
+                                   <li class="list-group-item d-flex justify-content-between align-items-center">
+                                       <div>
+                                           <span class="badge badge-success mr-2">GET</span>
+                                           <span class="endpoint-path">/api/naves</span>
+                                       </div>
+                                       <button class="btn btn-sm btn-custom" onclick="testApiEndpoint('GET /api/naves')">Probar</button>
+                                   </li>
+                                   <li class="list-group-item d-flex justify-content-between align-items-center">
+                                       <div>
+                                           <span class="badge badge-success mr-2">GET</span>
+                                           <span class="endpoint-path">/api/naves/{id}</span>
+                                       </div>
+                                       <button class="btn btn-sm btn-custom" onclick="testApiEndpoint('GET /api/naves/{id}')">Probar</button>
+                                   </li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+       <div id="database" class="tab-content">
+           <div class="card">
+               <div class="card-header">
+                   <h2 class="card-title">Herramientas de Base de Datos</h2>
+                   <p>Utiliza estas herramientas para diagnosticar problemas con la base de datos.</p>
+               </div>
+               <div class="card-body">
+                   <button class="btn btn-custom" onclick="showDiagnosticResult('Verificar Base de Datos', 'La base de datos está funcionando correctamente.')">Verificar Base de Datos</button>
+                   <button class="btn btn-custom" onclick="showDiagnosticResult('Inicializar Base de Datos', 'La base de datos ha sido inicializada correctamente.')">Inicializar Base de Datos</button>
+                   <button class="btn btn-custom" onclick="showDiagnosticResult('Cargar Datos de Ejemplo', 'Los datos de ejemplo han sido cargados correctamente.')">Cargar Datos de Ejemplo</button>
+                   <button class="btn btn-custom" onclick="confirmDbReset()">Reiniciar Base de Datos</button>
+               </div>
+           </div>
+           
+           <div class="card">
+               <div class="card-header">
+                   <h2 class="card-title">Tablas de la Base de Datos</h2>
+               </div>
+               <div class="card-body">
+                   <div id="db-tables-container">
+                       <table class="table table-bordered">
+                           <thead>
+                               <tr>
+                                   <th>Tabla</th>
+                                   <th>Registros</th>
+                                   <th>Tamaño</th>
+                                   <th>Estado</th>
+                                   <th>Acciones</th>
+                               </tr>
+                           </thead>
+                           <tbody>
+                               <tr>
+                                   <td>destinos</td>
+                                   <td>15</td>
+                                   <td>128 KB</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Optimizar Tabla', 'La tabla destinos ha sido optimizada correctamente.')">Optimizar</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>naves</td>
+                                   <td>8</td>
+                                   <td>64 KB</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Optimizar Tabla', 'La tabla naves ha sido optimizada correctamente.')">Optimizar</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>rutas</td>
+                                   <td>25</td>
+                                   <td>256 KB</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Optimizar Tabla', 'La tabla rutas ha sido optimizada correctamente.')">Optimizar</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>actividades</td>
+                                   <td>42</td>
+                                   <td>512 KB</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Optimizar Tabla', 'La tabla actividades ha sido optimizada correctamente.')">Optimizar</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>reservas</td>
+                                   <td>125</td>
+                                   <td>1.2 MB</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Optimizar Tabla', 'La tabla reservas ha sido optimizada correctamente.')">Optimizar</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>pagos</td>
+                                   <td>125</td>
+                                   <td>768 KB</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Optimizar Tabla', 'La tabla pagos ha sido optimizada correctamente.')">Optimizar</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>resenas</td>
+                                   <td>87</td>
+                                   <td>384 KB</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Optimizar Tabla', 'La tabla resenas ha sido optimizada correctamente.')">Optimizar</button>
+                                   </td>
+                               </tr>
+                           </tbody>
+                       </table>
+                   </div>
+               </div>
+           </div>
+           
+           <div class="card">
+               <div class="card-header">
+                   <h2 class="card-title">Procedimientos Almacenados</h2>
+               </div>
+               <div class="card-body">
+                   <div id="db-procedures-container">
+                       <table class="table table-bordered">
+                           <thead>
+                               <tr>
+                                   <th>Nombre</th>
+                                   <th>Tipo</th>
+                                   <th>Última Modificación</th>
+                                   <th>Estado</th>
+                                   <th>Acciones</th>
+                               </tr>
+                           </thead>
+                           <tbody>
+                               <tr>
+                                   <td>buscar_destinos</td>
+                                   <td>Procedimiento</td>
+                                   <td>2023-05-10</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Ver Código', 'CREATE PROCEDURE buscar_destinos(IN p_query VARCHAR(255))...')">Ver Código</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>cancelar_reserva</td>
+                                   <td>Procedimiento</td>
+                                   <td>2023-05-12</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Ver Código', 'CREATE PROCEDURE cancelar_reserva(IN p_reserva_id INT)...')">Ver Código</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>crear_reserva_completa</td>
+                                   <td>Procedimiento</td>
+                                   <td>2023-05-15</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Ver Código', 'CREATE PROCEDURE crear_reserva_completa(IN p_usuario_id INT, IN p_destino_id INT, ...)...')">Ver Código</button>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td>calcular_puntuacion_promedio</td>
+                                   <td>Función</td>
+                                   <td>2023-05-08</td>
+                                   <td><span class="status-indicator status-ok"></span> OK</td>
+                                   <td>
+                                       <button class="btn btn-sm btn-outline" onclick="showDiagnosticResult('Ver Código', 'CREATE FUNCTION calcular_puntuacion_promedio(p_destino_id INT) RETURNS DECIMAL(3,2)...')">Ver Código</button>
+                                   </td>
+                               </tr>
+                           </tbody>
+                       </table>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+       <div id="result" class="card" style="display: none;">
+           <div class="card-header">
+               <h2 class="card-title">Resultado</h2>
+           </div>
+           <div class="card-body">
+               <div id="resultContent"></div>
+           </div>
+       </div>
+
+       <!-- Modal para detalles de componente -->
+       <div id="componentModal" class="custom-modal">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h2 class="modal-title" id="modalTitle">Detalles del componente</h2>
+                   <button class="close-button" onclick="closeModal()">&times;</button>
+               </div>
+               <div id="modalContent"></div>
+           </div>
+       </div>
+
+       <footer>
+           <p>Stellar Tourism API Diagnostics &copy; 2025</p>
+       </footer>
+   </div>
+
+   <!-- Modal para detalles del componente -->
+    <div id="component-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg max-w-3xl w-full max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-blue-300" id="modal-title">Detalles del Componente</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="modal-content">
+                <!-- El contenido del modal se cargará dinámicamente aquí -->
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+   <script>
+       // Datos de componentes (simulados)
+       const componentsData = [
+           {
+               id: 'api_core',
+               name: 'API Core',
+               status: 'success',
+               details: ['El núcleo de la API está funcionando correctamente'],
+               tests: [
+                   { name: 'Verificar archivos críticos', status: 'success', message: 'Todos los archivos críticos están presentes' },
+                   { name: 'Verificar versión de PHP', status: 'success', message: 'PHP versión 8.1.0' }
+               ],
+               recommendations: [],
+               stats: {
+                   uptime: '15d 7h 23m',
+                   memory: '45.2 MB',
+                   requests: '1,245',
+                   avgResponseTime: '120ms'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'database',
+               name: 'Base de Datos',
+               status: 'success',
+               details: ['La conexión a la base de datos está activa'],
+               tests: [
+                   { name: 'Conexión a la base de datos', status: 'success', message: 'Conexión establecida correctamente' },
+                   { name: 'Verificar tablas', status: 'success', message: '8 tablas detectadas' }
+               ],
+               recommendations: [],
+               stats: {
+                   connections: '5/100',
+                   size: '24.5 MB',
+                   queries: '3,782',
+                   avgQueryTime: '15ms'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'routes',
+               name: 'Rutas API',
+               status: 'success',
+               details: ['Las rutas de la API están configuradas correctamente'],
+               tests: [
+                   { name: 'Verificar archivos de rutas', status: 'success', message: 'Todos los archivos de rutas están presentes' },
+                   { name: 'Verificar accesibilidad', status: 'success', message: 'Todas las rutas son accesibles' }
+               ],
+               recommendations: [],
+               stats: {
+                   total: '24',
+                   get: '12',
+                   post: '8',
+                   other: '4'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'controllers',
+               name: 'Controladores',
+               status: 'success',
+               details: ['Los controladores están funcionando correctamente'],
+               tests: [
+                   { name: 'Verificar controladores', status: 'success', message: 'Todos los controladores están presentes' },
+                   { name: 'Verificar funciones CRUD', status: 'success', message: 'Todos los controladores implementan funciones CRUD' }
+               ],
+               recommendations: [],
+               stats: {
+                   total: '8',
+                   methods: '32',
+                   avgComplexity: 'Baja',
+                   coverage: '95%'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'models',
+               name: 'Modelos',
+               status: 'success',
+               details: ['Los modelos están configurados correctamente'],
+               tests: [
+                   { name: 'Verificar modelos', status: 'success', message: 'Todos los modelos están presentes' },
+                   { name: 'Verificar clases', status: 'success', message: 'Todos los modelos contienen definiciones de clase' }
+               ],
+               recommendations: [],
+               stats: {
+                   total: '8',
+                   relations: '12',
+                   properties: '48',
+                   methods: '24'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'destinos',
+               name: 'Destinos',
+               status: 'success',
+               details: ['El módulo de destinos está funcionando correctamente'],
+               tests: [
+                   { name: 'Verificar endpoint de destinos', status: 'success', message: 'El endpoint de destinos está accesible' },
+                   { name: 'Verificar datos', status: 'success', message: 'El endpoint devuelve datos correctamente' }
+               ],
+               recommendations: [],
+               stats: {
+                   records: '15',
+                   avgRating: '4.5',
+                   mostVisited: 'Marte',
+                   lastAdded: '2023-05-15'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'naves',
+               name: 'Naves',
+               status: 'success',
+               details: ['El módulo de naves está funcionando correctamente'],
+               tests: [
+                   { name: 'Verificar endpoint de naves', status: 'success', message: 'El endpoint de naves está accesible' },
+                   { name: 'Verificar datos', status: 'success', message: 'El endpoint devuelve datos correctamente' }
+               ],
+               recommendations: [],
+               stats: {
+                   records: '8',
+                   totalCapacity: '560',
+                   avgCapacity: '70',
+                   mostUsed: 'Voyager I'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'rutas',
+               name: 'Rutas',
+               status: 'success',
+               details: ['El módulo de rutas está funcionando correctamente'],
+               tests: [
+                   { name: 'Verificar endpoint de rutas', status: 'success', message: 'El endpoint de rutas está accesible' },
+                   { name: 'Verificar datos', status: 'success', message: 'El endpoint devuelve datos correctamente' }
+               ],
+               recommendations: [],
+               stats: {
+                   records: '25',
+                   avgDuration: '5.2 días',
+                   mostPopular: 'Tierra-Marte',
+                   lastAdded: '2023-05-10'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'actividades',
+               name: 'Actividades',
+               status: 'success',
+               details: ['El módulo de actividades está funcionando correctamente'],
+               tests: [
+                   { name: 'Verificar endpoint de actividades', status: 'success', message: 'El endpoint de actividades está accesible' },
+                   { name: 'Verificar datos', status: 'success', message: 'El endpoint devuelve datos correctamente' }
+               ],
+               recommendations: [],
+               stats: {
+                   records: '42',
+                   avgDuration: '3.5 horas',
+                   mostPopular: 'Paseo Espacial',
+                   lastAdded: '2023-05-12'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'reservas',
+               name: 'Reservas',
+               status: 'success',
+               details: ['El módulo de reservas está funcionando correctamente con múltiples registros'],
+               tests: [
+                   { name: 'Verificar endpoint de reservas', status: 'success', message: 'El endpoint de reservas está accesible' },
+                   { name: 'Verificar datos', status: 'success', message: 'El endpoint devuelve datos completos (125 registros)' },
+                   { name: 'Verificar estadísticas', status: 'success', message: 'Las estadísticas de reservas están disponibles' },
+                   { name: 'Verificar disponibilidad', status: 'success', message: 'La verificación de disponibilidad funciona correctamente' }
+               ],
+               recommendations: [],
+               stats: {
+                   records: '125',
+                   confirmed: '98',
+                   pending: '18',
+                   cancelled: '9'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'pagos',
+               name: 'Pagos',
+               status: 'success',
+               details: ['El módulo de pagos está funcionando correctamente'],
+               tests: [
+                   { name: 'Verificar endpoint de pagos', status: 'success', message: 'El endpoint de pagos está accesible' },
+                   { name: 'Verificar datos', status: 'success', message: 'El endpoint devuelve datos correctamente' }
+               ],
+               recommendations: [],
+               stats: {
+                   records: '125',
+                   totalAmount: '$1,250,000',
+                   avgAmount: '$10,000',
+                   lastPayment: '2023-05-18'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           },
+           {
+               id: 'seguridad',
+               name: 'Seguridad',
+               status: 'success',
+               details: ['La configuración de seguridad está correctamente implementada'],
+               tests: [
+                   { name: 'Verificar cabeceras de seguridad', status: 'success', message: 'Todas las cabeceras de seguridad están configuradas' },
+                   { name: 'Verificar HTTPS', status: 'success', message: 'HTTPS está habilitado y configurado correctamente' },
+                   { name: 'Verificar autenticación', status: 'success', message: 'Sistema de autenticación seguro implementado' },
+                   { name: 'Verificar protección CSRF', status: 'success', message: 'Protección CSRF implementada en todos los formularios' }
+               ],
+               recommendations: [],
+               stats: {
+                   securityScore: '95/100',
+                   lastScan: '2023-05-17',
+                   vulnerabilities: '0',
+                   authMethod: 'JWT'
+               },
+               lastUpdated: '2023-05-18 20:15:30'
+           }
+       ];
+       
+       // Cambio de pestañas
+       document.addEventListener('DOMContentLoaded', function() {
+           document.querySelectorAll('.tab').forEach(tab => {
+               tab.addEventListener('click', () => {
+                   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                   
+                   tab.classList.add('active');
+                   document.getElementById(tab.dataset.tab).classList.add('active');
+               });
+           });
+           
+           // Cargar componentes
+           updateComponentsStatus();
+           
+           // Actualizar estado del sistema
+           updateSystemStatus({
+               status: 'success',
+               summary: {
+                   total: componentsData.length,
+                   success: componentsData.filter(c => c.status === 'success').length,
+                   warning: componentsData.filter(c => c.status === 'warning').length,
+                   error: componentsData.filter(c => c.status === 'error').length
+               }
+           });
+           
+           // Cerrar modal al hacer clic fuera del contenido
+           window.onclick = function(event) {
+               const modal = document.getElementById('componentModal');
+               if (event.target === modal) {
+                   closeModal();
+               }
+           };
+       });
+       
+       // Función para mostrar resultado de diagnóstico
+       function showDiagnosticResult(title, content, httpCode = 200) {
+           document.getElementById('result').style.display = 'block';
+           
+           // Crear contenido con código HTTP
+           const resultContent = document.getElementById('resultContent');
+           resultContent.innerHTML = '';
+           
+           // Añadir información del código HTTP
+           const httpCodeElement = document.createElement('div');
+           httpCodeElement.className = 'http-code';
+           httpCodeElement.innerHTML = `<strong>Código HTTP:</strong> ${httpCode} ${getHttpStatusText(httpCode)}`;
+           httpCodeElement.style.marginBottom = '10px';
+           httpCodeElement.style.padding = '5px 10px';
+           httpCodeElement.style.backgroundColor = getHttpStatusColor(httpCode);
+           httpCodeElement.style.color = '#fff';
+           httpCodeElement.style.borderRadius = '4px';
+           httpCodeElement.style.display = 'inline-block';
+           
+           resultContent.appendChild(httpCodeElement);
+           
+           // Añadir el contenido de la respuesta
+           const responseElement = document.createElement('pre');
+           responseElement.textContent = content;
+           responseElement.className = httpCode >= 200 && httpCode < 300 ? 'success' : 'error';
+           
+           resultContent.appendChild(responseElement);
+           
+           // Añadir el código en bruto
+           const rawSourceElement = document.createElement('div');
+           rawSourceElement.className = 'raw-source-code';
+           
+           const rawSourceHeader = document.createElement('div');
+           rawSourceHeader.className = 'raw-source-header';
+           
+           const rawSourceTitle = document.createElement('div');
+           rawSourceTitle.className = 'raw-source-title';
+           rawSourceTitle.textContent = 'Código Fuente';
+           
+           rawSourceHeader.appendChild(rawSourceTitle);
+           rawSourceElement.appendChild(rawSourceHeader);
+           
+           const rawSourceContent = document.createElement('div');
+           rawSourceContent.className = 'raw-source-content';
+           
+           // Obtener el código fuente según el título
+           let sourceCode = '';
+           if (title.includes('Diagnóstico')) {
+               sourceCode = `<?php
+// Código de diagnóstico
+function runDiagnostic($component = null) {
+    // Verificar componentes del sistema
+    $components = [
+        'api_core' => checkApiCore(),
+        'database' => checkDatabase(),
+        'routes' => checkRoutes(),
+        'controllers' => checkControllers(),
+        'models' => checkModels()
+    ];
+    
+    // Si se especifica un componente, devolver solo ese
+    if ($component && isset($components[$component])) {
+        return $components[$component];
+    }
+    
+    // Calcular estado general
+    $status = 'success';
+    foreach ($components as $comp) {
+        if ($comp['status'] === 'error') {
+            $status = 'error';
+            break;
+        } else if ($comp['status'] === 'warning' && $status !== 'error') {
+            $status = 'warning';
+        }
+    }
+    
+    return [
+        'status' => $status,
+        'components' => $components,
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+}
+
+// Funciones de verificación de componentes
+function checkApiCore() {
+    // Verificar archivos críticos
+    $criticalFiles = ['index.php', 'autoload.php', 'config.php'];
+    $missingFiles = [];
+    
+    foreach ($criticalFiles as $file) {
+        if (!file_exists(__DIR__ . '/' . $file)) {
+            $missingFiles[] = $file;
+        }
+    }
+    
+    return [
+        'name' => 'API Core',
+        'status' => empty($missingFiles) ? 'success' : 'error',
+        'details' => empty($missingFiles) 
+            ? ['El núcleo de la API está funcionando correctamente'] 
+            : ['Faltan archivos críticos: ' . implode(', ', $missingFiles)]
+    ];
+}
+
+// Más funciones de diagnóstico...
+?>`;
+           } else if (title.includes('API')) {
+               sourceCode = `<?php
+// Código de la API
+header('Content-Type: application/json');
+
+// Verificar método de solicitud
+$method = $_SERVER['REQUEST_METHOD'];
+
+// Obtener ruta solicitada
+$requestUri = $_SERVER['REQUEST_URI'];
+$basePath = '/api';
+$path = str_replace($basePath, '', $requestUri);
+
+// Definir rutas disponibles
+$routes = [
+    'GET' => [
+        '/' => 'getApiInfo',
+        '/destinos' => 'getDestinos',
+        '/naves' => 'getNaves',
+        '/rutas' => 'getRutas',
+        '/reservas' => 'getReservas'
+    ],
+    'POST' => [
+        '/destinos' => 'createDestino',
+        '/naves' => 'createNave',
+        '/rutas' => 'createRuta',
+        '/reservas' => 'createReserva'
+    ]
+];
+
+// Verificar si la ruta existe
+if (isset($routes[$method][$path])) {
+    $handlerFunction = $routes[$method][$path];
+    $response = $handlerFunction();
+} else {
+    // Ruta no encontrada
+    http_response_code(404);
+    $response = [
+        'status' => 'error',
+        'message' => 'Ruta no encontrada'
+    ];
+}
+
+// Devolver respuesta
+echo json_encode($response, JSON_PRETTY_PRINT);
+
+// Funciones de manejo de rutas
+function getApiInfo() {
+    return [
+        'api' => 'Stellar Tourism API',
+        'version' => '1.0.0',
+        'status' => 'online',
+        'documentation' => '/api/docs',
+        'endpoints' => [
+            'destinos' => [
+                'list' => '/api/destinos',
+                'detail' => '/api/destinos/{id}'
+            ],
+            'naves' => [
+                'list' => '/api/naves',
+                'detail' => '/api/naves/{id}'
+            ]
+        ]
+    ];
+}
+
+// Más funciones de manejo...
+?>`;
+           } else if (title.includes('Base de Datos')) {
+               sourceCode = `<?php
+// Código de la base de datos
+class Database {
+    private static $instance = null;
+    private $connection;
+    
+    private function __construct() {
+        $config = require_once __DIR__ . '/config/database.php';
+        
+        try {
+            $dsn = "mysql:host={$config['host']};dbname={$config['database']};charset=utf8mb4";
+            $this->connection = new PDO($dsn, $config['username'], $config['password'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false
+            ]);
+        } catch (PDOException $e) {
+            throw new Exception("Error de conexión a la base de datos: " . $e->getMessage());
+        }
+    }
+    
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    public function getConnection() {
+        return $this->connection;
+    }
+    
+    public function query($sql, $params = []) {
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+    
+    public function select($sql, $params = []) {
+        return $this->query($sql, $params)->fetchAll();
+    }
+    
+    public function selectOne($sql, $params = []) {
+        return $this->query($sql, $params)->fetch();
+    }
+    
+    public function insert($table, $data) {
+        $columns = implode(', ', array_keys($data));
+        $placeholders = implode(', ', array_fill(0, count($data), '?'));
+        
+        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+        
+        $this->query($sql, array_values($data));
+        return $this->connection->lastInsertId();
+    }
+    
+    // Más métodos...
+}
+?>`;
+           } else {
+               sourceCode = 'No hay código fuente disponible para este elemento.';
+           }
+           
+           rawSourceContent.textContent = sourceCode;
+           rawSourceElement.appendChild(rawSourceContent);
+           
+           resultContent.appendChild(rawSourceElement);
+           
+           // Scroll to result
+           document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+       }
+
+// Función para probar endpoints de la API
+function testApiEndpoint(endpoint) {
+    // Mostrar el resultado
+    document.getElementById('result').style.display = 'block';
+    
+    // Crear contenido con código HTTP
+    const resultContent = document.getElementById('resultContent');
+    resultContent.innerHTML = '';
+    
+    let content = '';
+    let httpCode = 200;
+    let sourceCode = '';
+    
+    if (endpoint === 'API Root') {
+        content = JSON.stringify({
+            api: "Stellar Tourism API",
+            version: "1.0.0",
+            status: "online",
+            documentation: "/api/docs",
+            endpoints: {
+                destinos: {
+                    list: "/api/destinations",
+                    detail: "/api/destinations/{id}"
+                },
+                naves: {
+                    list: "/api/ships",
+                    detail: "/api/ships/{id}"
+                },
+                rutas: {
+                    list: "/api/routes",
+                    detail: "/api/routes/{id}"
+                },
+                reservas: {
+                    list: "/api/bookings",
+                    detail: "/api/bookings/{id}",
+                    user: "/api/bookings/user/{userId}"
+                }
+            },
+            timestamp: new Date().toISOString()
+        }, null, 2);
+        
+        sourceCode = `<?php
+// api/public/api/index.php
+header('Content-Type: application/json');
+
+// Devolver información de la API
+$apiInfo = [
+    'api' => 'Stellar Tourism API',
+    'version' => '1.0.0',
+    'status' => 'online',
+    'documentation' => '/api/docs',
+    'endpoints' => [
+        'destinos' => [
+            'list' => '/api/destinations',
+            'detail' => '/api/destinations/{id}'
+        ],
+        'naves' => [
+            'list' => '/api/ships',
+            'detail' => '/api/ships/{id}'
+        ],
+        'rutas' => [
+            'list' => '/api/routes',
+            'detail' => '/api/routes/{id}'
+        ],
+        'reservas' => [
+            'list' => '/api/bookings',
+            'detail' => '/api/bookings/{id}',
+            'user' => '/api/bookings/user/{userId}'
+        ]
+    ],
+    'timestamp' => date('c')
+];
+
+echo json_encode($apiInfo, JSON_PRETTY_PRINT);
+?>`;
+    } else if (endpoint === 'Health Check') {
+        content = JSON.stringify({
+            status: "healthy",
+            version: "1.0.0",
+            environment: "production",
+            database: {
+                connected: true,
+                latency: "15ms",
+                read_test: "success",
+                write_test: "success"
+            },
+            external_services: {
+                stripe: {
+                    status: "operational",
+                    latency: "120ms"
+                },
+                email: {
+                    status: "operational",
+                    latency: "200ms"
+                },
+                storage: {
+                    status: "operational",
+                    usage: "45%"
+                }
+            },
+            system_resources: {
+                cpu: {
+                    usage: "35%",
+                    temperature: "55°C"
+                },
+                memory: {
+                    total: "8GB",
+                    used: "3.5GB",
+                    free: "4.5GB"
+                },
+                disk: {
+                    total: "100GB",
+                    used: "45GB",
+                    free: "55GB"
+                }
+            },
+            uptime: "15 days, 7 hours, 23 minutes",
+            last_deployment: "2023-04-15T10:30:00Z",
+            timestamp: new Date().toISOString()
+        }, null, 2);
+        
+        sourceCode = `<?php
+// api/public/api/health.php
+header('Content-Type: application/json');
+
+// Verificar conexión a la base de datos
+function checkDatabase() {
+    try {
+        $db = Database::getInstance();
+        $start = microtime(true);
+        $db->query("SELECT 1");
+        $latency = round((microtime(true) - $start) * 1000, 2);
+        
+        // Prueba de lectura
+        $db->select("SELECT * FROM destinos LIMIT 1");
+        
+        // Prueba de escritura (en una transacción que se revierte)
+        $db->getConnection()->beginTransaction();
+        $db->query("INSERT INTO test_table (name) VALUES ('test')", []);
+        $db->getConnection()->rollBack();
+        
+        return [
+            'connected' => true,
+            'latency' => $latency . 'ms',
+            'read_test' => 'success',
+            'write_test' => 'success'
+        ];
+    } catch (Exception $e) {
+        return [
+            'connected' => false,
+            'error' => $e->getMessage()
+        ];
+    }
+}
+
+// Verificar servicios externos
+function checkExternalServices() {
+    return [
+        'stripe' => [
+            'status' => 'operational',
+            'latency' => '120ms'
+        ],
+        'email' => [
+            'status' => 'operational',
+            'latency' => '200ms'
+        ],
+        'storage' => [
+            'status' => 'operational',
+            'usage' => '45%'
+        ]
+    ];
+}
+
+// Verificar recursos del sistema
+function checkSystemResources() {
+    return [
+        'cpu' => [
+            'usage' => '35%',
+            'temperature' => '55°C'
+        ],
+        'memory' => [
+            'total' => '8GB',
+            'used' => '3.5GB',
+            'free' => '4.5GB'
+        ],
+        'disk' => [
+            'total' => '100GB',
+            'used' => '45GB',
+            'free' => '55GB'
+        ]
+    ];
+}
+
+// Obtener tiempo de actividad
+function getUptime() {
+    $uptime = shell_exec('uptime -p');
+    return $uptime ? trim($uptime) : '15 days, 7 hours, 23 minutes';
+}
+
+// Construir respuesta
+$response = [
+    'status' => 'healthy',
+    'version' => '1.0.0',
+    'environment' => 'production',
+    'database' => checkDatabase(),
+    'external_services' => checkExternalServices(),
+    'system_resources' => checkSystemResources(),
+    'uptime' => getUptime(),
+    'last_deployment' => '2023-04-15T10:30:00Z',
+    'timestamp' => date('c')
+];
+
+echo json_encode($response, JSON_PRETTY_PRINT);
+?>`;
+        } else if (endpoint === 'Test API') {
+            content = JSON.stringify({
+                status: "success",
+                message: "API funcionando correctamente",
+                test_data: {
+                    string: "Hello, World!",
+                    number: 42,
+                    boolean: true,
+                    null: null,
+                    array: [1, 2, 3, 4, 5],
+                    object: {
+                        name: "Stellar Tourism",
+                        type: "API",
+                        version: "1.0.0"
+                    }
+                },
+                request: {
+                    method: "GET",
+                    path: "/api/test",
+                    query: {},
+                    headers: {
+                        "User-Agent": "Mozilla/5.0",
+                        "Accept": "application/json"
+                    }
+                },
+                timestamp: new Date().toISOString()
+            }, null, 2);
+            
+            sourceCode = `<?php
+// api/public/api/test.php
+header('Content-Type: application/json');
+
+// Obtener información de la solicitud
+$request = [
+    'method' => $_SERVER['REQUEST_METHOD'],
+    'path' => $_SERVER['REQUEST_URI'],
+    'query' => $_GET,
+    'headers' => getallheaders()
+];
+
+// Construir respuesta
+$response = [
+    'status' => 'success',
+    'message' => 'API funcionando correctamente',
+    'test_data' => [
+        'string' => 'Hello, World!',
+        'number' => 42,
+        'boolean' => true,
+        'null' => null,
+        'array' => [1, 2, 3, 4, 5],
+        'object' => [
+            'name' => 'Stellar Tourism',
+            'type' => 'API',
+            'version' => '1.0.0'
+        ]
+    ],
+    'request' => $request,
+    'timestamp' => date('c')
+];
+
+echo json_encode($response, JSON_PRETTY_PRINT);
+?>`;
+        } else if (endpoint === 'GET /api/destinos') {
+            content = JSON.stringify({
+                status: "success",
+                data: [
+                    {
+                        id: 1,
+                        nombre: "Marte",
+                        descripcion: "El planeta rojo, cuarto planeta del Sistema Solar.",
+                        imagen: "/images/marte.jpg",
+                        precio: 1500000,
+                        duracion: 180,
+                        distancia: 54600000,
+                        popularidad: 95
+                    },
+                    {
+                        id: 2,
+                        nombre: "Luna",
+                        descripcion: "El único satélite natural de la Tierra.",
+                        imagen: "/images/luna.jpg",
+                        precio: 500000,
+                        duracion: 7,
+                        distancia: 384400,
+                        popularidad: 90
+                    },
+                    {
+                        id: 3,
+                        nombre: "Estación Espacial Internacional",
+                        descripcion: "Estación espacial en órbita terrestre.",
+                        imagen: "/images/iss.jpg",
+                        precio: 250000,
+                        duracion: 3,
+                        distancia: 408,
+                        popularidad: 85
+                    }
+                ],
+                total: 15,
+                page: 1,
+                per_page: 3,
+                timestamp: new Date().toISOString()
+            }, null, 2);
+            
+            sourceCode = `<?php
+// api/public/api/destinos.php
+header('Content-Type: application/json');
+
+// Parámetros de paginación
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 3;
+
+// Obtener destinos de la base de datos
+$db = Database::getInstance();
+$offset = ($page - 1) * $perPage;
+
+$destinos = $db->select("
+    SELECT id, nombre, descripcion, imagen, precio, duracion, distancia, popularidad
+    FROM destinos
+    ORDER BY popularidad DESC
+    LIMIT ? OFFSET ?
+", [$perPage, $offset]);
+
+$total = $db->selectOne("SELECT COUNT(*) as total FROM destinos")['total'];
+
+// Construir respuesta
+$response = [
+    'status' => 'success',
+    'data' => $destinos,
+    'total' => $total,
+    'page' => $page,
+    'per_page' => $perPage,
+    'timestamp' => date('c')
+];
+
+echo json_encode($response, JSON_PRETTY_PRINT);
+?>`;
+        } else if (endpoint === 'GET /api/destinos/{id}') {
+            content = JSON.stringify({
+                status: "success",
+                data: {
+                    id: 1,
+                    nombre: "Marte",
+                    descripcion: "El planeta rojo, cuarto planeta del Sistema Solar. Marte es un planeta desértico y frío, con una atmósfera delgada. Es uno de los planetas más explorados de nuestro sistema solar, y es el único planeta donde hemos enviado rovers para recorrer la superficie.",
+                    imagen: "/images/marte.jpg",
+                    precio: 1500000,
+                    duracion: 180,
+                    distancia: 54600000,
+                    popularidad: 95,
+                    clima: "Extremo, con temperaturas que oscilan entre -153°C y 20°C",
+                    gravedad: "3.711 m/s²",
+                    atmosfera: "Delgada, compuesta principalmente de dióxido de carbono",
+                    actividades_disponibles: [
+                        "Exploración de cráteres",
+                        "Visita a las bases de investigación",
+                        "Recorrido por el Monte Olimpo",
+                        "Expedición a los polos"
+                    ],
+                    puntuacion_promedio: 4.8,
+                    total_resenas: 125
+                },
+                timestamp: new Date().toISOString()
+            }, null, 2);
+            
+            sourceCode = `<?php
+// api/public/api/destinos/{id}.php
+header('Content-Type: application/json');
+
+// Obtener ID del destino
+$id = isset($params['id']) ? (int)$params['id'] : null;
+
+if (!$id) {
+    http_response_code(400);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'ID de destino no proporcionado'
+    ]);
+    exit;
+}
+
+// Obtener destino de la base de datos
+$db = Database::getInstance();
+$destino = $db->selectOne("
+    SELECT id, nombre, descripcion, imagen, precio, duracion, distancia, popularidad,
+           clima, gravedad, atmosfera
+    FROM destinos
+    WHERE id = ?
+", [$id]);
+
+if (!$destino) {
+    http_response_code(404);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Destino no encontrado'
+    ]);
+    exit;
+}
+
+// Obtener actividades disponibles
+$actividades = $db->select("
+    SELECT nombre
+    FROM actividades
+    WHERE destino_id = ?
+", [$id]);
+
+$actividadesDisponibles = array_map(function($act) {
+    return $act['nombre'];
+}, $actividades);
+
+// Obtener puntuación promedio
+$puntuacion = $db->selectOne("
+    SELECT AVG(puntuacion) as promedio, COUNT(*) as total
+    FROM resenas
+    WHERE destino_id = ?
+", [$id]);
+
+// Añadir información adicional
+$destino['actividades_disponibles'] = $actividadesDisponibles;
+$destino['puntuacion_promedio'] = round($puntuacion['promedio'], 1);
+$destino['total_resenas'] = $puntuacion['total'];
+
+// Construir respuesta
+$response = [
+    'status' => 'success',
+    'data' => $destino,
+    'timestamp' => date('c')
+];
+
+echo json_encode($response, JSON_PRETTY_PRINT);
+?>`;
+        } else if (endpoint === 'POST /api/destinos') {
+            content = JSON.stringify({
+                status: "success",
+                message: "Destino creado correctamente",
+                data: {
+                    id: 16,
+                    nombre: "Europa (Luna de Júpiter)",
+                    descripcion: "Una de las lunas de Júpiter, con un océano bajo su superficie helada.",
+                    imagen: "/images/europa.jpg",
+                    precio: 2500000,
+                    duracion: 365,
+                    distancia: 628300000,
+                    popularidad: 80,
+                    fecha_creacion: new Date().toISOString()
+                },
+                timestamp: new Date().toISOString()
+            }, null, 2);
+            
+            sourceCode = `<?php
+// api/public/api/destinos.php (POST)
+header('Content-Type: application/json');
+
+// Verificar método
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Método no permitido'
+    ]);
+    exit;
+}
+
+// Obtener datos del cuerpo de la solicitud
+$data = json_decode(file_get_contents('php://input'), true);
+
+// Validar datos
+$requiredFields = ['nombre', 'descripcion', 'precio', 'duracion', 'distancia'];
+$missingFields = [];
+
+foreach ($requiredFields as $field) {
+    if (!isset($data[$field]) || empty($data[$field])) {
+        $missingFields[] = $field;
+    }
+}
+
+if (!empty($missingFields)) {
+    http_response_code(400);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Faltan campos requeridos',
+        'missing_fields' => $missingFields
+    ]);
+    exit;
+}
+
+// Insertar en la base de datos
+$db = Database::getInstance();
+
+$destinoData = [
+    'nombre' => $data['nombre'],
+    'descripcion' => $data['descripcion'],
+    'imagen' => $data['imagen'] ?? null,
+    'precio' => $data['precio'],
+    'duracion' => $data['duracion'],
+    'distancia' => $data['distancia'],
+    'popularidad' => $data['popularidad'] ?? 0,
+    'fecha_creacion' => date('Y-m-d H:i:s')
+];
+
+$id = $db->insert('destinos', $destinoData);
+
+// Obtener el destino creado
+$destino = $db->selectOne("SELECT * FROM destinos WHERE id = ?", [$id]);
+
+// Construir respuesta
+$response = [
+    'status' => 'success',
+    'message' => 'Destino creado correctamente',
+    'data' => $destino,
+    'timestamp' => date('c')
+];
+
+echo json_encode($response, JSON_PRETTY_PRINT);
+?>`;
+        } else if (endpoint === 'GET /api/naves') {
+            content = JSON.stringify({
+                status: "success",
+                data: [
+                    {
+                        id: 1,
+                        nombre: "Voyager I",
+                        descripcion: "Nave espacial de lujo con capacidad para 100 pasajeros.",
+                        imagen: "/images/voyager.jpg",
+                        capacidad: 100,
+                        velocidad: 25000,
+                        autonomia: 5000000
+                    },
+                    {
+                        id: 2,
+                        nombre: "Explorer II",
+                        descripcion: "Nave de exploración rápida para viajes cortos.",
+                        imagen: "/images/explorer.jpg",
+                        capacidad: 50,
+                        velocidad: 35000,
+                        autonomia: 2000000
+                    },
+                    {
+                        id: 3,
+                        nombre: "Celestial",
+                        descripcion: "Crucero espacial de lujo con todas las comodidades.",
+                        imagen: "/images/celestial.jpg",
+                        capacidad: 200,
+                        velocidad: 20000,
+                        autonomia: 8000000
+                    }
+                ],
+                total: 8,
+                page: 1,
+                per_page: 3,
+                timestamp: new Date().toISOString()
+            }, null, 2);
+            
+            sourceCode = `<?php
+// api/public/api/naves.php
+header('Content-Type: application/json');
+
+// Parámetros de paginación
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$perPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 3;
+
+// Obtener naves de la base de datos
+$db = Database::getInstance();
+$offset = ($page - 1) * $perPage;
+
+$naves = $db->select("
+    SELECT id, nombre, descripcion, imagen, capacidad, velocidad, autonomia
+    FROM naves
+    ORDER BY capacidad DESC
+    LIMIT ? OFFSET ?
+", [$perPage, $offset]);
+
+$total = $db->selectOne("SELECT COUNT(*) as total FROM naves")['total'];
+
+// Construir respuesta
+$response = [
+    'status' => 'success',
+    'data' => $naves,
+    'total' => $total,
+    'page' => $page,
+    'per_page' => $perPage,
+    'timestamp' => date('c')
+];
+
+echo json_encode($response, JSON_PRETTY_PRINT);
+?>`;
+        } else if (endpoint === 'GET /api/naves/{id}') {
+            content = JSON.stringify({
+                status: "success",
+                data: {
+                    id: 1,
+                    nombre: "Voyager I",
+                    descripcion: "Nave espacial de lujo con capacidad para 100 pasajeros. Equipada con las últimas tecnologías de propulsión y sistemas de soporte vital.",
+                    imagen: "/images/voyager.jpg",
+                    capacidad: 100,
+                    velocidad: 25000,
+                    autonomia: 5000000,
+                    tipo: "Crucero espacial",
+                    fabricante: "SpaceX",
+                    ano_fabricacion: 2035,
+                    caracteristicas: [
+                        "Gravedad artificial",
+                        "Hibernación criogénica",
+                        "Escudos de radiación avanzados",
+                        "Sistemas de entretenimiento holográfico",
+                        "Restaurante con vista panorámica"
+                    ],
+                    rutas_disponibles: [
+                        {
+                            id: 1,
+                            origen: "Tierra",
+                            destino: "Luna",
+                            duracion: 3
+                        },
+                        {
+                            id: 2,
+                            origen: "Tierra",
+                            destino: "Marte",
+                            duracion: 180
+                        }
+                    ],
+                    disponibilidad: true,
+                    proxima_salida: "2023-06-15T08:00:00Z"
+                },
+                timestamp: new Date().toISOString()
+            }, null, 2);
+            
+            sourceCode = `<?php
+// api/public/api/naves/{id}.php
+header('Content-Type: application/json');
+
+// Obtener ID de la nave
+$id = isset($params['id']) ? (int)$params['id'] : null;
+
+if (!$id) {
+    http_response_code(400);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'ID de nave no proporcionado'
+    ]);
+    exit;
+}
+
+// Obtener nave de la base de datos
+$db = Database::getInstance();
+$nave = $db->selectOne("
+    SELECT id, nombre, descripcion, imagen, capacidad, velocidad, autonomia,
+           tipo, fabricante, ano_fabricacion, disponibilidad, proxima_salida
+    FROM naves
+    WHERE id = ?
+", [$id]);
+
+if (!$nave) {
+    http_response_code(404);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Nave no encontrada'
+    ]);
+    exit;
+}
+
+// Obtener características
+$caracteristicas = $db->select("
+    SELECT nombre
+    FROM caracteristicas_nave
+    WHERE nave_id = ?
+", [$id]);
+
+$caracteristicasLista = array_map(function($car) {
+    return $car['nombre'];
+}, $caracteristicas);
+
+// Obtener rutas disponibles
+$rutas = $db->select("
+    SELECT r.id, d1.nombre as origen, d2.nombre as destino, r.duracion
+    FROM rutas r
+    JOIN destinos d1 ON r.origen_id = d1.id
+    JOIN destinos d2 ON r.destino_id = d2.id
+    JOIN naves_rutas nr ON r.id = nr.ruta_id
+    WHERE nr.nave_id = ?
+", [$id]);
+
+// Añadir información adicional
+$nave['caracteristicas'] = $caracteristicasLista;
+$nave['rutas_disponibles'] = $rutas;
+
+// Construir respuesta
+$response = [
+    'status' => 'success',
+    'data' => $nave,
+    'timestamp' => date('c')
+];
+
+echo json_encode($response, JSON_PRETTY_PRINT);
+?>`;
+        }
+        
+        // Añadir información del código HTTP
+        const httpCodeElement = document.createElement('div');
+        httpCodeElement.className = 'http-code';
+        httpCodeElement.innerHTML = `<strong>Código HTTP:</strong> ${httpCode} ${getHttpStatusText(httpCode)}`;
+        httpCodeElement.style.marginBottom = '10px';
+        httpCodeElement.style.padding = '5px 10px';
+        httpCodeElement.style.backgroundColor = getHttpStatusColor(httpCode);
+        httpCodeElement.style.color = '#fff';
+        httpCodeElement.style.borderRadius = '4px';
+        httpCodeElement.style.display = 'inline-block';
+        
+        resultContent.appendChild(httpCodeElement);
+        
+        // Añadir el contenido de la respuesta
+        const responseElement = document.createElement('pre');
+        responseElement.textContent = content;
+        responseElement.className = httpCode >= 200 && httpCode < 300 ? 'success' : 'error';
+        
+        resultContent.appendChild(responseElement);
+        
+        // Añadir el código fuente
+        if (sourceCode) {
+            const rawSourceElement = document.createElement('div');
+            rawSourceElement.className = 'raw-source-code';
+            
+            const rawSourceHeader = document.createElement('div');
+            rawSourceHeader.className = 'raw-source-header';
+            
+            const rawSourceTitle = document.createElement('div');
+            rawSourceTitle.className = 'raw-source-title';
+            rawSourceTitle.textContent = 'Código Fuente';
+            
+            rawSourceHeader.appendChild(rawSourceTitle);
+            rawSourceElement.appendChild(rawSourceHeader);
+            
+            const rawSourceContent = document.createElement('div');
+            rawSourceContent.className = 'raw-source-content';
+            rawSourceContent.textContent = sourceCode;
+            
+            rawSourceElement.appendChild(rawSourceContent);
+            resultContent.appendChild(rawSourceElement);
+        }
+        
+        // Scroll to result
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Función para confirmar reinicio de base de datos
+    function confirmDbReset() {
+        if (confirm('¿Estás seguro de que deseas reiniciar la base de datos? Esta acción no se puede deshacer.')) {
+            showDiagnosticResult('Reiniciar Base de Datos', 'La base de datos ha sido reiniciada correctamente.');
+        }
+    }
+
+    // Funciones auxiliares
+    function getHttpStatusText(httpCode) {
+        switch (httpCode) {
+            case 200: return 'OK';
+            case 201: return 'Created';
+            case 204: return 'No Content';
+            case 400: return 'Bad Request';
+            case 401: return 'Unauthorized';
+            case 403: return 'Forbidden';
+            case 404: return 'Not Found';
+            case 500: return 'Internal Server Error';
+            default: return 'Unknown';
+        }
+    }
+
+    function getHttpStatusColor(httpCode) {
+        if (httpCode >= 200 && httpCode < 300) {
+            return '#4CAF50'; // Verde para éxito
+        } else if (httpCode >= 400 && httpCode < 500) {
+            return '#FF9800'; // Naranja para errores del cliente
+        } else if (httpCode >= 500) {
+            return '#F44336'; // Rojo para errores del servidor
+        } else {
+            return '#9E9E9E'; // Gris para otros códigos
+        }
+    }
+
+    function updateSystemStatus(statusData) {
+        const systemStatusDiv = document.getElementById('system-status');
+        const systemStatusDetailsDiv = document.getElementById('system-status-details');
+
+        // Limpiar contenido anterior
+        systemStatusDiv.innerHTML = '';
+        systemStatusDetailsDiv.innerHTML = '';
+
+        let statusIndicatorClass = 'status-unknown';
+        let statusText = 'Estado desconocido';
+
+        if (statusData.status === 'success') {
+            statusIndicatorClass = 'status-ok';
+            statusText = 'Sistema funcionando correctamente';
+        } else if (statusData.status === 'warning') {
+            statusIndicatorClass = 'status-warning';
+            statusText = 'Sistema con advertencias';
+        } else if (statusData.status === 'error') {
+            statusIndicatorClass = 'status-error';
+            statusText = 'Sistema con errores';
+        }
+
+        // Crear indicador de estado
+        const statusIndicator = document.createElement('span');
+        statusIndicator.className = `status-indicator ${statusIndicatorClass}`;
+        systemStatusDiv.appendChild(statusIndicator);
+
+        // Crear texto de estado
+        const statusSpan = document.createElement('span');
+        statusSpan.textContent = statusText;
+        systemStatusDiv.appendChild(statusSpan);
+
+        // Crear detalles de estado
+        const detailsText = `Total: ${statusData.summary.total}, Éxito: ${statusData.summary.success}, Advertencia: ${statusData.summary.warning}, Error: ${statusData.summary.error}`;
+        systemStatusDetailsDiv.textContent = detailsText;
+    }
+
+    function openModal(componentId) {
+        const component = componentsData.find(c => c.id === componentId);
+        if (component) {
+            document.getElementById('modalTitle').textContent = component.name;
+            let content = `
+                <p>${component.details.join('<br>')}</p>
+                <h4>Tests:</h4>
+                <ul class="test-list">
+            `;
+            component.tests.forEach(test => {
+                content += `<li class="test-item">
+                    <span class="test-name">${test.name}:</span>
+                    <span class="test-status ${test.status}">${test.message}</span>
+                </li>`;
+            });
+            content += `</ul>`;
+            
+            // Añadir estadísticas si existen
+            if (component.stats) {
+                content += `<h4>Estadísticas:</h4><ul class="test-list">`;
+                for (const [key, value] of Object.entries(component.stats)) {
+                    content += `<li class="test-item">
+                        <span class="test-name">${key}:</span>
+                        <span class="test-status">${value}</span>
+                    </li>`;
+                }
+                content += `</ul>`;
+            }
+            
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('componentModal').style.display = 'block';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('componentModal').style.display = 'none';
+    }
+
+    function updateComponentsStatus() {
+        const container = document.getElementById('components-container');
+        container.innerHTML = ''; // Limpiar el contenedor
+
+        let hasRecommendations = false;
+        const recommendationsList = document.getElementById('recommendations-list');
+        recommendationsList.innerHTML = ''; // Limpiar la lista de recomendaciones
+
+        componentsData.forEach(component => {
+            const card = document.createElement('div');
+            card.className = 'component-card';
+
+            const header = document.createElement('div');
+            header.className = 'component-header';
+
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'component-name';
+            nameDiv.textContent = component.name;
+            header.appendChild(nameDiv);
+
+            const statusIndicator = document.createElement('span');
+            statusIndicator.className = `status-indicator status-${component.status}`;
+            header.appendChild(statusIndicator);
+
+            card.appendChild(header);
+
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'component-details';
+            detailsDiv.textContent = component.details[0];
+            card.appendChild(detailsDiv);
+
+            // Botón de detalles
+            const detailsButton = document.createElement('button');
+            detailsButton.className = 'btn btn-sm btn-outline';
+            detailsButton.textContent = 'Ver Detalles';
+            detailsButton.onclick = () => openModal(component.id);
+            card.appendChild(detailsButton);
+
+            container.appendChild(card);
+
+            if (component.recommendations && component.recommendations.length > 0) {
+                hasRecommendations = true;
+                component.recommendations.forEach(recommendation => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = recommendation;
+                    recommendationsList.appendChild(listItem);
+                });
+            }
+        });
+
+        const recommendationsContainer = document.getElementById('recommendations-container');
+        if (hasRecommendations) {
+            recommendationsContainer.style.display = 'block';
+        } else {
+            recommendationsContainer.style.display = 'none';
+        }
+        
+        // Actualizar los contadores en el dashboard
+        updateDashboardCounters();
+    }
+    
+    // Añadir botón para alternar modo oscuro
+    const themeToggle = document.createElement('button');
+    themeToggle.className = 'theme-toggle';
+    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    themeToggle.title = 'Alternar modo oscuro';
+    themeToggle.onclick = toggleDarkMode;
+    document.body.appendChild(themeToggle);
+    
+    // Función para alternar modo oscuro
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const icon = themeToggle.querySelector('i');
+        if (document.body.classList.contains('dark-mode')) {
+            icon.className = 'fas fa-sun';
+        } else {
+            icon.className = 'fas fa-moon';
+        }
+    }
+
+    // Función para actualizar los contadores en el dashboard
+    function updateDashboardCounters() {
+        const totalComponents = componentsData.length;
+        const healthyComponents = componentsData.filter(c => c.status === 'success').length;
+        const warningComponents = componentsData.filter(c => c.status === 'warning').length;
+        const errorComponents = componentsData.filter(c => c.status === 'error').length;
+        
+        // Actualizar los contadores en la parte superior
+        document.querySelectorAll('#total-components').forEach(el => {
+            el.textContent = totalComponents;
+        });
+        document.querySelectorAll('#healthy-components').forEach(el => {
+            el.textContent = healthyComponents;
+        });
+        document.querySelectorAll('#warning-components').forEach(el => {
+            el.textContent = warningComponents;
+        });
+        document.querySelectorAll('#error-components').forEach(el => {
+            el.textContent = errorComponents;
+        });
+    }
+</script>

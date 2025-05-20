@@ -1,0 +1,205 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HeroSection from '../components/vue/home/HeroSection.vue';
+import DestinationsPreview from '../components/vue/home/DestinationsPreview.vue';
+import ShipsPreview from '../components/vue/home/ShipsPreview.vue';
+import FeaturesSection from '../components/vue/home/FeaturesSection.vue';
+---
+
+<Layout title="Explora el Universo - StellarTourism">
+ <!-- Sección Hero interactiva con animaciones -->
+ <HeroSection client:load />
+ 
+ <!-- Sección de Destinos Populares -->
+ <section class="section destinos-section">
+   <div class="section-header">
+     <h2 class="section-title">Destinos Populares</h2>
+     <p class="section-subtitle">Descubre los destinos espaciales más fascinantes</p>
+   </div>
+   
+   <!-- Componente interactivo que carga cuando es visible -->
+   <DestinationsPreview client:visible />
+ </section>
+ 
+ <!-- Sección de Naves -->
+ <section class="section naves-section">
+   <div class="section-header">
+     <h2 class="section-title">Nuestras Naves</h2>
+     <p class="section-subtitle">Viaja en las naves espaciales más avanzadas</p>
+   </div>
+   
+   <!-- Componente interactivo que carga cuando es visible -->
+   <ShipsPreview client:visible />
+ </section>
+ 
+ <!-- Sección de Características -->
+ <section class="section features-section">
+   <div class="section-header">
+     <h2 class="section-title">¿Por qué elegirnos?</h2>
+     <p class="section-subtitle">Descubre las ventajas de viajar con StellarTourism</p>
+   </div>
+   
+   <!-- Componente interactivo que carga cuando es visible -->
+   <FeaturesSection client:visible />
+ </section>
+ 
+ <!-- Sección CTA estática (no necesita interactividad) -->
+ <section class="section cta-section">
+   <div class="cta-content">
+     <h2>¿Listo para tu aventura espacial?</h2>
+     <p>Reserva ahora y vive una experiencia única más allá de la Tierra</p>
+     <a href="/destinos" class="btn btn-primary">Explorar Destinos</a>
+   </div>
+ </section>
+</Layout>
+
+<style>
+ /* Estilos para esta página específica */
+ body {
+   background-color: #0f0f1a;
+   color: #f5f5f7;
+ }
+ 
+ .section {
+   margin: 4rem auto;
+   max-width: var(--content-max-width);
+   padding: 0 2rem;
+ }
+ 
+ .section-header {
+   text-align: center;
+   margin-bottom: 2rem;
+ }
+ 
+ .section-title {
+   font-size: 2.5rem;
+   background: linear-gradient(90deg, #7209b7, #4cc9f0);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   margin-bottom: 0.5rem;
+   text-shadow: 0 0 15px rgba(114, 9, 183, 0.3);
+   animation: glow 3s ease-in-out infinite alternate;
+ }
+ 
+ .section-subtitle {
+   font-size: 1.2rem;
+   color: #a0a0a7;
+   max-width: 600px;
+   margin-left: auto;
+   margin-right: auto;
+ }
+ 
+ .cta-section {
+   background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(15, 15, 26, 0.8));
+   padding: 4rem 2rem;
+   border-radius: 16px;
+   text-align: center;
+   margin-bottom: 6rem;
+   backdrop-filter: blur(10px);
+   border: 1px solid rgba(114, 9, 183, 0.2);
+   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 
+               inset 0 0 15px rgba(114, 9, 183, 0.2);
+   position: relative;
+   overflow: hidden;
+   transition: transform 0.3s ease, box-shadow 0.3s ease;
+ }
+ 
+ .cta-section::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   background: radial-gradient(circle at top right, 
+               rgba(114, 9, 183, 0.15), 
+               transparent 60%);
+   z-index: -1;
+ }
+ 
+ .cta-section:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 
+               inset 0 0 20px rgba(114, 9, 183, 0.3);
+ }
+ 
+ .cta-section h2 {
+   font-size: 2.5rem;
+   background: linear-gradient(90deg, #f72585, #7209b7);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   margin-bottom: 1rem;
+   text-shadow: 0 0 10px rgba(247, 37, 133, 0.3);
+ }
+ 
+ .cta-section p {
+   font-size: 1.2rem;
+   color: #a0a0a7;
+   margin-bottom: 2rem;
+   max-width: 600px;
+   margin-left: auto;
+   margin-right: auto;
+ }
+ 
+ .btn-primary {
+   background: linear-gradient(90deg, #7209b7, #4cc9f0);
+   color: white;
+   padding: 0.75rem 1.5rem;
+   border-radius: 8px;
+   font-weight: 600;
+   text-decoration: none;
+   display: inline-block;
+   transition: all 0.3s ease;
+   border: none;
+   position: relative;
+   overflow: hidden;
+   box-shadow: 0 4px 15px rgba(114, 9, 183, 0.3);
+ }
+ 
+ .btn-primary::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: -100%;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(90deg, 
+               transparent, 
+               rgba(255, 255, 255, 0.2), 
+               transparent);
+   transition: left 0.7s ease;
+ }
+ 
+ .btn-primary:hover {
+   transform: translateY(-3px);
+   box-shadow: 0 8px 25px rgba(114, 9, 183, 0.5);
+ }
+ 
+ .btn-primary:hover::before {
+   left: 100%;
+ }
+ 
+ @keyframes glow {
+   0% {
+     text-shadow: 0 0 10px rgba(114, 9, 183, 0.3);
+   }
+   100% {
+     text-shadow: 0 0 20px rgba(114, 9, 183, 0.6), 
+                 0 0 35px rgba(114, 9, 183, 0.3);
+   }
+ }
+ 
+ @media (max-width: 768px) {
+   .section {
+     margin: 2rem auto;
+   }
+   
+   .section-title {
+     font-size: 2rem;
+   }
+   
+   .cta-section h2 {
+     font-size: 2rem;
+   }
+ }
+</style>

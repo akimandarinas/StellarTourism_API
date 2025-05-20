@@ -1,0 +1,34 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DetalleDestinoPage from '../../views/DetalleDestinoPage.vue';
+import { destinos } from '../../data/destinos-data';
+
+// Obtener parámetros de la ruta
+const { id } = Astro.params;
+
+// Intentar obtener datos del destino para SEO
+const destinoId = parseInt(id);
+const destino = destinos.find(d => d.id === destinoId);
+
+// Datos para SEO
+const title = destino ? `${destino.nombre} | StellarTourism` : 'Destino Espacial | StellarTourism';
+const description = destino 
+  ? `Explora ${destino.nombre}, ${destino.subtitulo}. Reserva tu viaje con StellarTourism.`
+  : 'Explora este fascinante destino espacial y reserva tu viaje con StellarTourism.';
+
+// Pasar datos iniciales para hidratación
+const initialState = {
+  destino
+};
+---
+
+<Layout title={title} description={description}>
+  <DetalleDestinoPage client:load destinoId={id} />
+</Layout>
+
+<script define:vars={{ initialState, id }}>
+  // Inicializar estado para SSR
+  window.__INITIAL_STATE__ = window.__INITIAL_STATE__ || {};
+  window.__INITIAL_STATE__.destinoDetalle = initialState;
+  window.__INITIAL_STATE__.destinoId = id;
+</script>

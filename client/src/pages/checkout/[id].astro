@@ -1,0 +1,86 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CheckoutSummary from '../../components/checkout/CheckoutSummary.vue';
+import CheckoutPayment from '../../components/checkout/CheckoutPayment.vue';
+import AuthGuard from '../../components/auth/AuthGuard.vue';
+
+const { id } = Astro.params;
+---
+
+<Layout 
+  title="Finalizar Reserva" 
+  description="Completa tu reserva de viaje espacial con StellarTourism."
+>
+  <AuthGuard client:load>
+    <div class="page-header">
+      <h1>Finalizar Reserva</h1>
+      <p>Completa tu pago para confirmar tu viaje espacial</p>
+    </div>
+    
+    <div class="checkout-container">
+      <div class="checkout-grid">
+        <div class="checkout-main">
+          <CheckoutPayment reservaId={id} client:load />
+        </div>
+        
+        <div class="checkout-sidebar">
+          <CheckoutSummary reservaId={id} client:load />
+        </div>
+      </div>
+    </div>
+  </AuthGuard>
+</Layout>
+
+<style>
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .page-header h1 {
+    font-size: 3rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .page-header p {
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+  }
+  
+  .checkout-container {
+    width: 100%;
+  }
+  
+  .checkout-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+  }
+  
+  .checkout-main {
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+  }
+  
+  .checkout-sidebar {
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+  }
+  
+  @media (max-width: 768px) {
+    .checkout-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .checkout-sidebar {
+      position: static;
+      order: -1;
+    }
+  }
+</style>

@@ -1,0 +1,102 @@
+@import "./tokens.css";
+@import "./utilities.css";
+
+/* Estilos base del sistema de diseño */
+.ui-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.ui-section {
+  padding: 2rem 0;
+}
+
+.ui-grid {
+  display: grid;
+  gap: var(--ui-spacing-4);
+}
+
+.ui-flex {
+  display: flex;
+}
+
+.ui-flex-col {
+  flex-direction: column;
+}
+
+.ui-items-center {
+  align-items: center;
+}
+
+.ui-justify-between {
+  justify-content: space-between;
+}
+
+.ui-justify-center {
+  justify-content: center;
+}
+
+.ui-gap-2 {
+  gap: var(--ui-spacing-2);
+}
+
+.ui-gap-4 {
+  gap: var(--ui-spacing-4);
+}
+
+.ui-gap-6 {
+  gap: var(--ui-spacing-6);
+}
+
+.ui-text-center {
+  text-align: center;
+}
+
+.ui-text-left {
+  text-align: left;
+}
+
+.ui-text-right {
+  text-align: right;
+}
+
+.ui-hidden {
+  display: none;
+}
+
+.ui-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Responsive utilities */
+@media (min-width: 640px) {
+  .ui-sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .ui-md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ui-md\:flex-row {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ui-lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

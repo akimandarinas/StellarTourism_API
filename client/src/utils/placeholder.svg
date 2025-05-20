@@ -1,0 +1,57 @@
+/**
+ * Utilidades para manejar imágenes placeholder
+ */
+
+/**
+ * Genera una URL para una imagen placeholder
+ * @param {Object} options - Opciones para la imagen
+ * @param {number} options.width - Ancho de la imagen
+ * @param {number} options.height - Alto de la imagen
+ * @param {string} options.query - Descripción de la imagen
+ * @returns {string} - URL de la imagen placeholder
+ */
+export function getPlaceholderUrl(options = {}) {
+  const { width = 300, height = 200, query = "imagen" } = options
+
+  // Asegurarse de que la ruta sea correcta (sin 'public/')
+  return `/images/placeholder.svg?height=${height}&width=${width}&query=${encodeURIComponent(query)}`
+}
+
+/**
+ * Genera una URL para una imagen placeholder de perfil
+ * @param {string} [name] - Nombre para personalizar el placeholder
+ * @returns {string} - URL de la imagen placeholder de perfil
+ */
+export function getProfilePlaceholder(name) {
+  const query = name ? `perfil+de+${name}` : "perfil+usuario"
+  return getPlaceholderUrl({ width: 200, height: 200, query })
+}
+
+/**
+ * Genera una URL para una imagen placeholder de destino
+ * @param {string} [name] - Nombre del destino para personalizar el placeholder
+ * @returns {string} - URL de la imagen placeholder de destino
+ */
+export function getDestinationPlaceholder(name) {
+  const query = name ? `destino+espacial+${name}` : "destino+espacial"
+  return getPlaceholderUrl({ width: 300, height: 200, query })
+}
+
+/**
+ * Genera una URL para una imagen placeholder de nave
+ * @param {string} [name] - Nombre de la nave para personalizar el placeholder
+ * @returns {string} - URL de la imagen placeholder de nave
+ */
+export function getShipPlaceholder(name) {
+  const query = name ? `nave+espacial+${name}` : "nave+espacial"
+  return getPlaceholderUrl({ width: 400, height: 250, query })
+}
+
+/**
+ * Genera una URL para una imagen placeholder panorámica
+ * @param {string} [description] - Descripción para personalizar el placeholder
+ * @returns {string} - URL de la imagen placeholder panorámica
+ */
+export function getPanoramaPlaceholder(description = "panorama+espacial") {
+  return getPlaceholderUrl({ width: 1600, height: 600, query: description })
+}

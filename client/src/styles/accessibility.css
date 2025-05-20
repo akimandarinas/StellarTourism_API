@@ -1,0 +1,1071 @@
+/**
+ * Estilos de accesibilidad para Stellar Tourism
+ * Este archivo proporciona estilos consistentes para mejorar la accesibilidad
+ * en toda la aplicación.
+ */
+
+/* Clase para elementos visibles solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Clase para enlaces de salto */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px 16px;
+  background-color: var(--color-primary);
+  color: white;
+  z-index: 100;
+  transition: top 0.2s;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Estilos para el estado de foco */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Estilos para modo de alto contraste */
+@media (forced-colors: active) {
+  /* Asegurar que los bordes sean visibles */
+  .button,
+  .input,
+  .select,
+  .textarea,
+  .card,
+  .alert,
+  .badge,
+  .chip,
+  .modal,
+  .dialog,
+  .dropdown,
+  .tooltip,
+  .popover {
+    border: 1px solid currentColor;
+  }
+
+  /* Asegurar que los íconos sean visibles */
+  .icon {
+    forced-color-adjust: none;
+  }
+}
+
+/* Estilos para modo de reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Estilos para modo de alto contraste personalizado */
+.high-contrast {
+  --color-primary: #0066cc;
+  --color-primary-rgb: 0, 102, 204;
+  --color-text: #000000;
+  --color-background: #ffffff;
+  --color-border: #000000;
+
+  color: var(--color-text);
+  background-color: var(--color-background);
+  border-color: var(--color-border);
+}
+
+.high-contrast button,
+.high-contrast a {
+  outline: 2px solid transparent;
+}
+
+.high-contrast button:focus-visible,
+.high-contrast a:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+/* Estilos para fuente para dislexia */
+.dyslexic-font {
+  font-family: "OpenDyslexic", sans-serif;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+  line-height: 1.5;
+}
+
+/* Estilos para resaltar elementos enfocados */
+.focus-visible-always *:focus {
+  outline: 3px solid var(--color-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Variables para escalado de texto */
+:root {
+  --a11y-font-scale: 1;
+  --a11y-spacing-scale: 1;
+}
+
+/* Aplicar escalado de texto */
+html {
+  font-size: calc(16px * var(--a11y-font-scale));
+}
+
+/* Aplicar escalado de espaciado */
+.a11y-spacing {
+  margin: calc(var(--spacing) * var(--a11y-spacing-scale));
+  padding: calc(var(--spacing) * var(--a11y-spacing-scale));
+}
+
+/* Estilos para elementos con contraste insuficiente */
+.a11y-contrast-warning {
+  outline: 3px solid #ff6600;
+  position: relative;
+}
+
+.a11y-contrast-warning::after {
+  content: "⚠️ Contraste insuficiente";
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background-color: #ff6600;
+  color: #000000;
+  padding: 2px 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+  display: none;
+}
+
+.a11y-contrast-warning:hover::after {
+  display: block;
+}
+
+/* Estilos para anuncios para lectores de pantalla */
+.a11y-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Estilos para enlaces de salto */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px 16px;
+  background-color: var(--color-primary);
+  color: white;
+  z-index: 100;
+  transition: top 0.2s;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Estilos para menú de accesibilidad */
+.accessibility-menu {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.accessibility-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.accessibility-panel {
+  position: absolute;
+  bottom: 60px;
+  right: 0;
+  width: 300px;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  z-index: 101;
+}
+
+/* Estilos para botones de accesibilidad */
+.a11y-button {
+  background-color: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a11y-button:hover {
+  background-color: var(--color-background-hover);
+}
+
+.a11y-button:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.a11y-button-active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Estilos para tooltips accesibles */
+.a11y-tooltip {
+  position: relative;
+}
+
+.a11y-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-text);
+  color: var(--color-background);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.a11y-tooltip:hover::after,
+.a11y-tooltip:focus::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Estilos para tablas accesibles */
+.a11y-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.a11y-table caption {
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.a11y-table th {
+  text-align: left;
+  background-color: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  padding: 8px;
+}
+
+.a11y-table td {
+  border: 1px solid var(--color-border);
+  padding: 8px;
+}
+
+.a11y-table tr:nth-child(even) {
+  background-color: var(--color-background-alt);
+}
+
+/* Estilos para formularios accesibles */
+.a11y-form-group {
+  margin-bottom: 16px;
+}
+
+.a11y-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.a11y-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.a11y-input:focus {
+  border-color: var(--color-primary);
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.a11y-input-error {
+  border-color: var(--color-error);
+}
+
+.a11y-error-message {
+  color: var(--color-error);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.a11y-required {
+  color: var(--color-error);
+  margin-left: 4px;
+}
+
+/* Estilos para botones accesibles */
+.a11y-btn {
+  padding: 8px 16px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.a11y-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.a11y-btn:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.a11y-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Estilos para enlaces accesibles */
+.a11y-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.a11y-link:hover {
+  color: var(--color-primary-dark);
+}
+
+.a11y-link:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Estilos para imágenes accesibles */
+.a11y-img {
+  max-width: 100%;
+  height: auto;
+}
+
+.a11y-img-caption {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+/* Estilos para videos accesibles */
+.a11y-video {
+  max-width: 100%;
+}
+
+.a11y-video-caption {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+/* Estilos para audio accesibles */
+.a11y-audio {
+  max-width: 100%;
+}
+
+.a11y-audio-caption {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+/* Estilos para diálogos accesibles */
+.a11y-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.a11y-dialog-content {
+  background-color: var(--color-background);
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.a11y-dialog-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.a11y-dialog-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Estilos para alertas accesibles */
+.a11y-alert {
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.a11y-alert-info {
+  background-color: var(--color-info-light);
+  border: 1px solid var(--color-info);
+  color: var(--color-info-dark);
+}
+
+.a11y-alert-success {
+  background-color: var(--color-success-light);
+  border: 1px solid var(--color-success);
+  color: var(--color-success-dark);
+}
+
+.a11y-alert-warning {
+  background-color: var(--color-warning-light);
+  border: 1px solid var(--color-warning);
+  color: var(--color-warning-dark);
+}
+
+.a11y-alert-error {
+  background-color: var(--color-error-light);
+  border: 1px solid var(--color-error);
+  color: var(--color-error-dark);
+}
+
+/* Estilos para pestañas accesibles */
+.a11y-tabs {
+  margin-bottom: 16px;
+}
+
+.a11y-tablist {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.a11y-tab {
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+.a11y-tab[aria-selected="true"] {
+  border-bottom-color: var(--color-primary);
+  font-weight: bold;
+}
+
+.a11y-tabpanel {
+  padding: 16px 0;
+}
+
+/* Estilos para acordeones accesibles */
+.a11y-accordion {
+  margin-bottom: 16px;
+}
+
+.a11y-accordion-item {
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.a11y-accordion-header {
+  padding: 12px;
+  background-color: var(--color-background-alt);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.a11y-accordion-panel {
+  padding: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Estilos para menús accesibles */
+.a11y-menu {
+  position: relative;
+}
+
+.a11y-menu-button {
+  padding: 8px 16px;
+  background-color: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.a11y-menu-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 4px;
+}
+
+.a11y-menu-item {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.a11y-menu-item:hover {
+  background-color: var(--color-background-hover);
+}
+
+/* Estilos para tooltips accesibles */
+.a11y-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.a11y-tooltip-content {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-text);
+  color: var(--color-background);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 10;
+  margin-bottom: 4px;
+}
+
+/* Estilos para badges accesibles */
+.a11y-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Estilos para chips accesibles */
+.a11y-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  background-color: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.a11y-chip-close {
+  margin-left: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilos para switches accesibles */
+.a11y-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+}
+
+.a11y-switch-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.a11y-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  transition: background-color 0.2s;
+}
+
+.a11y-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.a11y-switch-input:checked + .a11y-switch-slider {
+  background-color: var(--color-primary);
+}
+
+.a11y-switch-input:checked + .a11y-switch-slider:before {
+  transform: translateX(16px);
+}
+
+.a11y-switch-input:focus-visible + .a11y-switch-slider {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Estilos para sliders accesibles */
+.a11y-slider {
+  width: 100%;
+  height: 24px;
+  position: relative;
+}
+
+.a11y-slider-input {
+  width: 100%;
+  height: 4px;
+  background-color: var(--color-background-alt);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.a11y-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.a11y-slider-input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  cursor: pointer;
+  border: none;
+}
+
+.a11y-slider-input:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Estilos para progress accesibles */
+.a11y-progress {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-background-alt);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.a11y-progress-bar {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 4px;
+}
+
+/* Estilos para spinners accesibles */
+.a11y-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--color-background-alt);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: a11y-spin 1s linear infinite;
+}
+
+@keyframes a11y-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilos para skeletons accesibles */
+.a11y-skeleton {
+  display: block;
+  width: 100%;
+  height: 16px;
+  background-color: var(--color-background-alt);
+  border-radius: 4px;
+  animation: a11y-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes a11y-pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* Estilos para pagination accesibles */
+.a11y-pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+.a11y-pagination-item {
+  margin: 0 4px;
+}
+
+.a11y-pagination-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.a11y-pagination-link[aria-current="page"] {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.a11y-pagination-link:hover {
+  background-color: var(--color-background-hover);
+}
+
+.a11y-pagination-link:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Estilos para breadcrumbs accesibles */
+.a11y-breadcrumb {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.a11y-breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.a11y-breadcrumb-item:not(:last-child)::after {
+  content: "/";
+  margin: 0 8px;
+  color: var(--color-text-secondary);
+}
+
+.a11y-breadcrumb-link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.a11y-breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.a11y-breadcrumb-link[aria-current="page"] {
+  color: var(--color-text);
+  font-weight: bold;
+}
+
+/* Estilos para steppers accesibles */
+.a11y-stepper {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+.a11y-stepper-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.a11y-stepper-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-border);
+}
+
+.a11y-stepper-indicator {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-background-alt);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  z-index: 1;
+}
+
+.a11y-stepper-item[aria-current="step"] .a11y-stepper-indicator {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.a11y-stepper-label {
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Estilos para calendars accesibles */
+.a11y-calendar {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.a11y-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.a11y-calendar-title {
+  font-weight: bold;
+}
+
+.a11y-calendar-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.a11y-calendar-nav-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a11y-calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.a11y-calendar-weekday {
+  padding: 8px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.a11y-calendar-day {
+  padding: 0;
+  text-align: center;
+}
+
+.a11y-calendar-day-button {
+  width: 100%;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.a11y-calendar-day-button:hover {
+  background-color: var(--color-background-hover);
+}
+
+.a11y-calendar-day-button[aria-selected="true"] {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.a11y-calendar-day-button[aria-current="date"] {
+  border: 2px solid var(--color-primary);
+}
+
+/* Estilos para datepickers accesibles */
+.a11y-datepicker {
+  position: relative;
+}
+
+.a11y-datepicker-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.a11y-datepicker-calendar {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  margin-top: 4px;
+  background-color: var(--color-background);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para timepickers accesibles */
+.a11y-timepicker {
+  position: relative;
+}
+
+.a11y-timepicker-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.a11y-timepicker-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  margin-top: 4px;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.a11y-timepicker-option {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.a11y-timepicker-option:hover {
+  background-color: var(--color-background-hover);
+}
+
+.a11y-timepicker-option[aria-selected="true"] {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Clase para resaltar el foco visible */
+.focus-visible-outline:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* Clase para reducción de movimiento */
+.reduce-motion,
+.reduce-motion * {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* Clase para espaciado aumentado */
+.increased-spacing {
+  letter-spacing: 0.12em;
+  word-spacing: 0.16em;
+  line-height: 1.8;
+}
+
+/* Clase para texto grande */
+.large-text {
+  font-size: 1.2em;
+}
+
+/* Clase para texto muy grande */
+.x-large-text {
+  font-size: 1.4em;
+}

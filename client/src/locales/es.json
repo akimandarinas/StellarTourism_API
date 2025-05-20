@@ -1,0 +1,32 @@
+{
+  "common": {
+    "home": "Inicio",
+    "destinations": "Destinos",
+    "ships": "Naves",
+    "activities": "Actividades",
+    "bookings": "Reservas",
+    "profile": "Perfil",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior"
+  },
+  "home": {
+    "hero": {
+      "title": "Explora el universo",
+      "subtitle": "Descubre destinos increíbles más allá de la Tierra",
+      "cta": "Reserva ahora"
+    }
+  }
+}

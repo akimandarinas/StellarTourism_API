@@ -1,0 +1,32 @@
+{
+  "common": {
+    "home": "Home",
+    "destinations": "Destinations",
+    "ships": "Ships",
+    "activities": "Activities",
+    "bookings": "Bookings",
+    "profile": "Profile",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "home": {
+    "hero": {
+      "title": "Explore the universe",
+      "subtitle": "Discover amazing destinations beyond Earth",
+      "cta": "Book now"
+    }
+  }
+}

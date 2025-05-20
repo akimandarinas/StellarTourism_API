@@ -1,0 +1,11 @@
+---
+import DefaultLayout from '../layouts/DefaultLayout.astro';
+import { AppShell } from '../components/AppShell.vue';
+
+// Obtener la ruta inicial de los parámetros de consulta
+const initialPath = Astro.url.searchParams.get('path') || '/app/destinos';
+---
+
+<DefaultLayout title="Stellar Tourism - App">
+  <AppShell client:load initialPath={initialPath} />
+</DefaultLayout>

@@ -1,0 +1,208 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavesGrid from '../../components/naves/NavesGrid.vue';
+
+// Datos para SEO
+const title = "Naves Espaciales | StellarTourism";
+const description = "Explora nuestra flota de naves espaciales para turismo. Desde lanzaderas orbitales hasta cruceros interplanetarios.";
+---
+
+<Layout title={title} description={description}>
+  <div class="page-container">
+    <div class="hero-section">
+      <div class="hero-content">
+        <h1>Naves Espaciales</h1>
+        <p>Descubre nuestra flota de naves espaciales diseñadas para llevarte a las estrellas.</p>
+      </div>
+    </div>
+    
+    <div class="content-section">
+      <NavesGrid client:visible />
+    </div>
+    
+    <!-- Sección CTA estática (no necesita interactividad) -->
+    <section class="section cta-section">
+      <div class="cta-content">
+        <h2>¿Listo para tu aventura espacial?</h2>
+        <p>Reserva ahora y vive una experiencia única más allá de la Tierra</p>
+        <a href="/reservas" class="btn btn-primary">Reservar ahora</a>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.hero-section {
+  background-image: linear-gradient(to bottom, rgba(13, 13, 35, 0.7), rgba(13, 13, 35, 0.9)), url('/images/hero-space.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 1rem;
+  padding: 4rem 2rem;
+  margin: 2rem 0;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #a78bfa, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+}
+
+.hero-content p {
+  font-size: 1.25rem;
+  color: #d1d5db;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.content-section {
+  padding: 2rem 0 4rem;
+}
+
+/* Estilos para la sección CTA (copiados de la página principal) */
+.section {
+  margin: 4rem auto;
+  max-width: var(--content-max-width);
+  padding: 0 2rem;
+}
+
+.cta-section {
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.8), rgba(15, 15, 26, 0.8));
+  padding: 4rem 2rem;
+  border-radius: 16px;
+  text-align: center;
+  margin-bottom: 6rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(114, 9, 183, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 
+              inset 0 0 15px rgba(114, 9, 183, 0.2);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, 
+              rgba(114, 9, 183, 0.15), 
+              transparent 60%);
+  z-index: -1;
+}
+
+.cta-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 
+              inset 0 0 20px rgba(114, 9, 183, 0.3);
+}
+
+.cta-section h2 {
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #f72585, #7209b7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(247, 37, 133, 0.3);
+}
+
+.cta-section p {
+  font-size: 1.2rem;
+  color: #a0a0a7;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #7209b7, #4cc9f0);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(114, 9, 183, 0.3);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+              transparent, 
+              rgba(255, 255, 255, 0.2), 
+              transparent);
+  transition: left 0.7s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(114, 9, 183, 0.5);
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 10px rgba(114, 9, 183, 0.3);
+  }
+  100% {
+    text-shadow: 0 0 20px rgba(114, 9, 183, 0.6), 
+                0 0 35px rgba(114, 9, 183, 0.3);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
+  }
+  
+  .hero-section {
+    padding: 3rem 1rem;
+  }
+  
+  .section {
+    margin: 2rem auto;
+  }
+  
+  .cta-section h2 {
+    font-size: 2rem;
+  }
+}
+</style>
