@@ -4,13 +4,13 @@
 
 La aplicación sigue una arquitectura de "Separación por Propósito" para maximizar el rendimiento y la experiencia de usuario:
 
-### Páginas Públicas (`src/`)
+### Páginas Públicas (`page/`)
 - Implementadas con Astro para mejor SEO
 - Incluyen: landing page, listado de destinos, páginas informativas
 - Optimizadas para visitantes no autenticados
 - Enfoque en rendimiento inicial y SEO
 
-### Aplicación Autenticada (`client/`)
+### Aplicación Autenticada (`views/`)
 - Implementada con Vue.js como SPA
 - Incluye: dashboard de usuario, reservas, perfil, pagos
 - Optimizada para experiencia interactiva después del login
