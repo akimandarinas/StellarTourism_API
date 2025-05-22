@@ -88,9 +88,9 @@
           <p>&copy; {{ currentYear }} StellarTourism. Todos los derechos reservados.</p>
           
           <div class="social-links">
-            <a href="#" aria-label="Facebook"><FacebookIcon class="icon" /></a>
-            <a href="#" aria-label="Twitter"><TwitterIcon class="icon" /></a>
-            <a href="#" aria-label="Instagram"><InstagramIcon class="icon" /></a>
+            <a href="#" aria-label="Facebook"></a>
+            <a href="#" aria-label="Twitter"></a>
+            <a href="#" aria-label="Instagram"></a>
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { SunIcon, MoonIcon, UserIcon, FacebookIcon, TwitterIcon, InstagramIcon } from 'lucide-vue-next';
+import { SunIcon, MoonIcon, UserIcon, } from '@/utils/lucide-adapter';
 
 // Estado
 const isDarkTheme = ref(true); // Cambiado a true por defecto para coincidir con el tema oscuro

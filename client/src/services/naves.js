@@ -1,4 +1,4 @@
-import { handleError } from "../utils/error-handler"
+import { handleError } from '@/utils/error-handler'
 
 // Datos de ejemplo para desarrollo
 const navesData = [
@@ -224,6 +224,117 @@ const navesData = [
     precio: 120000,
     disponibilidad: true,
   },
+  {
+    id: 7,
+    nombre: "Crucero Estelar",
+    tipo: "Crucero de Lujo",
+    fabricante: "Stellar Luxury Lines",
+    imagenPrincipal: "/images/naves/eea7728b-18e0-4b08-8e12-128b50fbe0e2.png",
+    descripcion:
+      "El Crucero Estelar es nuestra nave de lujo más exclusiva, diseñada para viajes de placer con todas las comodidades imaginables. Su diseño elegante y sus interiores de primera clase ofrecen una experiencia incomparable.",
+    velocidadMaxima: 25000,
+    capacidad: 60,
+    tipoPropulsion: "Iónica de alta eficiencia",
+    anoFabricacion: 2048,
+    longitud: 150,
+    altura: 35,
+    peso: 9800,
+    autonomia: 90,
+    alcanceMaximo: 500000, // Órbita lunar extendida
+    sistemaPropulsion: "Propulsores iónicos de última generación",
+    sistemaNavegacion: "LuxNav Premium",
+    sistemaSoporteVital: "Atmosphere Plus",
+    comunicaciones: "Red de comunicación cuántica",
+    escudos: "Escudo de partículas avanzado",
+    seguridadInfo:
+      "El Crucero Estelar cuenta con los sistemas de seguridad más avanzados, incluyendo múltiples capas de protección y sistemas de emergencia redundantes.",
+    confortInfo:
+      "Diseñado para el máximo lujo, cada suite cuenta con vistas panorámicas, control ambiental personalizado y servicio de mayordomo privado.",
+    caracteristicas: [
+      "Suites de lujo con vistas panorámicas",
+      "Restaurante gourmet con menú de degustación",
+      "Spa espacial con tratamientos anti-gravedad",
+      "Salón de observación con techo transparente",
+      "Bar de cócteles moleculares",
+      "Servicio de mayordomo personal",
+    ],
+    precio: 95000,
+    disponibilidad: true,
+  },
+  {
+    id: 8,
+    nombre: "Defensor Espacial",
+    tipo: "Nave de Escolta",
+    fabricante: "Orbital Defense Systems",
+    imagenPrincipal: "/images/naves/8778798.png",
+    descripcion:
+      "El Defensor Espacial es una nave de escolta que proporciona seguridad adicional para nuestras rutas más aventuradas. Equipada con sistemas de detección avanzados y capacidad de respuesta rápida.",
+    velocidadMaxima: 50000,
+    capacidad: 25,
+    tipoPropulsion: "Plasma comprimido",
+    anoFabricacion: 2046,
+    longitud: 85,
+    altura: 22,
+    peso: 7500,
+    autonomia: 120,
+    alcanceMaximo: 1000000, // Sistema solar interior
+    sistemaPropulsion: "Motores de plasma de alta densidad",
+    sistemaNavegacion: "TacticalNav 3.0",
+    sistemaSoporteVital: "Military-grade Life Support",
+    comunicaciones: "Red de comunicación encriptada",
+    escudos: "Escudo de defensa multicapa",
+    seguridadInfo:
+      "El Defensor Espacial está diseñado para proporcionar la máxima seguridad en rutas espaciales de alto riesgo, con capacidad para detectar y neutralizar amenazas a gran distancia.",
+    confortInfo:
+      "Aunque su diseño prioriza la funcionalidad, el Defensor ofrece alojamiento confortable para su tripulación y pasajeros, con áreas comunes bien equipadas.",
+    caracteristicas: [
+      "Sistemas de detección de largo alcance",
+      "Capacidad de respuesta rápida",
+      "Alojamiento seguro para pasajeros VIP",
+      "Sala de control táctico",
+      "Sistemas de comunicación de emergencia",
+      "Módulos de escape individuales",
+    ],
+    precio: 150000,
+    disponibilidad: true,
+  },
+  {
+    id: 9,
+    nombre: "Estación Comercial Nexus",
+    tipo: "Estación Comercial",
+    fabricante: "Interstellar Commerce Ltd.",
+    imagenPrincipal: "/images/naves/bb155376-b4ec-492e-b057-614eedacff24.png",
+    descripcion:
+      "La Estación Comercial Nexus es un centro de negocios y entretenimiento flotante, donde se pueden realizar transacciones comerciales, disfrutar de compras duty-free y experimentar la vida en el espacio.",
+    velocidadMaxima: 5000,
+    capacidad: 800,
+    tipoPropulsion: "Posicionamiento iónico",
+    anoFabricacion: 2043,
+    longitud: 600,
+    altura: 400,
+    peso: 50000,
+    autonomia: 3650, // 10 años
+    alcanceMaximo: 450000, // Órbita terrestre alta
+    sistemaPropulsion: "Sistema de posicionamiento orbital",
+    sistemaNavegacion: "CommercialNav Enterprise",
+    sistemaSoporteVital: "EcoSystem Commercial",
+    comunicaciones: "Centro de comunicaciones comerciales",
+    escudos: "Sistema de protección comercial",
+    seguridadInfo:
+      "La Estación Comercial Nexus cuenta con avanzados sistemas de seguridad y vigilancia, garantizando un entorno seguro para todas las actividades comerciales y de ocio.",
+    confortInfo:
+      "Diseñada para largas estancias, la estación ofrece alojamiento de diversas categorías, desde habitaciones estándar hasta suites de lujo con vistas al espacio.",
+    caracteristicas: [
+      "Centro comercial con tiendas duty-free",
+      "Zona de negocios con salas de conferencias",
+      "Restaurantes de diversas especialidades",
+      "Casino espacial",
+      "Hotel con diferentes categorías de habitaciones",
+      "Centro de entretenimiento y ocio",
+    ],
+    precio: 10000, // Por semana
+    disponibilidad: true,
+  },
 ]
 
 // Datos de ejemplo para destinos disponibles por nave
@@ -234,16 +345,22 @@ const destinosDisponiblesPorNave = {
   4: [1, 2, 5], // Luna, Estación Espacial y Júpiter
   5: [5, 6], // Júpiter y Saturno
   6: [1], // Solo Luna
+  7: [1, 2, 3], // Luna, Estación Espacial y Marte
+  8: [3, 4, 5], // Marte, Venus y Júpiter
+  9: [1, 2], // Luna y Estación Espacial
 }
 
 // Datos de ejemplo para naves relacionadas
 const navesRelacionadasPorNave = {
-  1: [2, 4], // Halcón Lunar y Nexus Orbital
+  1: [2, 4, 7], // Halcón Lunar, Nexus Orbital y Crucero Estelar
   2: [1, 6], // Aurora Estelar y Artemisa Lunar
-  3: [5], // Solar Explorer
-  4: [1, 2], // Aurora Estelar y Halcón Lunar
-  5: [3], // Voyager Marciano
+  3: [5, 8], // Solar Explorer y Defensor Espacial
+  4: [1, 2, 9], // Aurora Estelar, Halcón Lunar y Estación Comercial Nexus
+  5: [3, 8], // Voyager Marciano y Defensor Espacial
   6: [2], // Halcón Lunar
+  7: [1, 4], // Aurora Estelar y Nexus Orbital
+  8: [3, 5], // Voyager Marciano y Solar Explorer
+  9: [4, 7], // Nexus Orbital y Crucero Estelar
 }
 
 // Servicio para obtener datos de naves

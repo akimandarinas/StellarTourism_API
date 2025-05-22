@@ -1,6 +1,5 @@
 DELIMITER //
 
--- Trigger para actualizar plazas disponibles al cancelar una reserva
 CREATE TRIGGER after_reserva_cancel
 AFTER UPDATE ON reservas
 FOR EACH ROW
@@ -12,7 +11,6 @@ BEGIN
     END IF;
 END //
 
--- Trigger para actualizar plazas disponibles al crear una reserva
 CREATE TRIGGER after_reserva_insert
 AFTER INSERT ON reservas
 FOR EACH ROW
@@ -22,7 +20,6 @@ BEGIN
     WHERE id = NEW.ruta_id;
 END //
 
--- Trigger para registrar notificaciones cuando cambia el estado de una reserva
 CREATE TRIGGER after_reserva_estado_change
 AFTER UPDATE ON reservas
 FOR EACH ROW
@@ -62,7 +59,6 @@ BEGIN
     END IF;
 END //
 
--- Trigger para registrar notificaciones cuando se realiza un pago
 CREATE TRIGGER after_pago_insert
 AFTER INSERT ON pagos
 FOR EACH ROW
@@ -71,7 +67,6 @@ BEGIN
     DECLARE v_titulo VARCHAR(100);
     DECLARE v_mensaje TEXT;
     
-    -- Obtener el usuario_id de la reserva
     SELECT usuario_id INTO v_usuario_id
     FROM reservas
     WHERE id = NEW.reserva_id;
@@ -106,7 +101,6 @@ BEGIN
     END IF;
 END //
 
--- Trigger para calcular automáticamente la temperatura promedio
 CREATE TRIGGER before_destino_insert
 BEFORE INSERT ON destinos
 FOR EACH ROW

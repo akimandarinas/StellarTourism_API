@@ -61,7 +61,7 @@ import Alert from '../components/ui/Alert.vue';
 import Button from '../components/ui/Button.vue';
 import Modal from '../components/ui/Modal.vue';
 import { useToast } from '../composables/useToast';
-import { fetchReserva, cancelarReservaAPI } from '../services/api';
+import { fetchReserva, cancelarReservaAPI } from '@/services/api';
 
 const { toast } = useToast();
 const route = useRoute();

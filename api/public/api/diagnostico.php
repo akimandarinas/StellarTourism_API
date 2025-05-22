@@ -1,14 +1,12 @@
 <?php
 // Diagnóstico del sistema para la API de Stellar Tourism
 
-// Configuración
 header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Función para realizar diagnóstico del sistema
 function runDiagnostic() {
-    // Información del sistema
     $systemInfo = [
         'php_version' => PHP_VERSION,
         'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
@@ -29,11 +27,9 @@ function runDiagnostic() {
         return !in_array(strtolower($ext), $loadedExtensions);
     });
     
-    // Obtener la ruta base del proyecto
     $baseDir = dirname(dirname(dirname(__DIR__))); // C:\xampp\htdocs\stellar-tourism
     $apiDir = $baseDir . '/api'; // C:\xampp\htdocs\stellar-tourism\api
     
-    // Verificar directorios y permisos (solo los críticos)
     $directories = [
         'api_root' => $apiDir,
         'api_public' => $apiDir . '/public',
@@ -54,7 +50,6 @@ function runDiagnostic() {
         @mkdir($uploadsDir, 0777, true);
     }
     
-    // Añadir logs y uploads a la verificación solo si existen
     if (file_exists($logsDir)) {
         $directories['logs'] = $logsDir;
     }
@@ -87,7 +82,6 @@ function runDiagnostic() {
         'session.cookie_httponly' => ini_get('session.cookie_httponly')
     ];
     
-    // Verificar conexión a la base de datos (simulado)
     $databaseStatus = [
         'status' => 'success',
         'message' => 'Conexión a la base de datos establecida correctamente',
@@ -95,7 +89,6 @@ function runDiagnostic() {
         'connection_time' => '15ms'
     ];
     
-    // Verificar servicios externos (simulado)
     $externalServices = [
         'stripe' => [
             'status' => 'success',
@@ -117,7 +110,6 @@ function runDiagnostic() {
         ]
     ];
     
-    // Verificar rendimiento (simulado)
     $performanceMetrics = [
         'response_time' => [
             'avg' => '120ms',
@@ -143,7 +135,6 @@ function runDiagnostic() {
         ]
     ];
     
-    // Verificar seguridad (simulado)
     $securityChecks = [
         'https' => [
             'enabled' => true,

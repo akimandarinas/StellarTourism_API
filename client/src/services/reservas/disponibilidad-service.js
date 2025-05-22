@@ -2,7 +2,7 @@
  * Servicio para validación en tiempo real de disponibilidad
  * Maneja la verificación de disponibilidad de fechas, asientos y recursos
  */
-import { apiService } from "../api"
+import { apiService } from "@/services/api"
 import { createCacheClient } from "../cache"
 
 // Cliente de caché con TTL corto para datos de disponibilidad (2 minutos)

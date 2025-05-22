@@ -4,10 +4,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Establecer encabezados para JSON
 header('Content-Type: application/json');
 
-// Obtener información de la solicitud
 $requestUri = $_SERVER['REQUEST_URI'];
 $scriptName = $_SERVER['SCRIPT_NAME'];
 $phpSelf = $_SERVER['PHP_SELF'];
@@ -16,7 +14,6 @@ $documentRoot = $_SERVER['DOCUMENT_ROOT'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $queryString = $_SERVER['QUERY_STRING'] ?? '';
 
-// Definir la ruta base de la aplicación
 $basePath = dirname(__DIR__);
 
 // Función para probar rutas de la API
@@ -263,7 +260,6 @@ function testStoredProcedures() {
             ];
         }
         
-        // Consultar procedimientos almacenados
         $stmt = $conn->query("SHOW PROCEDURE STATUS WHERE Db = DATABASE()");
         $procedures = [];
         
@@ -273,7 +269,6 @@ function testStoredProcedures() {
             }
         }
         
-        // Consultar funciones
         $stmt = $conn->query("SHOW FUNCTION STATUS WHERE Db = DATABASE()");
         $functions = [];
         
@@ -328,5 +323,4 @@ $response = [
     'timestamp' => date('Y-m-d H:i:s')
 ];
 
-// Enviar respuesta
 echo json_encode($response, JSON_PRETTY_PRINT);

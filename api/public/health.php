@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../utils/response_utils.php';
 
-// Verificar si las funciones existen
 if (!function_exists('sendJsonResponse')) {
     function sendJsonResponse($data, $code = 200) {
         header("Content-Type: application/json");
@@ -29,7 +28,6 @@ header('Content-Type: application/json');
 try {
     $startTime = microtime(true);
     
-    // Verificar conexión a la base de datos
     $conn = getConnection();
     $dbConnected = ($conn !== null);
     
@@ -70,7 +68,6 @@ try {
         }
     }
     
-    // Verificar espacio en disco
     $diskFree = disk_free_space('/');
     $diskTotal = disk_total_space('/');
     $diskUsed = $diskTotal - $diskFree;
@@ -104,10 +101,8 @@ try {
         $loadAvg = sys_getloadavg();
     }
     
-    // Verificar versión de PHP
     $phpVersion = phpversion();
-    
-    // Verificar extensiones requeridas
+    s
     $requiredExtensions = [
         'mysqli',
         'pdo',
@@ -132,7 +127,6 @@ try {
         'max_input_time' => ini_get('max_input_time')
     ];
     
-    // Verificar directorios de escritura
     $writableDirs = [
         '/tmp',
         __DIR__ . '/../logs',
@@ -153,7 +147,6 @@ try {
         }
     }
     
-    // Verificar servicios externos (simulado)
     $externalServices = [
         'stripe' => [
             'status' => 'ok',

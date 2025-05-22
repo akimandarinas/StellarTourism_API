@@ -3,11 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import DestinosPage from '../../views/DestinosPage.vue';
 import { destinos } from '../../data/destinos-data';
 
-// Datos para SEO
 const title = 'Destinos Espaciales | StellarTourism';
 const description = 'Explora los destinos más fascinantes del Sistema Solar. Desde la Luna hasta Saturno, encuentra tu próxima aventura espacial con StellarTourism.';
 
-// Pasar datos iniciales para hidratación
 const initialState = {
  destinos
 };
@@ -58,7 +56,6 @@ const initialState = {
    50% { opacity: 1; }
  }
  
- /* Estilos para la sección CTA */
  .section {
    margin: 4rem auto;
    max-width: var(--content-max-width);

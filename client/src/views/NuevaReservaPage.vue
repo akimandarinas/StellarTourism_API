@@ -1,368 +1,12 @@
 <template>
   <MainLayout>
-    <div class="container mx-auto px-4 py-8">
-      <!-- Alerta de recuperación de datos -->
-      <div v-if="showRecoveryAlert" class="mb-6">
-        <Alert variant="info">
-          <div class="flex items-center justify-between">
-            <div>
-              <AlertCircleIcon class="h-5 w-5 mr-2 inline-block" />
-              <span>Hemos recuperado tu reserva en progreso.</span>
-            </div>
-            <div class="flex gap-2">
-              <Button size="sm" variant="outline" @click="descartarRecuperacion">
-                Descartar
-              </Button>
-              <Button size="sm" @click="continuarReserva">
-                Continuar
-              </Button>
-            </div>
-          </div>
-        </Alert>
-      </div>
-
-      <!-- Indicador de estado de guardado -->
-      <ReservaEstadoGuardado
-        :last-saved="lastSaved"
-        :is-saving="guardandoFormulario"
-        :has-error="errorGuardado"
-        :can-save="formularioValido"
-        :show-resume-button="false"
-        @save="guardarBorrador"
-        @clear="limpiarFormulario"
-        @retry="guardarFormulario"
-      />
-
-      <div v-if="loading" class="flex justify-center items-center min-h-[60vh]">
-        <LoadingSpinner />
+    <div class="nueva-reserva-page">
+      <div class="page-header">
+        <h1>Nueva Reserva</h1>
+        <p>Reserva tu próximo viaje espacial</p>
       </div>
       
-      <div v-else>
-        <!-- Breadcrumbs -->
-        <Breadcrumb class="mb-6">
-          <BreadcrumbItem>
-            <BreadcrumbLink to="/">Inicio</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem>
-            <BreadcrumbLink to="/reservas">Mis Reservas</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem>
-            <BreadcrumbLink>Nueva Reserva</BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
-        
-        <h1 class="text-3xl font-bold mb-8">Nueva Reserva</h1>
-        
-        <!-- Stepper -->
-        <div class="mb-8">
-          <Stepper 
-            :steps="pasos" 
-            :current-step="pasoActual" 
-            :completed-steps="pasosCompletados"
-            @step-click="intentarCambiarPaso"
-          />
-        </div>
-        
-        <!-- Paso 1: Selección de destino y nave -->
-        <div v-if="pasoActual === 1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Selecciona tu destino y nave</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form @submit.prevent="avanzarPaso">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <!-- Selección de destino -->
-                  <div class="space-y-2">
-                    <Label for="destino">Destino</Label>
-                    <Select 
-                      id="destino" 
-                      v-model="formulario.destinoId"
-                      :disabled="destinoPreseleccionado"
-                      required
-                      @change="verificarDisponibilidadDestino"
-                    >
-                      <option value="" disabled>Selecciona un destino</option>
-                      <option 
-                        v-for="destino in destinos" 
-                        :key="destino.id" 
-                        :value="destino.id"
-                      >
-                        {{ destino.nombre }}
-                      </option>
-                    </Select>
-                    
-                    <!-- Indicador de disponibilidad del destino -->
-                    <DisponibilidadIndicator
-                      v-if="formulario.destinoId"
-                      :loading="verificandoDestino"
-                      :disponible="disponibilidadDestino.disponible"
-                      :mensaje="disponibilidadDestino.mensaje"
-                      :plazas-disponibles="disponibilidadDestino.plazasDisponibles"
-                      :ultima-actualizacion="disponibilidadDestino.timestamp"
-                      @refresh="verificarDisponibilidadDestino"
-                    />
-                  </div>
-                  
-                  <!-- Selección de nave -->
-                  <div class="space-y-2">
-                    <Label for="nave">Nave</Label>
-                    <Select 
-                      id="nave" 
-                      v-model="formulario.naveId"
-                      :disabled="!formulario.destinoId || !disponibilidadDestino.disponible"
-                      required
-                      @change="verificarDisponibilidadFecha"
-                    >
-                      <option value="" disabled>Selecciona una nave</option>
-                      <option 
-                        v-for="nave in navesDisponibles" 
-                        :key="nave.id" 
-                        :value="nave.id"
-                      >
-                        {{ nave.nombre }}
-                      </option>
-                    </Select>
-                  </div>
-                  
-                  <!-- Fecha de salida -->
-                  <div class="space-y-2">
-                    <Label for="fechaSalida">Fecha de salida</Label>
-                    <Input 
-                      id="fechaSalida" 
-                      type="date" 
-                      v-model="formulario.fechaSalida"
-                      :min="fechaMinima"
-                      :disabled="!formulario.naveId || !disponibilidadDestino.disponible"
-                      required
-                      @change="verificarDisponibilidadFecha"
-                    />
-                    
-                    <!-- Indicador de disponibilidad de fecha -->
-                    <DisponibilidadIndicator
-                      v-if="formulario.destinoId && formulario.naveId && formulario.fechaSalida"
-                      :loading="verificandoFecha"
-                      :disponible="disponibilidadFecha.disponible"
-                      :mensaje="disponibilidadFecha.mensaje"
-                      :plazas-disponibles="disponibilidadFecha.plazasDisponibles"
-                      :ultima-actualizacion="disponibilidadFecha.timestamp"
-                      @refresh="verificarDisponibilidadFecha"
-                    />
-                  </div>
-                  
-                  <!-- Número de pasajeros -->
-                  <div class="space-y-2">
-                    <Label for="pasajeros">Número de pasajeros</Label>
-                    <Input 
-                      id="pasajeros" 
-                      type="number" 
-                      v-model="formulario.cantidadPasajeros"
-                      min="1"
-                      max="10"
-                      :disabled="!formulario.fechaSalida || !disponibilidadFecha.disponible"
-                      required
-                      @change="handlePasajerosChange"
-                    />
-                    
-                    <!-- Advertencia si hay pocos asientos disponibles -->
-                    <div 
-                      v-if="disponibilidadFecha.disponible && disponibilidadFecha.plazasDisponibles && formulario.cantidadPasajeros > 0"
-                      class="text-sm mt-1"
-                      :class="{ 'text-warning': asientosLimitados, 'text-success': !asientosLimitados }"
-                    >
-                      <AlertTriangleIcon v-if="asientosLimitados" class="h-4 w-4 inline-block mr-1" />
-                      <CheckCircleIcon v-else class="h-4 w-4 inline-block mr-1" />
-                      {{ mensajeDisponibilidadAsientos }}
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Información del destino seleccionado -->
-                <div v-if="destinoSeleccionado" class="mb-6">
-                  <Card>
-                    <CardContent class="p-4">
-                      <div class="flex items-start">
-                        <img 
-                          :src="destinoSeleccionado.imagen || '/placeholder.svg?height=100&width=100&query=planeta'" 
-                          :alt="destinoSeleccionado.nombre"
-                          class="w-24 h-24 rounded-lg object-cover mr-4"
-                        />
-                        <div>
-                          <h3 class="text-lg font-semibold">{{ destinoSeleccionado.nombre }}</h3>
-                          <p class="text-sm text-gray-500 mb-2">{{ destinoSeleccionado.tipo }}</p>
-                          <p class="text-sm">{{ destinoSeleccionado.descripcionCorta }}</p>
-                          <div class="mt-2 flex items-center">
-                            <span class="text-primary font-semibold">{{ formatPrice(destinoSeleccionado.precio) }}</span>
-                            <span class="text-sm text-gray-500 ml-1">por persona</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                
-                <!-- Información de la nave seleccionada -->
-                <div v-if="naveSeleccionada" class="mb-6">
-                  <Card>
-                    <CardContent class="p-4">
-                      <div class="flex items-start">
-                        <img 
-                          :src="naveSeleccionada.imagen || '/placeholder.svg?height=100&width=100&query=nave+espacial'" 
-                          :alt="naveSeleccionada.nombre"
-                          class="w-24 h-24 rounded-lg object-cover mr-4"
-                        />
-                        <div>
-                          <h3 class="text-lg font-semibold">{{ naveSeleccionada.nombre }}</h3>
-                          <p class="text-sm text-gray-500 mb-2">{{ naveSeleccionada.tipo }}</p>
-                          <p class="text-sm">{{ naveSeleccionada.descripcionCorta }}</p>
-                          <div class="mt-2 flex items-center">
-                            <span class="text-sm text-gray-500">Capacidad: {{ naveSeleccionada.capacidad }} pasajeros</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                
-                <div class="flex justify-end">
-                  <Button 
-                    type="submit" 
-                    :disabled="!puedeAvanzarPaso1"
-                  >
-                    Continuar
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <!-- Paso 2: Selección de cabina y asientos -->
-        <div v-else-if="pasoActual === 2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Selecciona tu cabina y asientos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form @submit.prevent="avanzarPaso">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <!-- Selección de tipo de cabina -->
-                  <div class="space-y-2">
-                    <Label for="tipoCabina">Tipo de cabina</Label>
-                    <Select 
-                      id="tipoCabina" 
-                      v-model="formulario.tipoCabina"
-                      required
-                      @change="handleCabinaChange"
-                    >
-                      <option value="" disabled>Selecciona un tipo de cabina</option>
-                      <option 
-                        v-for="cabina in tiposCabina" 
-                        :key="cabina.id" 
-                        :value="cabina.id"
-                      >
-                        {{ cabina.nombre }} - {{ formatPrice(cabina.precio) }}
-                      </option>
-                    </Select>
-                  </div>
-                </div>
-                
-                <!-- Selector de asientos con disponibilidad en tiempo real -->
-                <div class="mb-6">
-                  <h3 class="text-lg font-medium mb-4">Selección de asientos</h3>
-                  <div v-if="verificandoAsientos" class="flex justify-center py-8">
-                    <LoadingSpinner />
-                    <span class="ml-2">Verificando disponibilidad de asientos...</span>
-                  </div>
-                  <div v-else-if="!formulario.tipoCabina" class="text-center py-8 text-gray-500">
-                    Selecciona un tipo de cabina para ver los asientos disponibles
-                  </div>
-                  <div v-else>
-                    <SeatSelector 
-                      :cantidad-pasajeros="formulario.cantidadPasajeros" 
-                      :nave-id="formulario.naveId"
-                      :fecha-salida="formulario.fechaSalida"
-                      :tipo-cabina="formulario.tipoCabina"
-                      :asientos-disponibles="asientosDisponibles"
-                      v-model="formulario.asientos"
-                      @update:asientos="handleAsientosChange"
-                      @refresh-disponibilidad="verificarDisponibilidadAsientos"
-                    />
-                    
-                    <!-- Mensaje de asientos seleccionados -->
-                    <div class="mt-4 text-sm" :class="{ 'text-error': asientosInsuficientes, 'text-success': !asientosInsuficientes && formulario.asientos.length > 0 }">
-                      <AlertTriangleIcon v-if="asientosInsuficientes" class="h-4 w-4 inline-block mr-1" />
-                      <CheckCircleIcon v-else-if="formulario.asientos.length > 0" class="h-4 w-4 inline-block mr-1" />
-                      {{ mensajeAsientosSeleccionados }}
-                    </div>
-                    
-                    <!-- Tiempo restante para completar la selección -->
-                    <div v-if="tiempoReservaAsientos > 0" class="mt-2 text-sm text-warning">
-                      <ClockIcon class="h-4 w-4 inline-block mr-1" />
-                      Tienes {{ formatTiempoRestante }} para completar tu reserva
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="flex justify-between">
-                  <Button type="button" variant="outline" @click="retrocederPaso">
-                    Atrás
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    :disabled="!puedeAvanzarPaso2"
-                  >
-                    Continuar
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <!-- Resto de pasos (3, 4, 5) se mantienen igual que en el código original -->
-        <!-- ... -->
-        
-        <!-- Diálogo de confirmación para abandonar -->
-        <Dialog v-model:open="mostrarDialogoAbandonar">
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>¿Abandonar reserva?</DialogTitle>
-              <DialogDescription>
-                Si abandonas ahora, perderás los cambios no guardados. ¿Quieres guardar tu progreso como borrador antes de salir?
-              </DialogDescription>
-            </DialogHeader>
-            <div class="flex justify-end gap-2 mt-4">
-              <Button variant="outline" @click="abandonarSinGuardar">
-                Abandonar sin guardar
-              </Button>
-              <Button variant="default" @click="guardarYAbandonar">
-                Guardar y salir
-              </Button>
-              <Button variant="secondary" @click="mostrarDialogoAbandonar = false">
-                Continuar reserva
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-        
-        <!-- Diálogo de disponibilidad cambiada -->
-        <Dialog v-model:open="mostrarDialogoDisponibilidadCambiada">
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Disponibilidad actualizada</DialogTitle>
-              <DialogDescription>
-                {{ mensajeDisponibilidadCambiada }}
-              </DialogDescription>
-            </DialogHeader>
-            <div class="flex justify-end gap-2 mt-4">
-              <Button variant="outline" @click="mostrarDialogoDisponibilidadCambiada = false">
-                Entendido
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+      <NuevaReservaForm />
     </div>
   </MainLayout>
 </template>
@@ -381,7 +25,7 @@ import {
   AlertTriangleIcon,
   CheckCircleIcon,
   ClockIcon
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 
 import MainLayout from '../layouts/MainLayout.vue';
 import LoadingSpinner from '../components/common/LoadingSpinner.vue';
@@ -400,6 +44,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '../components/ui/bre
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/dialog';
 import ReservaEstadoGuardado from '../components/reservas/ReservaEstadoGuardado.vue';
 import DisponibilidadIndicator from '../components/reservas/DisponibilidadIndicator.vue';
+import NuevaReservaForm from '../components/reservas/NuevaReservaForm.vue';
 
 import { useDestinos } from '../composables/useDestinos';
 import { useNaves } from '../composables/useNaves';
@@ -1200,9 +845,28 @@ const iniciarVerificacionPeriodica = () => {
   });
 };
 
+// Call the hook at the top level
 iniciarVerificacionPeriodica();
 </script>
 
 <style scoped>
-/* Estilos adicionales si son necesarios */
+.nueva-reserva-page {
+  padding: 2rem;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.page-header h1 {
+  font-size: 3rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+}
 </style>

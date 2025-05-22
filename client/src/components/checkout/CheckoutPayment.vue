@@ -259,7 +259,7 @@ import { useAuth } from '@/composables/useAuth';
 import { useToast } from '@/composables/useToast';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { formatPrice } from '@/utils/format';
-import { CreditCard, Check, Loader2, CheckCircle, InfoIcon, Copy } from 'lucide-vue-next';
+import { CreditCard, Check, Loader2, CheckCircle, InfoIcon, Copy } from '@/utils/lucide-adapter';
 import StripePaymentForm from './StripePaymentForm.vue';
 import SavedPaymentMethods from './SavedPaymentMethods.vue';
 import { useReservas } from '../../composables/useReservas';

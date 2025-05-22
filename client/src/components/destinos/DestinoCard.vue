@@ -8,25 +8,24 @@
     :aria-label="`Destino ${destino?.nombre || 'sin nombre'}. Haz clic para ver detalles.`"
     role="button"
   >
-    <!-- Contenedor de imagen con altura fija -->
+    <!-- Contenedor con altura fija -->
     <div class="destino-image">
       <img 
-        :src="destino?.imagen || getDestinationPlaceholder(destino?.nombre)"
+        :src="imageSrc"
         :alt="getImageAlt"
         class="w-full h-full object-cover transition-transform duration-300"
         loading="lazy"
+        @error="handleImageError"
       />
       <div class="categoria-badge">
         {{ destino?.categoria || 'Destino' }}
       </div>
     </div>
     
-    <!-- Contenido con altura controlada -->
     <div class="destino-content">
       <!-- Título con truncamiento -->
       <h3 class="destino-title">{{ destino?.nombre || 'Destino sin nombre' }}</h3>
       
-      <!-- Descripción con truncamiento estricto -->
       <p class="destino-description">
         {{ truncatedDescription }}
         <button 
@@ -39,17 +38,16 @@
         </button>
       </p>
       
-      <!-- Metadatos en grid para mejor control -->
       <div class="destino-meta">
         <div class="meta-item">
-          <RocketIcon class="meta-icon" aria-hidden="true" />
+          <Planet class="meta-icon" aria-hidden="true" />
           <span class="meta-text">
             <span class="sr-only">Distancia:</span>
             {{ formattedDistance }}
           </span>
         </div>
         <div class="meta-item">
-          <CalendarIcon class="meta-icon" aria-hidden="true" />
+          <Calendar class="meta-icon" aria-hidden="true" />
           <span class="meta-text">
             <span class="sr-only">Duración:</span>
             {{ destino?.duracion || '?' }} días
@@ -57,7 +55,6 @@
         </div>
       </div>
       
-      <!-- Footer con precio y valoración -->
       <div class="destino-footer">
         <div class="precio">
           <span class="sr-only">Precio:</span>
@@ -78,7 +75,7 @@
               ]" 
               aria-hidden="true"
             >
-              <StarIcon class="star-icon" />
+              <Star class="star-icon" />
             </span>
           </div>
           <span class="reviews">({{ destino?.numResenas || 0 }})</span>
@@ -86,7 +83,6 @@
       </div>
     </div>
     
-    <!-- Diálogo para descripción completa -->
     <Modal 
       v-model="showDescriptionModal" 
       :title="destino?.nombre || 'Descripción del destino'"
@@ -98,112 +94,105 @@
   </div>
 </template>
 
-<script>
-import { RocketIcon, CalendarIcon, StarIcon } from 'lucide-vue-next';
+<script setup>
+import { Planet, Star, Calendar } from '@/utils/lucide-adapter';
 import Modal from '../ui/Modal.vue';
-import { formatPrice } from '@/utils/format';
+import { formatPrice } from '../../utils/format';
 import { computed, ref } from 'vue';
-import { getDestinationPlaceholder } from '@/utils/placeholder-utils';
+import { getDestinationPlaceholder } from '../../utils/placeholder-utils';
+import { getDestinoImagePath } from '../../utils/image-paths';
 
-export default {
-  name: 'DestinoCard',
-  components: {
-    RocketIcon,
-    CalendarIcon,
-    StarIcon,
-    Modal
-  },
-  props: {
-    destino: {
-      type: Object,
-      required: true
-    }
-  },
-  emits: ['click'],
-  setup(props) {
-    // Estado para el modal de descripción completa
-    const showDescriptionModal = ref(false);
-    
-    // Generar un ID único para este destino
-    const destinoId = ref(`destino-${Math.random().toString(36).substring(2, 11)}`);
-    
-    // Texto alternativo detallado para la imagen
-    const getImageAlt = computed(() => {
-      if (!props.destino) return 'Imagen de destino espacial';
-      
-      return `Imagen de ${props.destino.nombre || 'destino espacial'}, ${props.destino.categoria || 'destino'} espacial`;
-    });
-    
-    const truncatedDescription = computed(() => {
-      const text = props.destino?.descripcion || 'Sin descripción disponible';
-      const maxLength = 70; // Reducido para evitar desbordamiento
-      return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-    });
-    
-    const isDescriptionTruncated = computed(() => {
-      const text = props.destino?.descripcion || '';
-      return text.length > 70;
-    });
-    
-    const formattedDistance = computed(() => {
-      const distancia = props.destino?.distanciaTierra;
-      if (distancia === null || distancia === undefined) return 'Distancia desconocida';
-      return new Intl.NumberFormat('es-ES').format(distancia) + ' km';
-    });
-    
-    const formattedPrice = computed(() => {
-      return formatPrice(props.destino?.precio) || 'Precio no disponible';
-    });
-    
-    // Mostrar descripción completa
-    const showFullDescription = (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      showDescriptionModal.value = true;
-    };
-    
-    return {
-      destinoId,
-      getImageAlt,
-      truncatedDescription,
-      isDescriptionTruncated,
-      formattedDistance,
-      formattedPrice,
-      showDescriptionModal,
-      showFullDescription
-    };
+const props = defineProps({
+  destino: {
+    type: Object,
+    required: true
   }
+});
+
+const emit = defineEmits(['click']);
+
+const showDescriptionModal = ref(false);
+    
+const destinoId = ref(`destino-${Math.random().toString(36).substring(2, 11)}`);
+    
+const imageError = ref(false);
+    
+//Texto alternativo detallado para la imagen
+const getImageAlt = computed(() => {
+  if (!props.destino) return 'Imagen de destino espacial';
+      
+  return `Imagen de ${props.destino.nombre || 'destino espacial'}, ${props.destino.categoria || 'destino'} espacial`;
+});
+    
+const imageSrc = computed(() => {
+  if (imageError.value) {
+    return '/images/placeholder.svg';
+  }
+      
+  if (props.destino?.imagen) {
+    return props.destino.imagen;
+  }
+      
+  return getDestinoImagePath(props.destino?.nombre);
+});
+    
+const truncatedDescription = computed(() => {
+  const text = props.destino?.descripcion || 'Sin descripción disponible';
+  const maxLength = 70; // Reducido para evitar desbordamiento
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+});
+    
+const isDescriptionTruncated = computed(() => {
+  const text = props.destino?.descripcion || '';
+  return text.length > 70;
+});
+    
+const formattedDistance = computed(() => {
+  const distancia = props.destino?.distanciaTierra;
+  if (distancia === null || distancia === undefined) return 'Distancia desconocida';
+  return new Intl.NumberFormat('es-ES').format(distancia) + ' km';
+});
+    
+const formattedPrice = computed(() => {
+  return formatPrice(props.destino?.precio) || 'Precio no disponible';
+});
+    
+const showFullDescription = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  showDescriptionModal.value = true;
+};
+    
+const handleImageError = (event) => {
+  console.log("Error al cargar la imagen:", event.target.src);
+  imageError.value = true;
 };
 </script>
 
 <style scoped>
-/* Estilos base de la tarjeta */
 .destino-card {
   display: flex;
   flex-direction: column;
   background-color: var(--color-surface, white);
   border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   height: 100%;
   max-width: 100%;
   cursor: pointer;
-  position: relative;
-  isolation: isolate;
 }
 
 .destino-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(76, 201, 240, 0.2);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 .destino-card:focus {
-  outline: 2px solid var(--color-primary, #4cc9f0);
+  outline: 2px solid var(--color-primary, #7209b7);
   outline-offset: 2px;
 }
 
-/* Contenedor de imagen con altura fija */
 .destino-image {
   position: relative;
   height: 180px;
@@ -215,22 +204,19 @@ export default {
   transform: scale(1.05);
 }
 
-/* Badge de categoría */
 .categoria-badge {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  background: linear-gradient(135deg, var(--space-blue, #4cc9f0), var(--space-cyan, #38bdf8));
+  background-color: var(--color-primary, #7209b7);
   color: white;
   font-size: 0.75rem;
   font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Contenido de la tarjeta */
 .destino-content {
   display: flex;
   flex-direction: column;
@@ -239,7 +225,6 @@ export default {
   min-height: 0; /* Importante para que flex funcione correctamente */
 }
 
-/* Título con truncamiento */
 .destino-title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -250,7 +235,6 @@ export default {
   text-overflow: ellipsis;
 }
 
-/* Descripción con truncamiento estricto */
 .destino-description {
   font-size: 0.875rem;
   color: var(--color-text-secondary, #4a4a5a);
@@ -275,7 +259,6 @@ export default {
   cursor: pointer;
 }
 
-/* Metadatos */
 .destino-meta {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -304,7 +287,6 @@ export default {
   text-overflow: ellipsis;
 }
 
-/* Footer con precio y valoración */
 .destino-footer {
   display: flex;
   justify-content: space-between;
@@ -352,7 +334,6 @@ export default {
   margin-left: 0.25rem;
 }
 
-/* Clase para elementos solo para lectores de pantalla */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -365,7 +346,6 @@ export default {
   border-width: 0;
 }
 
-/* Media queries para diseño responsive */
 @media (max-width: 480px) {
   .destino-meta {
     grid-template-columns: 1fr;

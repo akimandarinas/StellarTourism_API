@@ -1,67 +1,53 @@
 <?php
-// Headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Incluir archivos de configuración y modelo
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/Ruta.php';
 require_once __DIR__ . '/../utils/auth_utils.php';
 require_once __DIR__ . '/../utils/response_utils.php';
 require_once __DIR__ . '/../utils/validation_utils.php';
 
-// Crear instancia de la base de datos
 $database = new Database();
 $db = $database->getConnection();
 
-// Crear instancia del objeto Ruta
 $ruta = new Ruta($db);
 
-// Obtener método de solicitud HTTP
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Verificar autenticación para métodos que lo requieren
 if (in_array($method, ['POST', 'PUT', 'DELETE'])) {
     $auth_header = getAuthorizationHeader();
     $token = getBearerToken($auth_header);
     
     if (!$token || !validateFirebaseToken($token)) {
-        // No autorizado
         sendJsonResponse(array("message" => "No autorizado."), 401);
         exit();
     }
     
-    // Verificar si es administrador para operaciones de escritura
     if (!isAdmin($token)) {
         sendJsonResponse(array("message" => "No autorizado. Se requiere rol de administrador."), 403);
         exit();
     }
 }
 
-// Procesar según el método
 switch($method) {
     case 'GET':
         // Verificar si se solicitan rutas populares
         if(isset($_GET['popular']) && $_GET['popular'] == 'true') {
-            // Leer rutas populares
             $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
             
-            // Validar limit
             if ($limit <= 0 || $limit > 20) {
                 $limit = 5; // Valor por defecto si es inválido
             }
             
             $rutas_data = $ruta->getRutasPopulares($limit);
             
-            // Enviar respuesta
             sendJsonResponse(array("records" => $rutas_data));
         }
-        // Verificar si se proporciona un ID
         else if(isset($_GET['id'])) {
-            // Leer una sola ruta
             $id = $_GET['id'];
             
             // Validar ID
@@ -76,16 +62,12 @@ switch($method) {
                 // Enviar respuesta
                 sendJsonResponse($ruta_data);
             } else {
-                // No se encontró la ruta
                 sendJsonResponse(array("message" => "Ruta no encontrada."), 404);
             }
         }
-        // Verificar si se proporciona un ID de destino
         else if(isset($_GET['destino_id'])) {
-            // Leer rutas por destino
             $destino_id = $_GET['destino_id'];
             
-            // Validar destino_id
             if (!validateId($destino_id)) {
                 sendJsonResponse(array("message" => "ID de destino inválido."), 400);
                 exit();
@@ -93,15 +75,11 @@ switch($method) {
             
             $rutas_data = $ruta->getRutasByDestino($destino_id);
             
-            // Enviar respuesta
             sendJsonResponse(array("records" => $rutas_data));
         }
-        // Verificar si se proporciona un ID de nave
         else if(isset($_GET['nave_id'])) {
-            // Leer rutas por nave
             $nave_id = $_GET['nave_id'];
             
-            // Validar nave_id
             if (!validateId($nave_id)) {
                 sendJsonResponse(array("message" => "ID de nave inválido."), 400);
                 exit();
@@ -112,78 +90,58 @@ switch($method) {
             // Enviar respuesta
             sendJsonResponse(array("records" => $rutas_data));
         } else {
-            // Leer todas las rutas
             $rutas_data = $ruta->getAll();
             
-            // Enviar respuesta
             sendJsonResponse(array("records" => $rutas_data));
         }
         break;
         
     case 'POST':
-        // Crear una ruta
-        // Obtener los datos enviados
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Validar datos
         $errors = validateRutaData($data);
         if (!empty($errors)) {
             sendJsonResponse(array("message" => "Errores de validación", "errors" => $errors), 400);
             exit();
         }
         
-        // Crear la ruta
         $result = $ruta->create($data);
         
         if($result) {
-            // Enviar respuesta
             sendJsonResponse(array(
                 "message" => "Ruta creada.",
                 "id" => $result
             ), 201);
         } else {
-            // Enviar respuesta
             sendJsonResponse(array("message" => "No se pudo crear la ruta."), 503);
         }
         break;
         
     case 'PUT':
-        // Actualizar una ruta
-        // Obtener el ID de la ruta a actualizar
         $data = json_decode(file_get_contents("php://input"), true);
-        
-        // Validar ID
         if(!isset($data['id']) || !validateId($data['id'])) {
             sendJsonResponse(array("message" => "ID de ruta inválido o no proporcionado."), 400);
             exit();
         }
         
-        // Validar datos
         $errors = validateRutaData($data, false);
         if (!empty($errors)) {
             sendJsonResponse(array("message" => "Errores de validación", "errors" => $errors), 400);
             exit();
         }
         
-        // Actualizar la ruta
         $id = $data['id'];
         unset($data['id']); // Eliminar el ID de los datos a actualizar
         
         if($ruta->update($id, $data)) {
-            // Enviar respuesta
             sendJsonResponse(array("message" => "Ruta actualizada."));
         } else {
-            // Enviar respuesta
             sendJsonResponse(array("message" => "No se pudo actualizar la ruta."), 503);
         }
         break;
         
     case 'DELETE':
-        // Eliminar una ruta
-        // Obtener el ID de la ruta a eliminar
-        $data = json_decode(file_get_contents("php://input"), true);
-        
-        // Validar ID
+        $data = json_decode(file_get_contents("php://input"), true);   
         if(!isset($data['id']) || !validateId($data['id'])) {
             sendJsonResponse(array("message" => "ID de ruta inválido o no proporcionado."), 400);
             exit();
@@ -191,25 +149,20 @@ switch($method) {
         
         // Eliminar la ruta
         if($ruta->delete($data['id'])) {
-            // Enviar respuesta
             sendJsonResponse(array("message" => "Ruta eliminada."));
         } else {
-            // Enviar respuesta
             sendJsonResponse(array("message" => "No se pudo eliminar la ruta."), 503);
         }
         break;
         
     default:
-        // Método no permitido
         sendJsonResponse(array("message" => "Método no permitido."), 405);
         break;
 }
 
-// Función para validar datos de ruta
 function validateRutaData($data, $isCreate = true) {
     $errors = [];
     
-    // Validar campos requeridos para creación
     if ($isCreate) {
         if (!isset($data['destino_id']) || !validateId($data['destino_id'])) {
             $errors[] = "Destino ID es requerido y debe ser un número entero positivo.";
@@ -281,7 +234,6 @@ function validateRutaData($data, $isCreate = true) {
         $errors[] = "Fecha de regreso debe tener un formato válido (YYYY-MM-DD).";
     }
     
-    // Validar que la fecha de regreso sea posterior a la fecha de salida
     if (isset($data['fecha_salida']) && isset($data['fecha_regreso']) && 
         validateDate($data['fecha_salida']) && validateDate($data['fecha_regreso'])) {
         $salida = new DateTime($data['fecha_salida']);
@@ -294,10 +246,6 @@ function validateRutaData($data, $isCreate = true) {
     
     return $errors;
 
-
-/**
- * Obtiene todos los registros
- */
 function getAll() {
     global $conn;
     
@@ -323,10 +271,8 @@ function getAll() {
 }
 
 /**
- * Obtiene un registro por su ID
- * 
- * @param int $id ID del registro
- */
+Obtiene un registro por su ID
+*/
 function getById($id) {
     global $conn;
     
@@ -352,21 +298,17 @@ function getById($id) {
 }
 
 /**
- * Crea un nuevo registro
- * 
- * @param array $data Datos del registro
+Crea un nuevo registro
  */
 function create($data) {
     global $conn;
     
     try {
-        // Validar datos
         if (empty($data)) {
             sendErrorResponse('No se proporcionaron datos', 400);
             return;
         }
         
-        // Preparar la consulta
         $columns = array_keys($data);
         $values = array_values($data);
         
@@ -378,7 +320,6 @@ function create($data) {
         $sql = "INSERT INTO ruta ($columnsStr) VALUES ($placeholdersStr)";
         $stmt = $conn->prepare($sql);
         
-        // Determinar los tipos de datos
         $types = '';
         foreach ($values as $value) {
             if (is_int($value)) {
@@ -392,7 +333,6 @@ function create($data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
         // Ejecutar la consulta
@@ -411,23 +351,15 @@ function create($data) {
     }
 }
 
-/**
- * Actualiza un registro existente
- * 
- * @param int $id ID del registro
- * @param array $data Datos del registro
- */
 function update($id, $data) {
     global $conn;
     
     try {
-        // Validar datos
         if (empty($data)) {
             sendErrorResponse('No se proporcionaron datos', 400);
             return;
         }
         
-        // Verificar si el registro existe
         $checkSql = "SELECT id FROM ruta WHERE id = ?";
         $checkStmt = $conn->prepare($checkSql);
         $checkStmt->bind_param("i", $id);
@@ -439,7 +371,6 @@ function update($id, $data) {
             return;
         }
         
-        // Preparar la consulta de actualización
         $updates = [];
         $values = [];
         
@@ -468,7 +399,6 @@ function update($id, $data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
         // Ejecutar la consulta
@@ -486,11 +416,6 @@ function update($id, $data) {
     }
 }
 
-/**
- * Elimina un registro
- * 
- * @param int $id ID del registro
- */
 function delete($id) {
     global $conn;
     
@@ -507,12 +432,10 @@ function delete($id) {
             return;
         }
         
-        // Preparar la consulta de eliminación
         $sql = "DELETE FROM ruta WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
         
-        // Ejecutar la consulta
         if ($stmt->execute()) {
             sendJsonResponse([
                 'status' => 'success',

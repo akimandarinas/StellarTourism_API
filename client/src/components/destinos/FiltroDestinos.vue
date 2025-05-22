@@ -208,7 +208,7 @@
 
 <script>
 import { ref, reactive, computed, watch, onMounted } from 'vue';
-import { FilterIcon, XIcon, SearchIcon } from 'lucide-vue-next';
+import { FilterIcon, XIcon, SearchIcon } from '@/utils/lucide-adapter';
 import { useMobile } from '../../composables/useMobile';
 
 // Detectar si estamos en el cliente o en el servidor

@@ -1,25 +1,19 @@
 <?php
-// Utilidades para envío de notificaciones
 
 // Enviar correo electrónico
 function sendEmail($to, $subject, $message, $from = null) {
-    // Configurar remitente
     $from = $from ?: getenv('EMAIL_FROM') ?: 'noreply@stellartourism.com';
-    
-    // Cabeceras
     $headers = "From: $from\r\n";
     $headers .= "Reply-To: $from\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-    
-    // Enviar correo
     return mail($to, $subject, $message, $headers);
 }
 
 // Enviar notificación de reserva
 function sendBookingNotification($user_email, $user_name, $booking_data) {
     $subject = "Confirmación de Reserva - StellarTourism";
-    
+
     $message = "
     <html>
     <head>

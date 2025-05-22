@@ -1,4 +1,3 @@
--- Crear tabla para eventos de webhook si no existe
 CREATE TABLE IF NOT EXISTS webhook_events (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tipo_evento VARCHAR(50) NOT NULL,
@@ -14,7 +13,6 @@ CREATE TABLE IF NOT EXISTS webhook_events (
     codigo_respuesta INT
 );
 
--- Crear tabla para configuración de webhooks
 CREATE TABLE IF NOT EXISTS webhook_configuracion (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -26,7 +24,7 @@ CREATE TABLE IF NOT EXISTS webhook_configuracion (
     ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Crear tabla para suscripciones de notificaciones
+-- para suscripciones de notificaciones
 CREATE TABLE IF NOT EXISTS notificaciones_suscripciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
@@ -38,7 +36,7 @@ CREATE TABLE IF NOT EXISTS notificaciones_suscripciones (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- Crear tabla para historial de notificaciones
+-- para historial de notificaciones
 CREATE TABLE IF NOT EXISTS notificaciones_historial (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
@@ -51,7 +49,7 @@ CREATE TABLE IF NOT EXISTS notificaciones_historial (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- Crear índices para optimizar consultas
+-- para optimizar consultas
 CREATE INDEX idx_webhook_events_tipo ON webhook_events(tipo_evento);
 CREATE INDEX idx_webhook_events_estado ON webhook_events(estado);
 CREATE INDEX idx_webhook_configuracion_activo ON webhook_configuracion(activo);

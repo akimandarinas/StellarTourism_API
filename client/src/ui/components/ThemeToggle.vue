@@ -17,7 +17,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { SunIcon, MoonIcon } from 'lucide-vue-next';
+import { SunIcon, MoonIcon } from '@/utils/lucide-adapter';
 import { isDarkTheme, toggleTheme } from '../theme';
 
 const props = defineProps({

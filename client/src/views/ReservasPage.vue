@@ -5,551 +5,318 @@
       <p>Gestiona tus viajes espaciales</p>
     </div>
     
-    <div v-if="!isLoggedIn" class="login-prompt">
-      <div class="login-content">
-        <LockIcon class="login-icon" />
-        <h2>Acceso Restringido</h2>
-        <p>Debes iniciar sesión para ver tus reservas</p>
-        <router-link to="/login" class="login-button">Iniciar Sesión</router-link>
-      </div>
-    </div>
-    
-    <template v-else>
-      <div class="filters-bar">
-        <div class="filter-tabs">
-          <button 
-            v-for="tab in statusTabs" 
-            :key="tab.value"
-            :class="['tab-button', { active: activeTab === tab.value }]"
-            @click="filterByStatus(tab.value)"
-          >
-            {{ tab.label }}
-          </button>
-        </div>
-        
-        <div class="search-container">
-          <div class="search-input">
-            <SearchIcon class="search-icon" />
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              placeholder="Buscar reservas..." 
-              @keyup.enter="searchReservations"
-            />
-          </div>
-        </div>
-      </div>
+    <div class="actions-bar">
+      <a href="/reservas/nueva" class="btn-nueva-reserva">
+        <span class="icon">+</span>
+        <span>Nueva Reserva</span>
+      </a>
       
-      <div class="sort-container">
-        <label for="sort-select">Ordenar por:</label>
-        <select id="sort-select" v-model="sortBy" @change="sortReservations" class="sort-select">
-          <option value="date-desc">Fecha: más reciente primero</option>
-          <option value="date-asc">Fecha: más antigua primero</option>
-          <option value="price-desc">Precio: mayor a menor</option>
-          <option value="price-asc">Precio: menor a mayor</option>
+      <div class="filters">
+        <select v-model="filtroEstado" class="filter-select">
+          <option value="">Todos los estados</option>
+          <option value="pendiente">Pendientes</option>
+          <option value="confirmada">Confirmadas</option>
+          <option value="completada">Completadas</option>
+          <option value="cancelada">Canceladas</option>
         </select>
-      </div>
-      
-      <div v-if="loading" class="loading-container">
-        <div class="loading-spinner"></div>
-        <p>Cargando reservas...</p>
-      </div>
-      
-      <div v-else-if="filteredReservations.length === 0" class="no-results">
-        <CalendarOffIcon class="no-results-icon" />
-        <h3>No se encontraron reservas</h3>
-        <p v-if="activeTab !== 'all'">Prueba a cambiar el filtro de estado</p>
-        <p v-else>Aún no tienes reservas</p>
-        <router-link to="/destinos" class="explore-button">Explorar destinos</router-link>
-      </div>
-      
-      <div v-else class="reservations-list">
-        <div 
-          v-for="reserva in paginatedReservations" 
-          :key="reserva.id" 
-          class="reservation-card"
-        >
-          <div class="reservation-header">
-            <div class="reservation-id">
-              <span class="label">Reserva #</span>
-              <span class="value">{{ reserva.id }}</span>
-            </div>
-            <div :class="['reservation-status', reserva.estado.toLowerCase()]">
-              {{ reserva.estado }}
-            </div>
-          </div>
-          
-          <div class="reservation-content">
-            <div class="reservation-destination">
-              <div class="destination-image" :style="{ backgroundImage: `url(${reserva.imagen})` }"></div>
-              <div class="destination-info">
-                <h3>{{ reserva.destino }}</h3>
-                <div class="destination-meta">
-                  <span class="destination-ship">
-                    <RocketIcon class="icon-small" />
-                    {{ reserva.nave }}
-                  </span>
-                  <span class="destination-passengers">
-                    <UsersIcon class="icon-small" />
-                    {{ reserva.pasajeros }} pasajeros
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="reservation-details">
-              <div class="detail-group">
-                <div class="detail-item">
-                  <span class="label">Fecha de salida</span>
-                  <span class="value">{{ formatDate(reserva.fechaSalida) }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">Fecha de regreso</span>
-                  <span class="value">{{ formatDate(reserva.fechaRegreso) }}</span>
-                </div>
-              </div>
-              
-              <div class="detail-group">
-                <div class="detail-item">
-                  <span class="label">Duración</span>
-                  <span class="value">{{ reserva.duracion }} días</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">Precio total</span>
-                  <span class="value price">{{ formatPrice(reserva.precio) }}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="reservation-actions">
-              <router-link :to="`/reservas/${reserva.id}`" class="view-button">
-                Ver detalles
-              </router-link>
-              
-              <button 
-                v-if="reserva.estado === 'Pendiente' || reserva.estado === 'Confirmada'"
-                class="cancel-button"
-                @click="showCancelModal(reserva)"
-              >
-                Cancelar reserva
-              </button>
-              
-              <button 
-                v-if="reserva.estado === 'Completada'"
-                class="review-button"
-                @click="showReviewModal(reserva)"
-              >
-                Dejar reseña
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="pagination">
-        <button 
-          class="pagination-button" 
-          :disabled="currentPage === 1"
-          @click="changePage(currentPage - 1)"
-        >
-          <ChevronLeftIcon />
-        </button>
         
-        <button 
-          v-for="page in totalPages" 
-          :key="page"
-          :class="['page-number', { active: page === currentPage }]"
-          @click="changePage(page)"
-        >
-          {{ page }}
-        </button>
-        
-        <button 
-          class="pagination-button" 
-          :disabled="currentPage === totalPages"
-          @click="changePage(currentPage + 1)"
-        >
-          <ChevronRightIcon />
-        </button>
+        <input 
+          type="text" 
+          v-model="busqueda" 
+          placeholder="Buscar reserva..." 
+          class="search-input"
+        />
       </div>
-    </template>
+    </div>
     
-    <!-- Modal de cancelación -->
-    <div v-if="showCancel" class="modal-overlay" @click="closeModal">
-      <div class="modal-container" @click.stop>
-        <div class="modal-header">
-          <h3>Cancelar Reserva</h3>
-          <button class="close-button" @click="closeModal">
-            <XIcon />
+    <div v-if="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Cargando tus reservas...</p>
+    </div>
+    
+    <div v-else-if="reservasFiltradas.length === 0" class="empty-state">
+      <div class="empty-icon">🚀</div>
+      <h2>No tienes reservas</h2>
+      <p v-if="filtroEstado || busqueda">No se encontraron reservas que coincidan con tu búsqueda.</p>
+      <p v-else>¡Comienza tu aventura espacial creando una nueva reserva!</p>
+      <a href="/reservas/nueva" class="btn-empty-action">Crear mi primera reserva</a>
+    </div>
+    
+    <div v-else class="reservas-list">
+      <div v-for="reserva in reservasFiltradas" :key="reserva.id" class="reserva-card">
+        <div class="reserva-header">
+          <div class="reserva-destino">
+            <h3>{{ reserva.destino }}</h3>
+            <span class="reserva-id">ID: {{ reserva.id }}</span>
+          </div>
+          <div class="reserva-estado" :class="'estado-' + reserva.estado.toLowerCase()">
+            {{ formatEstado(reserva.estado) }}
+          </div>
+        </div>
+        
+        <div class="reserva-details">
+          <div class="detail-item">
+            <span class="detail-label">Fecha de viaje:</span>
+            <span class="detail-value">{{ formatDate(reserva.fechaViaje) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Nave:</span>
+            <span class="detail-value">{{ reserva.nave }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Pasajeros:</span>
+            <span class="detail-value">{{ reserva.pasajeros }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Precio total:</span>
+            <span class="detail-value precio">{{ formatPrice(reserva.precio) }}</span>
+          </div>
+        </div>
+        
+        <div class="reserva-actions">
+          <a :href="`/reservas/${reserva.id}`" class="btn-ver">Ver detalles</a>
+          
+          <button 
+            v-if="reserva.estado.toLowerCase() === 'pendiente'" 
+            class="btn-pagar"
+            @click="procesarPago(reserva.id)"
+          >
+            Pendiente de pago
           </button>
-        </div>
-        <div class="modal-content">
-          <p>¿Estás seguro de que deseas cancelar la reserva para <strong>{{ selectedReservation?.destino }}</strong>?</p>
-          <p class="warning">Esta acción no se puede deshacer.</p>
           
-          <div class="cancellation-policy">
-            <h4>Política de cancelación:</h4>
-            <ul>
-              <li>Cancelación con más de 30 días de antelación: reembolso del 90%</li>
-              <li>Cancelación entre 15-30 días: reembolso del 50%</li>
-              <li>Cancelación con menos de 15 días: sin reembolso</li>
-            </ul>
-            
-            <div class="refund-info">
-              <p>Reembolso estimado: <strong>{{ calculateRefund(selectedReservation) }}</strong></p>
-            </div>
-          </div>
+          <button 
+            v-if="puedeModificar(reserva)" 
+            class="btn-modificar"
+            @click="modificarReserva(reserva.id)"
+          >
+            Modificar
+          </button>
           
-          <div class="cancellation-reason">
-            <label for="cancel-reason">Motivo de la cancelación (opcional):</label>
-            <textarea 
-              id="cancel-reason" 
-              v-model="cancellationReason" 
-              rows="3" 
-              placeholder="Indica el motivo de la cancelación..."
-            ></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="secondary-button" @click="closeModal">Volver</button>
-          <button class="danger-button" @click="confirmCancellation">Confirmar Cancelación</button>
+          <button 
+            v-if="puedeCancelar(reserva)" 
+            class="btn-cancelar"
+            @click="confirmarCancelacion(reserva.id)"
+          >
+            Cancelar
+          </button>
         </div>
       </div>
     </div>
     
-    <!-- Modal de reseña -->
-    <div v-if="showReview" class="modal-overlay" @click="closeModal">
-      <div class="modal-container" @click.stop>
+    <!-- Modal de confirmación de cancelación -->
+    <div v-if="showCancelModal" class="modal-overlay" @click="closeCancelModal">
+      <div class="modal-content" @click.stop>
         <div class="modal-header">
-          <h3>Dejar Reseña</h3>
-          <button class="close-button" @click="closeModal">
-            <XIcon />
-          </button>
+          <h3>Confirmar cancelación</h3>
+          <button class="modal-close" @click="closeCancelModal">×</button>
         </div>
-        <div class="modal-content">
-          <p>Comparte tu experiencia en <strong>{{ selectedReservation?.destino }}</strong></p>
-          
-          <div class="rating-container">
-            <label>Puntuación:</label>
-            <div class="star-rating">
-              <button 
-                v-for="star in 5" 
-                :key="star"
-                :class="['star-button', { active: star <= reviewRating }]"
-                @click="reviewRating = star"
-              >
-                <StarIcon />
-              </button>
-            </div>
-          </div>
-          
-          <div class="review-text">
-            <label for="review-content">Tu reseña:</label>
-            <textarea 
-              id="review-content" 
-              v-model="reviewContent" 
-              rows="5" 
-              placeholder="Comparte tu experiencia con otros viajeros..."
-            ></textarea>
-          </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+          <p class="warning-text">Esta acción no se puede deshacer y podrían aplicarse cargos por cancelación según la política de cancelación.</p>
         </div>
         <div class="modal-footer">
-          <button class="secondary-button" @click="closeModal">Cancelar</button>
-          <button 
-            class="primary-button" 
-            @click="submitReview"
-            :disabled="reviewRating === 0 || !reviewContent.trim()"
-          >
-            Enviar Reseña
-          </button>
+          <button class="btn-secondary" @click="closeCancelModal">No, mantener reserva</button>
+          <button class="btn-danger" @click="cancelarReserva">Sí, cancelar reserva</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { 
-  SearchIcon, RocketIcon, UsersIcon, LockIcon, 
-  CalendarOffIcon, ChevronLeftIcon, ChevronRightIcon,
-  XIcon, StarIcon
-} from 'lucide-vue-next';
 
-const router = useRouter();
-
-// Estado
-const isLoggedIn = ref(true); // Cambiar a false para probar el prompt de inicio de sesión
-const searchQuery = ref('');
-const activeTab = ref('all');
-const currentPage = ref(1);
-const itemsPerPage = 5;
-const loading = ref(false);
-const sortBy = ref('date-desc');
-
-// Estado para modales
-const showCancel = ref(false);
-const showReview = ref(false);
-const selectedReservation = ref(null);
-const cancellationReason = ref('');
-const reviewRating = ref(0);
-const reviewContent = ref('');
-
-// Datos de ejemplo
-const statusTabs = [
-  { label: 'Todas', value: 'all' },
-  { label: 'Pendientes', value: 'pendiente' },
-  { label: 'Confirmadas', value: 'confirmada' },
-  { label: 'Completadas', value: 'completada' },
-  { label: 'Canceladas', value: 'cancelada' }
-];
-
-const reservas = ref([
-  {
-    id: 'R-1001',
-    destino: 'Luna',
-    nave: 'Orion',
-    estado: 'Confirmada',
-    fechaSalida: new Date(2024, 5, 15),
-    fechaRegreso: new Date(2024, 5, 18),
-    duracion: 3,
-    pasajeros: 2,
-    precio: 30000,
-    imagen: '/placeholder.svg?height=300&width=500&query=moon+surface'
-  },
-  {
-    id: 'R-1002',
-    destino: 'Marte',
-    nave: 'Starship',
-    estado: 'Pendiente',
-    fechaSalida: new Date(2024, 7, 20),
-    fechaRegreso: new Date(2024, 7, 27),
-    duracion: 7,
-    pasajeros: 3,
-    precio: 105000,
-    imagen: '/placeholder.svg?height=300&width=500&query=mars+surface'
-  },
-  {
-    id: 'R-1003',
-    destino: 'Estación Espacial',
-    nave: 'Lunar Shuttle',
-    estado: 'Completada',
-    fechaSalida: new Date(2024, 2, 5),
-    fechaRegreso: new Date(2024, 2, 10),
-    duracion: 5,
-    pasajeros: 2,
-    precio: 24000,
-    imagen: '/placeholder.svg?height=300&width=500&query=space+station'
-  },
-  {
-    id: 'R-1004',
-    destino: 'Europa',
-    nave: 'Voyager X',
-    estado: 'Cancelada',
-    fechaSalida: new Date(2024, 4, 10),
-    fechaRegreso: new Date(2024, 4, 20),
-    duracion: 10,
-    pasajeros: 1,
-    precio: 50000,
-    imagen: '/placeholder.svg?height=300&width=500&query=europa+moon'
-  },
-  {
-    id: 'R-1005',
-    destino: 'Venus',
-    nave: 'Explorer I',
-    estado: 'Confirmada',
-    fechaSalida: new Date(2024, 8, 12),
-    fechaRegreso: new Date(2024, 8, 18),
-    duracion: 6,
-    pasajeros: 2,
-    precio: 60000,
-    imagen: '/placeholder.svg?height=300&width=500&query=venus+planet'
-  },
-  {
-    id: 'R-1006',
-    destino: 'Titán',
-    nave: 'Mars Pioneer',
-    estado: 'Pendiente',
-    fechaSalida: new Date(2024, 9, 5),
-    fechaRegreso: new Date(2024, 9, 17),
-    duracion: 12,
-    pasajeros: 4,
-    precio: 240000,
-    imagen: '/placeholder.svg?height=300&width=500&query=titan+moon'
-  },
-  {
-    id: 'R-1007',
-    destino: 'Ceres',
-    nave: 'Asteroid Miner',
-    estado: 'Confirmada',
-    fechaSalida: new Date(2024, 10, 15),
-    fechaRegreso: new Date(2024, 10, 24),
-    duracion: 9,
-    pasajeros: 2,
-    precio: 90000,
-    imagen: '/placeholder.svg?height=300&width=500&query=ceres+asteroid'
+export default {
+  name: 'ReservasPage',
+  
+  setup() {
+    const reservas = ref([]);
+    const loading = ref(true);
+    const filtroEstado = ref('');
+    const busqueda = ref('');
+    const showCancelModal = ref(false);
+    const reservaIdACancelar = ref(null);
+    
+    const cargarReservas = async () => {
+      loading.value = true;
+      try {
+        // En un entorno real, esto sería una llamada a la API
+        // Por ahora, usamos datos de ejemplo
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        reservas.value = [
+          {
+            id: 'RES-123456',
+            destino: 'Luna - Base Artemisa',
+            nave: 'Aurora Estelar',
+            fechaViaje: '2025-08-15',
+            pasajeros: 2,
+            precio: 3000000,
+            estado: 'PENDIENTE'
+          },
+          {
+            id: 'RES-789012',
+            destino: 'Marte - Colonia Ares',
+            nave: 'Voyager Marciano',
+            fechaViaje: '2025-09-20',
+            pasajeros: 3,
+            precio: 10500000,
+            estado: 'CONFIRMADA'
+          },
+          {
+            id: 'RES-345678',
+            destino: 'Estación Orbital Internacional',
+            nave: 'Halcón Lunar',
+            fechaViaje: '2025-07-05',
+            pasajeros: 1,
+            precio: 950000,
+            estado: 'COMPLETADA'
+          },
+          {
+            id: 'RES-901234',
+            destino: 'Venus - Estación Afrodita',
+            nave: 'Nexus Orbital',
+            fechaViaje: '2025-10-10',
+            pasajeros: 2,
+            precio: 8400000,
+            estado: 'CANCELADA'
+          }
+        ];
+      } catch (error) {
+        console.error('Error al cargar reservas:', error);
+      } finally {
+        loading.value = false;
+      }
+    };
+    
+    const reservasFiltradas = computed(() => {
+      let resultado = reservas.value;
+      
+      //Filtrar por estado
+      if (filtroEstado.value) {
+        resultado = resultado.filter(r => 
+          r.estado.toLowerCase() === filtroEstado.value.toLowerCase()
+        );
+      }
+      
+      //Filtrar por búsqueda
+      if (busqueda.value) {
+        const termino = busqueda.value.toLowerCase();
+        resultado = resultado.filter(r => 
+          r.id.toLowerCase().includes(termino) ||
+          r.destino.toLowerCase().includes(termino) ||
+          r.nave.toLowerCase().includes(termino)
+        );
+      }
+      
+      return resultado;
+    });
+    
+    // Métodos
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+      
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('es-ES', { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      }).format(date);
+    };
+    
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat('es-ES', { 
+        style: 'currency', 
+        currency: 'EUR' 
+      }).format(price);
+    };
+    
+    const formatEstado = (estado) => {
+      const estados = {
+        'PENDIENTE': 'Pendiente de pago',
+        'CONFIRMADA': 'Confirmada',
+        'COMPLETADA': 'Completada',
+        'CANCELADA': 'Cancelada'
+      };
+      
+      return estados[estado] || estado;
+    };
+    
+    const procesarPago = (reservaId) => {
+      window.location.href = `/reservas/${reservaId}/pago`;
+    };
+    
+    const modificarReserva = (reservaId) => {
+      window.location.href = `/reservas/${reservaId}/editar`;
+    };
+    
+    const confirmarCancelacion = (reservaId) => {
+      reservaIdACancelar.value = reservaId;
+      showCancelModal.value = true;
+    };
+    
+    const closeCancelModal = () => {
+      showCancelModal.value = false;
+      reservaIdACancelar.value = null;
+    };
+    
+    const cancelarReserva = async () => {
+      try {
+        // En un entorno real, esto sería una llamada a la API
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const reserva = reservas.value.find(r => r.id === reservaIdACancelar.value);
+        if (reserva) {
+          reserva.estado = 'CANCELADA';
+        }
+        
+        closeCancelModal();
+        
+        alert('Reserva cancelada con éxito');
+      } catch (error) {
+        console.error('Error al cancelar reserva:', error);
+      }
+    };
+    
+    const puedeModificar = (reserva) => {
+      return ['PENDIENTE', 'CONFIRMADA'].includes(reserva.estado);
+    };
+    
+    const puedeCancelar = (reserva) => {
+      return ['PENDIENTE', 'CONFIRMADA'].includes(reserva.estado);
+    };
+    
+    onMounted(() => {
+      cargarReservas();
+    });
+    
+    return {
+      reservas,
+      loading,
+      filtroEstado,
+      busqueda,
+      showCancelModal,
+      reservasFiltradas,
+      formatDate,
+      formatPrice,
+      formatEstado,
+      procesarPago,
+      modificarReserva,
+      confirmarCancelacion,
+      closeCancelModal,
+      cancelarReserva,
+      puedeModificar,
+      puedeCancelar
+    };
   }
-]);
-
-// Reservas filtradas
-const filteredReservations = computed(() => {
-  let result = [...reservas.value];
-  
-  // Filtrar por búsqueda
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    result = result.filter(reserva => 
-      reserva.destino.toLowerCase().includes(query) ||
-      reserva.nave.toLowerCase().includes(query) ||
-      reserva.id.toLowerCase().includes(query)
-    );
-  }
-  
-  // Filtrar por estado
-  if (activeTab.value !== 'all') {
-    result = result.filter(reserva => 
-      reserva.estado.toLowerCase() === activeTab.value
-    );
-  }
-  
-  // Ordenar
-  switch (sortBy.value) {
-    case 'date-asc':
-      result.sort((a, b) => a.fechaSalida - b.fechaSalida);
-      break;
-    case 'date-desc':
-      result.sort((a, b) => b.fechaSalida - a.fechaSalida);
-      break;
-    case 'price-asc':
-      result.sort((a, b) => a.precio - b.precio);
-      break;
-    case 'price-desc':
-      result.sort((a, b) => b.precio - a.precio);
-      break;
-  }
-  
-  return result;
-});
-
-// Paginación
-const paginatedReservations = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredReservations.value.slice(start, end);
-});
-
-const totalPages = computed(() => 
-  Math.ceil(filteredReservations.value.length / itemsPerPage)
-);
-
-// Métodos
-function searchReservations() {
-  currentPage.value = 1;
-}
-
-function filterByStatus(status) {
-  activeTab.value = status;
-  currentPage.value = 1;
-}
-
-function sortReservations() {
-  currentPage.value = 1;
-}
-
-function changePage(page) {
-  currentPage.value = page;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function formatDate(date) {
-  return new Intl.DateTimeFormat('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }).format(date);
-}
-
-function formatPrice(price) {
-  return `$${price.toLocaleString()}`;
-}
-
-function showCancelModal(reservation) {
-  selectedReservation.value = reservation;
-  showCancel.value = true;
-}
-
-function showReviewModal(reservation) {
-  selectedReservation.value = reservation;
-  showReview.value = true;
-}
-
-function closeModal() {
-  showCancel.value = false;
-  showReview.value = false;
-  selectedReservation.value = null;
-  cancellationReason.value = '';
-  reviewRating.value = 0;
-  reviewContent.value = '';
-}
-
-function calculateRefund(reservation) {
-  if (!reservation) return '$0';
-  
-  const today = new Date();
-  const departureDate = new Date(reservation.fechaSalida);
-  const daysUntilDeparture = Math.ceil((departureDate - today) / (1000 * 60 * 60 * 24));
-  
-  let refundPercentage = 0;
-  if (daysUntilDeparture > 30) {
-    refundPercentage = 0.9;
-  } else if (daysUntilDeparture >= 15) {
-    refundPercentage = 0.5;
-  }
-  
-  const refundAmount = reservation.precio * refundPercentage;
-  return formatPrice(refundAmount);
-}
-
-function confirmCancellation() {
-  // Aquí iría la lógica para cancelar la reserva
-  console.log('Cancelando reserva:', selectedReservation.value.id);
-  console.log('Motivo:', cancellationReason.value);
-  
-  // Actualizar el estado de la reserva en el array
-  const index = reservas.value.findIndex(r => r.id === selectedReservation.value.id);
-  if (index !== -1) {
-    reservas.value[index].estado = 'Cancelada';
-  }
-  
-  closeModal();
-}
-
-function submitReview() {
-  // Aquí iría la lógica para enviar la reseña
-  console.log('Enviando reseña para:', selectedReservation.value.destino);
-  console.log('Puntuación:', reviewRating.value);
-  console.log('Contenido:', reviewContent.value);
-  
-  closeModal();
-}
-
-// Simulación de carga de datos
-onMounted(() => {
-  loading.value = true;
-  
-  // Simular carga de datos
-  setTimeout(() => {
-    loading.value = false;
-  }, 1000);
-});
+};
 </script>
 
 <style scoped>
 .reservas-page {
-  max-width: var(--content-max-width);
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2rem;
 }
 
 .page-header {
@@ -559,144 +326,64 @@ onMounted(() => {
 
 .page-header h1 {
   font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
   margin-bottom: 0.5rem;
-  color: var(--color-text);
 }
 
 .page-header p {
-  font-size: 1.2rem;
-  color: var(--color-text-secondary);
+  font-size: 1.125rem;
+  color: #6b7280;
 }
 
-.login-prompt {
-  background-color: var(--color-surface);
-  border-radius: var(--border-radius-md);
-  padding: 3rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  text-align: center;
-}
-
-.login-content {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.login-icon {
-  width: 64px;
-  height: 64px;
-  color: var(--color-primary);
-  margin-bottom: 1.5rem;
-}
-
-.login-prompt h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: var(--color-text);
-}
-
-.login-prompt p {
-  color: var(--color-text-secondary);
-  margin-bottom: 2rem;
-}
-
-.login-button {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: var(--color-primary);
-  color: white;
-  border-radius: var(--border-radius-sm);
-  text-decoration: none;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.login-button:hover {
-  background-color: var(--color-primary-dark);
-}
-
-.filters-bar {
+.actions-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.filter-tabs {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.tab-button {
-  padding: 0.5rem 1rem;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  color: var(--color-text);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.tab-button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.tab-button.active {
-  background-color: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-}
-
-.search-container {
-  flex: 1;
-  max-width: 300px;
-}
-
-.search-input {
-  display: flex;
-  align-items: center;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  padding: 0.5rem 1rem;
-}
-
-.search-icon {
-  color: var(--color-text-secondary);
-  margin-right: 0.5rem;
-}
-
-.search-input input {
-  flex: 1;
-  border: none;
-  padding: 0.25rem 0;
-  font-size: 0.875rem;
-  background: transparent;
-  color: var(--color-text);
-}
-
-.search-input input:focus {
-  outline: none;
-}
-
-.sort-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   margin-bottom: 2rem;
 }
 
-.sort-select {
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+.btn-nueva-reserva {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #7c3aed;
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-nueva-reserva:hover {
+  background-color: #6d28d9;
+}
+
+.btn-nueva-reserva .icon {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+}
+
+.filter-select,
+.search-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
   font-size: 0.875rem;
+}
+
+.filter-select {
+  min-width: 150px;
+}
+
+.search-input {
+  min-width: 200px;
 }
 
 .loading-container {
@@ -704,15 +391,15 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem;
+  padding: 4rem 0;
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid #e5e7eb;
+  border-top-color: #7c3aed;
   border-radius: 50%;
-  border-top-color: var(--color-primary);
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
@@ -723,268 +410,203 @@ onMounted(() => {
   }
 }
 
-.no-results {
+.empty-state {
   text-align: center;
-  padding: 3rem;
-  background-color: var(--color-surface);
-  border-radius: var(--border-radius-md);
+  padding: 4rem 0;
 }
 
-.no-results-icon {
-  width: 64px;
-  height: 64px;
-  color: var(--color-text-secondary);
+.empty-icon {
+  font-size: 4rem;
   margin-bottom: 1rem;
 }
 
-.no-results h3 {
+.empty-state h2 {
   font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
   margin-bottom: 0.5rem;
-  color: var(--color-text);
 }
 
-.no-results p {
-  color: var(--color-text-secondary);
+.empty-state p {
+  font-size: 1rem;
+  color: #6b7280;
   margin-bottom: 1.5rem;
 }
 
-.explore-button {
+.btn-empty-action {
   display: inline-block;
   padding: 0.75rem 1.5rem;
-  background-color: var(--color-primary);
+  background-color: #7c3aed;
   color: white;
-  border-radius: var(--border-radius-sm);
-  text-decoration: none;
+  border-radius: 0.375rem;
   font-weight: 500;
-  transition: background-color 0.3s;
+  text-decoration: none;
+  transition: all 0.2s;
 }
 
-.explore-button:hover {
-  background-color: var(--color-primary-dark);
+.btn-empty-action:hover {
+  background-color: #6d28d9;
 }
 
-.reservations-list {
-  display: flex;
-  flex-direction: column;
+.reservas-list {
+  display: grid;
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
-.reservation-card {
-  background-color: var(--color-surface);
-  border-radius: var(--border-radius-md);
+.reserva-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
 
-.reservation-header {
+.reserva-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.reserva-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.reservation-id {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.label {
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-}
-
-.value {
+.reserva-destino h3 {
+  font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-text);
+  color: #1f2937;
+  margin-bottom: 0.25rem;
 }
 
-.reservation-status {
+.reserva-id {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.reserva-estado {
   padding: 0.25rem 0.75rem;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.875rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
   font-weight: 500;
+  text-transform: uppercase;
 }
 
-.reservation-status.pendiente {
-  background-color: #f59e0b;
-  color: white;
+.estado-pendiente {
+  background-color: #fef3c7;
+  color: #92400e;
 }
 
-.reservation-status.confirmada {
-  background-color: var(--color-primary);
-  color: white;
+.estado-confirmada {
+  background-color: #dbeafe;
+  color: #1e40af;
 }
 
-.reservation-status.completada {
-  background-color: var(--color-success);
-  color: white;
+.estado-completada {
+  background-color: #d1fae5;
+  color: #065f46;
 }
 
-.reservation-status.cancelada {
-  background-color: var(--color-error);
-  color: white;
+.estado-cancelada {
+  background-color: #fee2e2;
+  color: #b91c1c;
 }
 
-.reservation-content {
-  padding: 1.5rem;
-}
-
-.reservation-destination {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.destination-image {
-  width: 120px;
-  height: 80px;
-  background-size: cover;
-  background-position: center;
-  border-radius: var(--border-radius-sm);
-}
-
-.destination-info {
-  flex: 1;
-}
-
-.destination-info h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--color-text);
-}
-
-.destination-meta {
-  display: flex;
-  gap: 1.5rem;
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-}
-
-.destination-ship, .destination-passengers {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.icon-small {
-  width: 16px;
-  height: 16px;
-}
-
-.reservation-details {
+.reserva-details {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding: 1.5rem;
-  background-color: var(--color-background);
-  border-radius: var(--border-radius-sm);
-}
-
-.detail-group {
-  display: flex;
-  flex-direction: column;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
+  padding: 1.5rem;
 }
 
 .detail-item {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
 }
 
-.price {
-  color: var(--color-primary);
-  font-weight: 700;
+.detail-label {
+  font-size: 0.75rem;
+  color: #6b7280;
 }
 
-.reservation-actions {
+.detail-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.detail-value.precio {
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.reserva-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
 }
 
-.view-button, .cancel-button, .review-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--border-radius-sm);
+.btn-ver,
+.btn-pagar,
+.btn-modificar,
+.btn-cancelar {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
-  text-align: center;
+  transition: all 0.2s;
 }
 
-.view-button {
-  background-color: var(--color-primary);
-  color: white;
+.btn-ver {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
   text-decoration: none;
 }
 
-.view-button:hover {
-  background-color: var(--color-primary-dark);
+.btn-ver:hover {
+  background-color: #e5e7eb;
 }
 
-.cancel-button {
-  background-color: transparent;
-  border: 1px solid var(--color-error);
-  color: var(--color-error);
-}
-
-.cancel-button:hover {
-  background-color: var(--color-error);
+.btn-pagar {
+  background-color: #7c3aed;
   color: white;
+  border: none;
 }
 
-.review-button {
-  background-color: transparent;
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
+.btn-pagar:hover {
+  background-color: #6d28d9;
 }
 
-.review-button:hover {
-  background-color: var(--color-primary);
-  color: white;
+.btn-modificar {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
+.btn-modificar:hover {
+  background-color: #bfdbfe;
 }
 
-.pagination-button, .page-number {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  cursor: pointer;
-  transition: all 0.3s;
+.btn-cancelar {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }
 
-.pagination-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.btn-cancelar:hover {
+  background-color: #fecaca;
 }
 
-.pagination-button:not(:disabled):hover, .page-number:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.page-number.active {
-  background-color: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-}
-
-/* Modal Styles */
+/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -995,207 +617,123 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
+  z-index: 50;
 }
 
-.modal-container {
-  background-color: var(--color-surface);
-  border-radius: var(--border-radius-md);
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+.modal-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  width: 90%;
+  max-width: 500px;
+  overflow: hidden;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .modal-header h3 {
-  font-size: 1.5rem;
-  color: var(--color-text);
-  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
 }
 
-.close-button {
+.modal-close {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
+  font-size: 1.5rem;
+  color: #6b7280;
   cursor: pointer;
-  transition: color 0.3s;
 }
 
-.close-button:hover {
-  color: var(--color-text);
-}
-
-.modal-content {
+.modal-body {
   padding: 1.5rem;
 }
 
-.warning {
-  color: var(--color-error);
-  font-weight: 500;
-  margin-top: 0.5rem;
-}
-
-.cancellation-policy {
-  background-color: var(--color-background);
-  padding: 1rem;
-  border-radius: var(--border-radius-sm);
-  margin: 1.5rem 0;
-}
-
-.cancellation-policy h4 {
-  margin-bottom: 0.5rem;
-  color: var(--color-text);
-}
-
-.cancellation-policy ul {
-  padding-left: 1.5rem;
+.modal-body p {
   margin-bottom: 1rem;
+  color: #4b5563;
 }
 
-.cancellation-policy li {
-  margin-bottom: 0.25rem;
-  color: var(--color-text-secondary);
-}
-
-.refund-info {
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--color-border);
-}
-
-.cancellation-reason, .review-text {
-  margin-top: 1.5rem;
-}
-
-.cancellation-reason label, .review-text label, .rating-container label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--color-text);
-}
-
-textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  resize: vertical;
-}
-
-textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-.rating-container {
-  margin-bottom: 1.5rem;
-}
-
-.star-rating {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.star-button {
-  background: none;
-  border: none;
-  color: #d1d5db;
-  cursor: pointer;
-  transition: color 0.3s;
-  padding: 0;
-}
-
-.star-button.active {
-  color: #f59e0b;
+.warning-text {
+  color: #b91c1c;
+  font-size: 0.875rem;
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  padding: 1.5rem;
-  border-top: 1px solid var(--color-border);
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
 }
 
-.secondary-button, .danger-button, .primary-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--border-radius-sm);
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
 }
 
-.secondary-button {
-  background-color: transparent;
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
+.btn-secondary:hover {
+  background-color: #e5e7eb;
 }
 
-.secondary-button:hover {
-  border-color: var(--color-text);
-}
-
-.danger-button {
-  background-color: var(--color-error);
+.btn-danger {
+  padding: 0.5rem 1rem;
+  background-color: #ef4444;
   color: white;
   border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.danger-button:hover {
+.btn-danger:hover {
   background-color: #dc2626;
 }
 
-.primary-button {
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-}
-
-.primary-button:hover {
-  background-color: var(--color-primary-dark);
-}
-
-.primary-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+/* Responsive styles */
 @media (max-width: 768px) {
-  .filters-bar {
+  .reservas-page {
+    padding: 1rem;
+  }
+  
+  .actions-bar {
     flex-direction: column;
+    gap: 1rem;
     align-items: stretch;
   }
   
-  .search-container {
-    max-width: none;
-  }
-  
-  .reservation-destination {
+  .filters {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
   }
   
-  .destination-image {
-    width: 100%;
-    height: 150px;
+  .reserva-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
   
-  .reservation-details {
+  .reserva-details {
     grid-template-columns: 1fr;
   }
   
-  .reservation-actions {
-    flex-direction: column;
+  .reserva-actions {
+    flex-wrap: wrap;
   }
 }
 </style>

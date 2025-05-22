@@ -1,8 +1,6 @@
 <?php
-// Archivo para el endpoint raíz de la API
 header('Content-Type: application/json');
 
-// Obtener la URL base
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
 $baseUrl = $protocol . '://' . $host;
@@ -55,5 +53,4 @@ $response = [
     'timestamp' => date('Y-m-d H:i:s')
 ];
 
-// Enviar respuesta
 echo json_encode($response, JSON_PRETTY_PRINT);

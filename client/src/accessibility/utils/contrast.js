@@ -1,15 +1,3 @@
-/**
- * Utilidades para manejar el contraste y los colores
- */
-
-/**
- * Verifica si el contraste entre dos colores es suficiente según WCAG
- * @param {string} foreground - Color de primer plano (formato hex)
- * @param {string} background - Color de fondo (formato hex)
- * @param {string} level - Nivel de conformidad ('AA' o 'AAA')
- * @param {boolean} isLargeText - Si el texto es grande (>= 18pt o >= 14pt bold)
- * @returns {boolean} - True si el contraste es suficiente
- */
 export function hasAdequateContrast(foreground, background, level = "AA", isLargeText = false) {
   // Convertir colores hex a RGB
   const hexToRgb = (hex) => {
@@ -26,7 +14,6 @@ export function hasAdequateContrast(foreground, background, level = "AA", isLarg
       : null
   }
 
-  // Calcular luminancia relativa
   const getLuminance = (color) => {
     const rgb = hexToRgb(color)
     if (!rgb) return 0
@@ -56,11 +43,6 @@ export function hasAdequateContrast(foreground, background, level = "AA", isLarg
   return isLargeText ? ratio >= 3 : ratio >= 4.5
 }
 
-/**
- * Aplica estilos de alto contraste a un elemento
- * @param {HTMLElement} element - Elemento a modificar
- * @param {boolean} enabled - Si el alto contraste está habilitado
- */
 export function applyHighContrast(element, enabled = true) {
   if (!element) return
 

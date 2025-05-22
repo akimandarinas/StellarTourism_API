@@ -3,26 +3,27 @@ import { createPinia } from "pinia"
 import App from "./App.vue"
 import { getRouter } from "./router"
 
-// Función para determinar si estamos en el cliente
+// Crear la instancia de Pinia primero
+const pinia = createPinia()
+window.__pinia = pinia
+
 function isClient() {
   return typeof window !== "undefined"
 }
 
-// Solo inicializar la aplicación en el cliente
 if (isClient()) {
   // Inicializar la aplicación de forma asíncrona
   async function initApp() {
     const app = createApp(App)
-    const pinia = createPinia()
     const router = await getRouter()
 
+    // Usar Pinia antes que cualquier otro plugin
     app.use(pinia)
 
     if (router) {
       app.use(router)
     }
 
-    // Montar la aplicación cuando el DOM esté listo
     document.addEventListener("DOMContentLoaded", () => {
       const mountPoint = document.getElementById("app")
       if (mountPoint) {
@@ -37,5 +38,4 @@ if (isClient()) {
   initApp().catch(console.error)
 }
 
-// Exportar componentes para SSR (si es necesario)
-export { App }
+export { App, pinia }

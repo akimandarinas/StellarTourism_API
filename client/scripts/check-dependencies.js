@@ -1,14 +1,11 @@
 #!/usr/bin/env node
 
-/**
- * Script para verificar que todas las dependencias estén instaladas y en versiones compatibles
- */
+/* Script para verificar que todas las dependencias estén instaladas y en versiones compatibles */
 
 import fs from "fs"
 import path from "path"
 import { execSync } from "child_process"
 
-// Colores para la consola
 const colors = {
   reset: "\x1b[0m",
   red: "\x1b[31m",
@@ -19,12 +16,11 @@ const colors = {
   cyan: "\x1b[36m",
 }
 
-// Función para imprimir mensajes con colores
+// Función para imprimir mensajes en la consola
 function log(message, color = colors.reset) {
   console.log(`${color}${message}${colors.reset}`)
 }
 
-// Función para verificar si un comando existe
 function commandExists(command) {
   try {
     execSync(`which ${command}`, { stdio: "ignore" })
@@ -45,7 +41,6 @@ function checkNodeVersion() {
   const packageJson = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"))
   const engineNode = packageJson.engines?.node || requiredVersion
 
-  // Verificación simple (podría mejorarse con semver)
   const currentVersion = Number.parseInt(nodeVersion.slice(1).split(".")[0], 10)
   const requiredMinVersion = Number.parseInt(engineNode.replace(">=", "").split(".")[0], 10)
 
@@ -79,7 +74,6 @@ function checkDependencies() {
   log("Verificando dependencias...", colors.cyan)
 
   try {
-    // Verificar si node_modules existe
     if (!fs.existsSync(path.resolve("node_modules"))) {
       log("Error: Las dependencias no están instaladas", colors.red)
       log("Por favor, ejecuta: npm install", colors.yellow)
@@ -91,7 +85,6 @@ function checkDependencies() {
 
     for (const dep of criticalDeps) {
       try {
-        // Intentar importar la dependencia
         const depPath = path.resolve(`node_modules/${dep}/package.json`)
         if (!fs.existsSync(depPath)) {
           log(`Error: Dependencia crítica no encontrada: ${dep}`, colors.red)
@@ -119,7 +112,6 @@ function checkVersionCompatibility() {
   log("Verificando compatibilidad de versiones...", colors.cyan)
 
   try {
-    // Verificar compatibilidad de Vue y Vue Router
     const vuePackage = JSON.parse(fs.readFileSync(path.resolve("node_modules/vue/package.json"), "utf8"))
     const vueRouterPackage = JSON.parse(fs.readFileSync(path.resolve("node_modules/vue-router/package.json"), "utf8"))
 
@@ -156,7 +148,8 @@ function checkVersionCompatibility() {
   }
 }
 
-// Función principal
+
+
 function main() {
   log("=== Verificación de dependencias ===", colors.magenta)
 
@@ -168,5 +161,4 @@ function main() {
   log("=== Verificación completada con éxito ===", colors.magenta)
 }
 
-// Ejecutar la función principal
 main()

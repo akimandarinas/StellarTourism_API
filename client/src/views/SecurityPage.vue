@@ -184,7 +184,7 @@
             <div v-else class="space-y-4">
               <div v-for="(activity, index) in accountActivity" :key="index" class="flex items-start space-x-3 py-3 border-b border-gray-200 dark:border-gray-700">
                 <div class="bg-gray-100 dark:bg-gray-800 p-2 rounded-full">
-                  <component :is="getActivityIcon(activity.type)" class="h-5 w-5 text-gray-500 dark:text-gray-400" />
+               
                 </div>
                 
                 <div>
@@ -211,8 +211,7 @@ import { useAuthStore } from '../stores/auth'
 import SessionsManager from '../components/auth/SessionsManager.vue'
 import { 
   KeyIcon, 
-  ShieldIcon, 
-  ActivityIcon, 
+  ShieldIcon,  
   UsersIcon, 
   AlertTriangleIcon,
   LogInIcon,
@@ -220,7 +219,7 @@ import {
   UserIcon,
   SettingsIcon,
   LockIcon
-} from 'lucide-vue-next'
+} from '@/utils/lucide-adapter'
 
 // Store
 const authStore = useAuthStore()
@@ -246,7 +245,7 @@ const menuItems = [
   { id: 'sessions', name: 'Sesiones activas', icon: UsersIcon },
   { id: 'password', name: 'Cambiar contraseña', icon: KeyIcon },
   { id: '2fa', name: 'Verificación en dos pasos', icon: ShieldIcon },
-  { id: 'activity', name: 'Actividad de la cuenta', icon: ActivityIcon }
+  { id: 'activity', name: 'Actividad de la cuenta', icon: KeyIcon }
 ]
 
 // Métodos
@@ -327,16 +326,7 @@ const fetchAccountActivity = async () => {
   }
 }
 
-const getActivityIcon = (type) => {
-  switch (type) {
-    case 'login': return LogInIcon
-    case 'logout': return LogOutIcon
-    case 'password_change': return LockIcon
-    case 'profile_update': return UserIcon
-    case 'settings_change': return SettingsIcon
-    default: return ActivityIcon
-  }
-}
+
 
 const getActivityTitle = (activity) => {
   switch (activity.type) {

@@ -1,10 +1,8 @@
 -- Crear la base de datos
 CREATE DATABASE IF NOT EXISTS stellar_tourism CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Usar la base de datos
 USE stellar_tourism;
 
--- Tabla de usuarios
 CREATE TABLE IF NOT EXISTS usuarios (
    id INT AUTO_INCREMENT PRIMARY KEY,
    firebase_uid VARCHAR(128) UNIQUE,
@@ -39,7 +37,6 @@ CREATE TABLE IF NOT EXISTS destinos (
    activo BOOLEAN DEFAULT TRUE,
    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   -- Columnas adicionales según el análisis
    imagen VARCHAR(255),
    precio DECIMAL(10,2) NOT NULL DEFAULT 0,
    duracion INT NOT NULL DEFAULT 0 COMMENT 'Duración en días',
@@ -62,7 +59,6 @@ CREATE TABLE IF NOT EXISTS naves (
    activo BOOLEAN DEFAULT TRUE,
    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   -- Columnas adicionales según el análisis
    imagen VARCHAR(255),
    capacidad VARCHAR(255),
    velocidad VARCHAR(255),
@@ -86,7 +82,6 @@ CREATE TABLE IF NOT EXISTS rutas (
    activo BOOLEAN DEFAULT TRUE,
    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   -- Columna adicional según el análisis
    origen_id VARCHAR(255),
    FOREIGN KEY (destino_id) REFERENCES destinos(id) ON DELETE CASCADE,
    FOREIGN KEY (nave_id) REFERENCES naves(id) ON DELETE CASCADE
@@ -105,7 +100,6 @@ CREATE TABLE IF NOT EXISTS actividades (
    activo BOOLEAN DEFAULT TRUE,
    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   -- Columna adicional según el análisis
    dificultad VARCHAR(255),
    FOREIGN KEY (destino_id) REFERENCES destinos(id) ON DELETE CASCADE
 );
@@ -120,7 +114,6 @@ CREATE TABLE IF NOT EXISTS reservas (
    estado ENUM('pendiente', 'confirmada', 'cancelada', 'completada') DEFAULT 'pendiente',
    fecha_reserva TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   -- Columnas adicionales según el análisis
    nave_id VARCHAR(255),
    fecha_salida VARCHAR(255),
    fecha_regreso VARCHAR(255),
@@ -136,7 +129,6 @@ CREATE TABLE IF NOT EXISTS actividades_reservadas (
    cantidad INT NOT NULL,
    precio_total DECIMAL(10,2) NOT NULL,
    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   -- Columna adicional según el análisis
    precio VARCHAR(255),
    FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE,
    FOREIGN KEY (actividad_id) REFERENCES actividades(id) ON DELETE CASCADE
@@ -152,7 +144,6 @@ CREATE TABLE IF NOT EXISTS pagos (
    estado ENUM('pendiente', 'completado', 'fallido', 'reembolsado') DEFAULT 'pendiente',
    fecha_pago TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   -- Columnas adicionales según el análisis
    fecha VARCHAR(255),
    metodo VARCHAR(255),
    referencia VARCHAR(255),
@@ -169,7 +160,6 @@ CREATE TABLE IF NOT EXISTS resenas (
    puntuacion INT NOT NULL CHECK (puntuacion BETWEEN 1 AND 5),
    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   -- Columnas adicionales según el análisis
    calificacion VARCHAR(255),
    fecha VARCHAR(255),
    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
@@ -248,7 +238,6 @@ INSERT INTO resenas (usuario_id, destino_id, titulo, comentario, puntuacion, cal
 (5, 4, 'Europa es mágica', 'El hielo y los géiseres son espectaculares.', 4, '4 estrellas', '2025-09-10'),
 (2, 5, 'Titán sorprendente', 'La atmósfera naranja es impresionante, pero hace mucho frío.', 3, '3 estrellas', '2025-12-30');
 
--- Crear índices para optimizar consultas
 CREATE INDEX idx_destinos_tipo ON destinos(tipo);
 CREATE INDEX idx_destinos_destacado ON destinos(destacado);
 CREATE INDEX idx_naves_tipo ON naves(tipo);

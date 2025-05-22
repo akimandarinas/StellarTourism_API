@@ -1,10 +1,8 @@
 <?php
 // Utilidades para integración con Stripe
 
-// Cargar la biblioteca de Stripe
 require_once '../vendor/autoload.php';
 
-// Configurar la clave API de Stripe
 function configureStripe() {
     $stripe_secret_key = STRIPE_SECRET_KEY;
     \Stripe\Stripe::setApiKey($stripe_secret_key);
@@ -13,13 +11,8 @@ function configureStripe() {
 // Procesar un pago con Stripe
 function processStripePayment($token, $amount, $description) {
     try {
-        // Configurar Stripe
         configureStripe();
-        
-        // Convertir el monto a centavos (Stripe trabaja con la moneda en su unidad más pequeña)
         $amount_cents = $amount * 100;
-        
-        // Crear el cargo
         $charge = \Stripe\Charge::create([
             'amount' => $amount_cents,
             'currency' => 'eur',
@@ -88,7 +81,6 @@ function processStripePayment($token, $amount, $description) {
     }
 }
 
-// Crear un cliente en Stripe
 function createStripeCustomer($email, $name, $token) {
     try {
         // Configurar Stripe
@@ -113,7 +105,6 @@ function createStripeCustomer($email, $name, $token) {
     }
 }
 
-// Crear un reembolso en Stripe
 function createStripeRefund($charge_id, $amount = null) {
     try {
         // Configurar Stripe

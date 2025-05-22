@@ -16,10 +16,36 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { authService } from '../../services/auth/auth-service';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import Button from '../ui/Button.vue';
+
+//Intentar importar el router y la ruta, pero no fallar si no están disponibles
+let useRouter, useRoute;
+try {
+  const vueRouter = await import('vue-router');
+  useRouter = vueRouter.useRouter;
+  useRoute = vueRouter.useRoute;
+} catch (e) {
+  console.log('Vue Router no está disponible, usando modo Astro');
+}
+
+//Intentar importar el servicio de autenticación
+let authService;
+try {
+  const authModule = await import('../../services/auth/auth-service');
+  authService = authModule.authService;
+} catch (e) {
+  console.log('Servicio de autenticación no disponible, usando modo mock');
+  authService = {
+    getCurrentUser: () => {
+      return { uid: 'astro-user', roles: ['user'] };
+    },
+    onAuthStateChanged: (callback) => {
+      callback({ uid: 'astro-user', roles: ['user'] });
+      return () => {}; // Función de limpieza
+    }
+  };
+}
 
 const props = defineProps({
   requireAuth: {
@@ -36,14 +62,15 @@ const props = defineProps({
   }
 });
 
-const router = useRouter();
-const route = useRoute();
+//Obtener el router y la ruta si están disponibles
+const router = useRouter ? useRouter() : null;
+const route = useRoute ? useRoute() : { path: '/reservas', query: {} };
+
 const loading = ref(true);
 const isAuthorized = ref(false);
 const isRedirecting = ref(false);
 const unsubscribe = ref<(() => void) | null>(null);
 
-// Verificar si el usuario tiene los roles requeridos
 const hasRequiredRoles = computed(() => {
   const user = authService.getCurrentUser();
   
@@ -52,6 +79,31 @@ const hasRequiredRoles = computed(() => {
   
   return props.roles.some(role => user.roles?.includes(role));
 });
+
+//Redirigir a la página de inicio de sesión
+const redirectToLogin = () => {
+  if (router) {
+    // Si estamos en Vue Router, usar el router para redirigir
+    const currentQuery = { ...route.query };
+    const redirectQuery = { 
+      redirect: route.path,
+      ...currentQuery
+    };
+    
+    delete redirectQuery.redirect;
+    
+    router.replace({
+      path: props.redirectTo,
+      query: { 
+        redirect: route.path,
+        ...redirectQuery
+      }
+    });
+  } else {
+    //Si estamos en Astro, usar window.location
+    window.location.href = props.redirectTo;
+  }
+};
 
 // Verificar autorización
 const checkAuthorization = () => {
@@ -69,7 +121,6 @@ const checkAuthorization = () => {
       redirectToLogin();
     }, 500);
   } else if (props.requireAuth && !hasRequiredRoles.value) {
-    // El usuario está autenticado pero no tiene los roles requeridos
     isAuthorized.value = false;
     isRedirecting.value = false;
   } else {
@@ -80,42 +131,22 @@ const checkAuthorization = () => {
   loading.value = false;
 };
 
-// Redirigir a la página de inicio de sesión
-const redirectToLogin = () => {
-  // Construir la URL de redirección preservando los parámetros de consulta actuales
-  const currentQuery = { ...route.query };
-  const redirectQuery = { 
-    redirect: route.fullPath,
-    ...currentQuery
-  };
-  
-  // Evitar duplicar el parámetro redirect
-  delete redirectQuery.redirect;
-  
-  router.replace({
-    path: props.redirectTo,
-    query: { 
-      redirect: route.fullPath,
-      ...redirectQuery
-    }
-  });
-};
-
-// Ciclo de vida
 onMounted(() => {
-  // Suscribirse a cambios en el estado de autenticación
-  unsubscribe.value = authService.onAuthStateChanged(() => {
-    checkAuthorization();
-  });
+  if (authService && authService.onAuthStateChanged) {
+    unsubscribe.value = authService.onAuthStateChanged(() => {
+      checkAuthorization();
+    });
+  }
   
-  // Verificar autorización inicial
   checkAuthorization();
 });
 
-// Observar cambios en la ruta
-watch(() => route.path, checkAuthorization);
+if (route && watch) {
+  watch(() => route.path, () => {
+    checkAuthorization();
+  });
+}
 
-// Limpiar suscripción al desmontar
 onUnmounted(() => {
   if (unsubscribe.value) {
     unsubscribe.value();

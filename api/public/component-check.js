@@ -57,7 +57,6 @@ function renderComponentStatus(component) {
 
   componentCard.appendChild(componentHeader)
 
-  // Añadir detalles
   if (component.details && component.details.length > 0) {
     const componentDetails = document.createElement("div")
     componentDetails.className = "component-details"
@@ -82,9 +81,7 @@ function renderComponentStatus(component) {
   return componentCard
 }
 
-// Función para mostrar detalles de un componente
 function showComponentDetails(component) {
-  // Crear modal
   const modal = document.createElement("div")
   modal.style.position = "fixed"
   modal.style.top = "0"
@@ -97,7 +94,6 @@ function showComponentDetails(component) {
   modal.style.alignItems = "center"
   modal.style.zIndex = "1000"
 
-  // Crear contenido del modal
   const modalContent = document.createElement("div")
   modalContent.style.backgroundColor = "white"
   modalContent.style.borderRadius = "5px"
@@ -133,7 +129,6 @@ function showComponentDetails(component) {
 
   modalContent.appendChild(modalHeader)
 
-  // Crear sección de estado
   const statusSection = document.createElement("div")
   statusSection.style.marginBottom = "20px"
 

@@ -1,77 +1,56 @@
 <?php
 require_once __DIR__ . '/../utils/response_utils.php';
 
-
-// Headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Incluir archivos de configuración y modelo
 include_once '../config/database.php';
 include_once '../models/Usuario.php';
 
-// Crear instancia del objeto Usuario
 $usuario = new Usuario();
-
-// Obtener método de solicitud HTTP
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Procesar según el método
 switch($method) {
     case 'GET':
-        // Verificar si se proporciona un ID
         if(isset($_GET['id'])) {
-            // Leer un solo usuario
             $id = $_GET['id'];
             $usuario_data = $usuario->getById($id);
             
             if($usuario_data) {
-                // Enviar respuesta
                 sendJsonResponse($usuario_data);
             } else {
-                // No se encontró el usuario
                 sendJsonResponse(array("message" => "Usuario no encontrado."), 404);
             }
         } 
-        // Verificar si se proporciona un email
         else if(isset($_GET['email'])) {
-            // Leer usuario por email
             $email = $_GET['email'];
             $usuario_data = $usuario->getByEmail($email);
             
             if($usuario_data) {
-                // Enviar respuesta
                 sendJsonResponse($usuario_data);
             } else {
-                // No se encontró el usuario
                 sendJsonResponse(array("message" => "Usuario no encontrado."), 404);
             }
         }
         // Verificar si se proporciona un Firebase UID
         else if(isset($_GET['firebase_uid'])) {
-            // Leer usuario por Firebase UID
             $firebase_uid = $_GET['firebase_uid'];
             $usuario_data = $usuario->getByFirebaseUid($firebase_uid);
             
             if($usuario_data) {
-                // Enviar respuesta
                 sendJsonResponse($usuario_data);
             } else {
-                // No se encontró el usuario
                 sendJsonResponse(array("message" => "Usuario no encontrado."), 404);
             }
         } else {
-            // Leer todos los usuarios
             $usuarios_data = $usuario->getAll(array("orderBy" => "nombre ASC"));
             
             if(count($usuarios_data) > 0) {
-                // Enviar respuesta
                 sendJsonResponse(array("records" => $usuarios_data));
             } else {
-                // No se encontraron usuarios
                 sendJsonResponse(array(
                     "status" => "info",
                     "message" => "No se encontraron usuarios."
@@ -81,18 +60,13 @@ switch($method) {
         break;
         
     case 'POST':
-        // Crear un usuario
-        // Obtener los datos enviados
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Verificar que los datos no estén vacíos
         if(
             !empty($data['nombre']) &&
             !empty($data['email'])
         ) {
-            // Verificar si el email ya existe
             if($usuario->emailExists($data['email'])) {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "error",
                     "message" => "El email ya está registrado."
@@ -100,25 +74,21 @@ switch($method) {
                 exit();
             }
             
-            // Crear el usuario
             $result = $usuario->create($data);
             
             if($result) {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "success",
                     "message" => "Usuario creado.",
                     "id" => $result
                 ), 201);
             } else {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "error",
                     "message" => "No se pudo crear el usuario."
                 ), 503);
             }
         } else {
-            // Enviar respuesta
             sendJsonResponse(array(
                 "status" => "error",
                 "message" => "No se puede crear el usuario. Datos incompletos."
@@ -127,32 +97,25 @@ switch($method) {
         break;
         
     case 'PUT':
-        // Actualizar un usuario
-        // Obtener el ID del usuario a actualizar
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Verificar que el ID no esté vacío
         if(!empty($data['id'])) {
-            // Obtener ID a actualizar
             $id = $data['id'];
-            unset($data['id']); // Eliminar el ID de los datos a actualizar
+            unset($data['id']); 
             
             // Actualizar el usuario
             if($usuario->updatePerfil($id, $data)) {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "success",
                     "message" => "Usuario actualizado."
                 ));
             } else {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "error",
                     "message" => "No se pudo actualizar el usuario."
                 ), 503);
             }
         } else {
-            // Enviar respuesta
             sendJsonResponse(array(
                 "status" => "error",
                 "message" => "No se puede actualizar el usuario. ID no proporcionado."
@@ -161,28 +124,21 @@ switch($method) {
         break;
         
     case 'DELETE':
-        // Eliminar un usuario
-        // Obtener el ID del usuario a eliminar
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Verificar que el ID no esté vacío
         if(!empty($data['id'])) {
-            // Eliminar el usuario
             if($usuario->delete($data['id'])) {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "success",
                     "message" => "Usuario eliminado."
                 ));
             } else {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "error",
                     "message" => "No se pudo eliminar el usuario."
                 ), 503);
             }
         } else {
-            // Enviar respuesta
             sendJsonResponse(array(
                 "status" => "error",
                 "message" => "No se puede eliminar el usuario. ID no proporcionado."
@@ -191,7 +147,6 @@ switch($method) {
         break;
         
     default:
-        // Método no permitido
         sendJsonResponse(array(
             "status" => "error",
             "message" => "Método no permitido."
@@ -199,9 +154,6 @@ switch($method) {
         break;
 
 
-/**
- * Obtiene todos los registros
- */
 function getAll() {
     global $conn;
     
@@ -226,11 +178,6 @@ function getAll() {
     }
 }
 
-/**
- * Obtiene un registro por su ID
- * 
- * @param int $id ID del registro
- */
 function getById($id) {
     global $conn;
     
@@ -255,11 +202,6 @@ function getById($id) {
     }
 }
 
-/**
- * Crea un nuevo registro
- * 
- * @param array $data Datos del registro
- */
 function create($data) {
     global $conn;
     
@@ -296,7 +238,6 @@ function create($data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
         // Ejecutar la consulta
@@ -315,23 +256,15 @@ function create($data) {
     }
 }
 
-/**
- * Actualiza un registro existente
- * 
- * @param int $id ID del registro
- * @param array $data Datos del registro
- */
 function update($id, $data) {
     global $conn;
     
     try {
-        // Validar datos
         if (empty($data)) {
             sendErrorResponse('No se proporcionaron datos', 400);
             return;
         }
         
-        // Verificar si el registro existe
         $checkSql = "SELECT id FROM usuario WHERE id = ?";
         $checkStmt = $conn->prepare($checkSql);
         $checkStmt->bind_param("i", $id);
@@ -343,7 +276,6 @@ function update($id, $data) {
             return;
         }
         
-        // Preparar la consulta de actualización
         $updates = [];
         $values = [];
         
@@ -358,7 +290,6 @@ function update($id, $data) {
         $sql = "UPDATE usuario SET $updatesStr WHERE id = ?";
         $stmt = $conn->prepare($sql);
         
-        // Determinar los tipos de datos
         $types = '';
         foreach ($values as $value) {
             if (is_int($value)) {
@@ -372,10 +303,8 @@ function update($id, $data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
-        // Ejecutar la consulta
         if ($stmt->execute()) {
             sendJsonResponse([
                 'status' => 'success',
@@ -390,11 +319,6 @@ function update($id, $data) {
     }
 }
 
-/**
- * Elimina un registro
- * 
- * @param int $id ID del registro
- */
 function delete($id) {
     global $conn;
     
@@ -411,12 +335,10 @@ function delete($id) {
             return;
         }
         
-        // Preparar la consulta de eliminación
         $sql = "DELETE FROM usuario WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
         
-        // Ejecutar la consulta
         if ($stmt->execute()) {
             sendJsonResponse([
                 'status' => 'success',
@@ -432,5 +354,4 @@ function delete($id) {
 }
 }
 
-// Asegurar que el script termine aquí
 exit();

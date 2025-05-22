@@ -1,9 +1,6 @@
 <?php
-/**
- * Manejador de errores personalizado para la API
- */
+/* Manejador de errores para la API */
 
-// Definir clases de excepción personalizadas
 class ValidationException extends Exception {
     protected $errors;
     
@@ -25,14 +22,7 @@ class DatabaseException extends Exception {}
 class PaymentException extends Exception {}
 class ApiException extends Exception {}
 
-/**
- * Registra un error en el archivo de log
- * 
- * @param string $message Mensaje de error
- * @param array $context Contexto adicional del error
- * @return void
- */
-// Verificar si la función ya existe antes de declararla
+/*Registra un error en el archivo de log*/
 if (!function_exists('logError')) {
     function logError($message, $context = []) {
         if (defined('LOG_ENABLED') && LOG_ENABLED) {
@@ -46,7 +36,6 @@ if (!function_exists('logError')) {
                 mkdir($logDir, 0755, true);
             }
             
-            // Añadir información de la solicitud al contexto
             $requestInfo = [
                 'request_id' => $requestId,
                 'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
@@ -65,7 +54,7 @@ if (!function_exists('logError')) {
                 'execution_time' => microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'],
             ];
             
-            // Añadir información del usuario si está disponible
+            // Añadir información del usuario 
             $userInfo = [];
             if (function_exists('getCurrentUserId')) {
                 $userInfo['user_id'] = getCurrentUserId();
@@ -95,7 +84,6 @@ if (!function_exists('logError')) {
             // Determinar nivel de severidad
             $severity = isset($context['severity']) ? strtoupper($context['severity']) : 'ERROR';
             
-            // Formatear mensaje de log en formato JSON para facilitar el análisis
             $logData = [
                 'timestamp' => $timestamp,
                 'request_id' => $requestId,
@@ -106,30 +94,21 @@ if (!function_exists('logError')) {
             
             $logMessage = json_encode($logData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . PHP_EOL;
             
-            // Escribir en el archivo de log
             file_put_contents($logFile, $logMessage, FILE_APPEND);
             
-            // Registrar errores críticos en un archivo separado
             if ($severity === 'CRITICAL' || $severity === 'EMERGENCY' || $severity === 'ALERT') {
                 $criticalLogFile = dirname($logFile) . '/critical.log';
                 file_put_contents($criticalLogFile, $logMessage, FILE_APPEND);
             }
         }
         
-        // Si está habilitado el monitoreo, enviar el error
         if (defined('MONITORING_ENABLED') && MONITORING_ENABLED) {
             sendErrorToMonitoring($message, $fullContext ?? $context);
         }
     }
 }
 
-/**
- * Envía un error al servicio de monitoreo
- * 
- * @param string $message Mensaje de error
- * @param array $context Contexto adicional del error
- * @return void
- */
+/* Envía un error al servicio de monitoreo */
 function sendErrorToMonitoring($message, $context = []) {
     // Implementación del envío de errores a un servicio de monitoreo
     if (defined('SENTRY_DSN') && SENTRY_DSN) {
@@ -137,15 +116,6 @@ function sendErrorToMonitoring($message, $context = []) {
     }
 }
 
-/**
- * Manejador de errores personalizado
- * 
- * @param int $errno Número de error
- * @param string $errstr Mensaje de error
- * @param string $errfile Archivo donde ocurrió el error
- * @param int $errline Línea donde ocurrió el error
- * @return bool
- */
 function errorHandler($errno, $errstr, $errfile, $errline) {
     $errorTypes = [
         E_ERROR => 'Error',
@@ -178,10 +148,8 @@ function errorHandler($errno, $errstr, $errfile, $errline) {
         $severity = 'CRITICAL';
     }
     
-    // Generar un ID único para este error
     $errorId = uniqid('php_err_');
     
-    // Registrar el error con contexto detallado
     logError($message, [
         'error_id' => $errorId,
         'type' => $errorType,
@@ -193,16 +161,14 @@ function errorHandler($errno, $errstr, $errfile, $errline) {
         'memory_usage' => memory_get_usage(true),
     ]);
     
-    // Determinar si debemos mostrar el error
     $isProduction = defined('APP_ENV') && APP_ENV === 'production';
     $isFatalError = in_array($errno, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR, E_PARSE]);
     
-    // En producción, no mostrar errores no fatales
+   
     if ($isProduction && !$isFatalError) {
         return true; // Suprimir el error
     }
     
-    // Para errores fatales, lanzar una excepción que será capturada por el manejador de excepciones
     if ($isFatalError) {
         throw new Exception($message, $errno);
     }
@@ -210,20 +176,13 @@ function errorHandler($errno, $errstr, $errfile, $errline) {
     return false; // Permitir que PHP maneje el error para errores no fatales en desarrollo
 }
 
-/**
- * Manejador de excepciones personalizado
- * 
- * @param Exception $exception Excepción capturada
- * @return void
- */
+/*Manejador de excepciones personalizado*/
 function exceptionHandler($exception) {
     $message = "Exception: " . $exception->getMessage();
     $exceptionClass = get_class($exception);
     
-    // Generar un ID único para este error
     $errorId = uniqid('err_');
     
-    // Registrar la excepción con información detallada
     logError($message, [
         'error_id' => $errorId,
         'exception' => $exception,
@@ -232,7 +191,6 @@ function exceptionHandler($exception) {
         'exception_code' => $exception->getCode(),
     ]);
     
-    // Determinar el código de estado HTTP y el tipo de error
     $statusCode = 500;
     $errorCode = 'server_error';
     $errorType = 'ServerError';
@@ -267,7 +225,6 @@ function exceptionHandler($exception) {
         $errorType = 'PaymentError';
     }
     
-    // Preparar la respuesta
     $response = [
         'status' => 'error',
         'error' => [
@@ -278,7 +235,6 @@ function exceptionHandler($exception) {
         ]
     ];
     
-    // Añadir detalles de validación si están disponibles
     if ($exception instanceof ValidationException) {
         $response['error']['details'] = $exception->getErrors();
     }
@@ -299,18 +255,12 @@ function exceptionHandler($exception) {
         ];
     }
     
-    // Enviar la respuesta
     header('Content-Type: application/json');
     http_response_code($statusCode);
     echo json_encode($response);
 }
 
-/**
- * Determina la severidad basada en el tipo de excepción
- * 
- * @param Exception $exception La excepción
- * @return string Nivel de severidad
- */
+/*Determina la severidad basada en el tipo de excepción*/
 function getSeverityFromException($exception) {
     $exceptionClass = get_class($exception);
     $code = $exception->getCode();
@@ -345,15 +295,7 @@ function getSeverityFromException($exception) {
     return 'ERROR';
 }
 
-/**
- * Registra un error de aplicación con contexto detallado
- * 
- * @param string $message Mensaje de error
- * @param string $errorCode Código de error específico de la aplicación
- * @param array $context Contexto adicional
- * @param string $severity Nivel de severidad (ERROR, WARNING, NOTICE, INFO)
- * @return string ID del error registrado
- */
+
 function logApplicationError($message, $errorCode = null, $context = [], $severity = 'ERROR') {
     $errorId = uniqid('app_err_');
     
@@ -372,15 +314,7 @@ function logApplicationError($message, $errorCode = null, $context = [], $severi
     return $errorId;
 }
 
-/**
- * Registra un evento de seguridad
- * 
- * @param string $message Mensaje del evento
- * @param string $eventType Tipo de evento (login_attempt, password_reset, etc.)
- * @param array $context Contexto adicional
- * @param bool $isSuccess Indica si el evento fue exitoso
- * @return string ID del evento registrado
- */
+/*Registra un evento de seguridad*/
 function logSecurityEvent($message, $eventType, $context = [], $isSuccess = true) {
     $eventId = uniqid('sec_');
     $securityLogFile = defined('AUTH_LOG_FILE') ? AUTH_LOG_FILE : __DIR__ . '/../logs/security.log';
@@ -401,7 +335,6 @@ function logSecurityEvent($message, $eventType, $context = [], $isSuccess = true
         ]
     );
     
-    // Formatear mensaje de log en formato JSON
     $logData = [
         'timestamp' => $timestamp,
         'event_id' => $eventId,
@@ -412,13 +345,11 @@ function logSecurityEvent($message, $eventType, $context = [], $isSuccess = true
     
     $logMessage = json_encode($logData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . PHP_EOL;
     
-    // Asegurar que el directorio de logs existe
     $logDir = dirname($securityLogFile);
     if (!is_dir($logDir)) {
         mkdir($logDir, 0755, true);
     }
     
-    // Escribir en el archivo de log de seguridad
     file_put_contents($securityLogFile, $logMessage, FILE_APPEND);
     
     return $eventId;
@@ -428,14 +359,12 @@ function logSecurityEvent($message, $eventType, $context = [], $isSuccess = true
 set_error_handler('errorHandler');
 set_exception_handler('exceptionHandler');
 
-// Registrar manejador para errores fatales
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error !== null && in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR])) {
         $message = "Fatal Error: {$error['message']} in {$error['file']} on line {$error['line']}";
         logError($message, $error);
         
-        // Enviar respuesta de error si no se ha enviado ya
         if (!headers_sent()) {
             header('Content-Type: application/json');
             http_response_code(500);

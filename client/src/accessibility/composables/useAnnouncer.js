@@ -1,17 +1,13 @@
 import { ref } from "vue"
 
-/**
- * Composable para anunciar mensajes a lectores de pantalla
- */
+/* Composable para anunciar mensajes a lectores de pantalla */
 export function useAnnouncer() {
   // Verificar si estamos en un navegador
   const isBrowser = typeof window !== "undefined"
 
-  // Estado para el mensaje actual
   const message = ref("")
   const politeness = ref("polite") // 'polite' o 'assertive'
 
-  // Función para crear o obtener el elemento anunciador
   const getAnnouncerElement = () => {
     if (!isBrowser) return null
 
@@ -38,11 +34,6 @@ export function useAnnouncer() {
     return announcer
   }
 
-  /**
-   * Anuncia un mensaje a los lectores de pantalla
-   * @param {string} text - El mensaje a anunciar
-   * @param {string} level - El nivel de politeness ('polite' o 'assertive')
-   */
   const announce = (text, level = "polite") => {
     if (!isBrowser) return
 
@@ -63,9 +54,6 @@ export function useAnnouncer() {
     }
   }
 
-  /**
-   * Limpia el anunciador
-   */
   const clear = () => {
     if (!isBrowser) return
 

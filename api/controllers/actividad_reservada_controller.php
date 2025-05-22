@@ -1,19 +1,16 @@
 <?php
-// Headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Incluir archivos de configuración y modelo
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/ActividadReservada.php';
 require_once __DIR__ . '/../utils/auth_utils.php';
 require_once __DIR__ . '/../utils/response_utils.php';
 require_once __DIR__ . '/../utils/validation_utils.php';
 
-// Crear instancia de la base de datos
 $database = new Database();
 $db = $database->getConnection();
 
@@ -23,25 +20,19 @@ $actividad_reservada = new ActividadReservada($db);
 // Obtener método de solicitud HTTP
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Verificar autenticación para todos los métodos
 $auth_header = getAuthorizationHeader();
 $token = getBearerToken($auth_header);
 
 if (!$token || !validateFirebaseToken($token)) {
-    // No autorizado
     sendJsonResponse(array("message" => "No autorizado."), 401);
     exit();
 }
 
-// Procesar según el método
 switch($method) {
     case 'GET':
-        // Verificar si se proporciona un ID de reserva
         if(isset($_GET['reserva_id'])) {
-            // Leer actividades reservadas por reserva
             $reserva_id = $_GET['reserva_id'];
             
-            // Validar reserva_id
             if (!validateId($reserva_id)) {
                 sendJsonResponse(array("message" => "ID de reserva inválido."), 400);
                 exit();
@@ -49,20 +40,16 @@ switch($method) {
             
             $actividades_data = $actividad_reservada->getByReserva($reserva_id);
             
-            // Enviar respuesta
             sendJsonResponse(array("records" => $actividades_data));
         } else {
-            // Se requiere un ID de reserva
             sendJsonResponse(array("message" => "Se requiere un ID de reserva."), 400);
         }
         break;
         
     case 'POST':
         // Crear actividades reservadas
-        // Obtener los datos enviados
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Validar datos
         if (!isset($data['reserva_id']) || !validateId($data['reserva_id'])) {
             sendJsonResponse(array("message" => "ID de reserva inválido o no proporcionado."), 400);
             exit();
@@ -73,7 +60,6 @@ switch($method) {
             exit();
         }
         
-        // Validar cada actividad
         $errors = [];
         foreach ($data['actividades'] as $index => $actividad) {
             $actividadErrors = validateActividadReservadaData($actividad);
@@ -87,46 +73,36 @@ switch($method) {
             exit();
         }
         
-        // Crear las actividades reservadas
         $result = $actividad_reservada->createMultiple($data['actividades'], $data['reserva_id']);
         
         if($result) {
-            // Enviar respuesta
             sendJsonResponse(array("message" => "Actividades reservadas creadas."), 201);
         } else {
-            // Enviar respuesta
             sendJsonResponse(array("message" => "No se pudieron crear las actividades reservadas."), 503);
         }
         break;
         
     case 'DELETE':
-        // Eliminar actividades reservadas por reserva
-        // Obtener el ID de la reserva
         $data = json_decode(file_get_contents("php://input"), true);
         
-        // Validar ID de reserva
         if(!isset($data['reserva_id']) || !validateId($data['reserva_id'])) {
             sendJsonResponse(array("message" => "ID de reserva inválido o no proporcionado."), 400);
             exit();
         }
         
-        // Eliminar las actividades reservadas
         if($actividad_reservada->deleteByReserva($data['reserva_id'])) {
             // Enviar respuesta
             sendJsonResponse(array("message" => "Actividades reservadas eliminadas."));
         } else {
-            // Enviar respuesta
             sendJsonResponse(array("message" => "No se pudieron eliminar las actividades reservadas."), 503);
         }
         break;
         
     default:
-        // Método no permitido
         sendJsonResponse(array("message" => "Método no permitido."), 405);
         break;
 }
 
-// Función para validar datos de actividad reservada
 function validateActividadReservadaData($data) {
     $errors = [];
     
@@ -142,13 +118,11 @@ function validateActividadReservadaData($data) {
         $errors[] = "Precio unitario es requerido y debe ser un número positivo.";
     }
     
-    // Validar precio total si se proporciona
     if (isset($data['precio_total'])) {
         if (!is_numeric($data['precio_total']) || $data['precio_total'] <= 0) {
             $errors[] = "Precio total debe ser un número positivo.";
         }
         
-        // Verificar que el precio total sea igual a cantidad * precio_unitario
         if (isset($data['cantidad']) && isset($data['precio_unitario']) && 
             is_numeric($data['cantidad']) && is_numeric($data['precio_unitario'])) {
             $calculatedTotal = $data['cantidad'] * $data['precio_unitario'];
@@ -161,9 +135,7 @@ function validateActividadReservadaData($data) {
     return $errors;
 
 
-/**
- * Obtiene todos los registros
- */
+
 function getAll() {
     global $conn;
     
@@ -188,11 +160,7 @@ function getAll() {
     }
 }
 
-/**
- * Obtiene un registro por su ID
- * 
- * @param int $id ID del registro
- */
+
 function getById($id) {
     global $conn;
     
@@ -217,11 +185,7 @@ function getById($id) {
     }
 }
 
-/**
- * Crea un nuevo registro
- * 
- * @param array $data Datos del registro
- */
+
 function create($data) {
     global $conn;
     
@@ -277,12 +241,7 @@ function create($data) {
     }
 }
 
-/**
- * Actualiza un registro existente
- * 
- * @param int $id ID del registro
- * @param array $data Datos del registro
- */
+
 function update($id, $data) {
     global $conn;
     
@@ -334,7 +293,6 @@ function update($id, $data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
         // Ejecutar la consulta
@@ -352,11 +310,7 @@ function update($id, $data) {
     }
 }
 
-/**
- * Elimina un registro
- * 
- * @param int $id ID del registro
- */
+
 function delete($id) {
     global $conn;
     
@@ -373,7 +327,6 @@ function delete($id) {
             return;
         }
         
-        // Preparar la consulta de eliminación
         $sql = "DELETE FROM actividad_reservada WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);

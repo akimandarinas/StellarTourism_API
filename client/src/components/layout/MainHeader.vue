@@ -100,7 +100,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { Menu as MenuIcon, X as XIcon, User as UserIcon, Calendar as CalendarIcon, Heart as HeartIcon, LogOut as LogOutIcon, ChevronDown as ChevronDownIcon } from 'lucide-vue-next';
+import { Menu as MenuIcon, X as XIcon, User as UserIcon, Calendar as CalendarIcon, Heart as HeartIcon, LogOut as LogOutIcon, ChevronDown as ChevronDownIcon } from '@/utils/lucide-adapter';
 import { useAuth } from '@/composables/useAuth';
 import { useMobile } from '@/composables/useMobile';
 import ThemeToggle from '@/ui/components/ThemeToggle.vue';

@@ -97,7 +97,6 @@
                 <span>{{ formatPrice(actividad.precio) }}</span>
               </div>
               <div class="meta-item">
-                <ActivityIcon class="meta-icon" />
                 <span>Dificultad: {{ actividad.dificultad }}</span>
               </div>
             </div>
@@ -163,128 +162,64 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
-import { getDestinoById, getDestinosRelacionados } from '../data/destinos-data';
-import { 
-  RocketIcon, CalendarIcon, StarIcon, ClockIcon, 
-  TagIcon, AlertCircleIcon, CheckCircleIcon, ActivityIcon 
-} from 'lucide-vue-next';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
-  name: 'DetalleDestinoPage',
-  components: {
-    RocketIcon,
-    CalendarIcon,
-    StarIcon,
-    ClockIcon,
-    TagIcon,
-    AlertCircleIcon,
-    CheckCircleIcon,
-    ActivityIcon
-  },
   props: {
-    // Permitir pasar el ID como prop desde Astro
     destinoId: {
       type: [String, Number],
       default: null
-    }
+    },
+    RocketIcon: {
+      type: Object,
+      required: true
+    },
+    CalendarIcon: {
+      type: Object,
+      required: true
+    },
+    StarIcon: {
+      type: Object,
+      required: true
+    },
+    ClockIcon: {
+      type: Object,
+      required: true
+    },
+    TagIcon: {
+      type: Object,
+      required: true
+    },
+    AlertCircleIcon: {
+      type: Object,
+      required: true
+    },
+    CheckCircleIcon: {
+      type: Object,
+      required: true
+    },
   },
   setup(props) {
     const destino = ref(null);
-    const destinosRelacionados = ref([]);
-    const loading = ref(true);
+    const route = useRoute();
 
-    const descriptionParagraphs = computed(() => {
-      if (!destino.value || !destino.value.descripcionLarga) return [];
-      return destino.value.descripcionLarga.split('\n\n').map(p => p.trim());
-    });
-
-    const formatPrice = (price) => {
-      return new Intl.NumberFormat('es-ES', {
-        style: 'currency',
-        currency: 'EUR',
-        maximumFractionDigits: 0
-      }).format(price);
-    };
-
-    const formatDistance = (distance) => {
-      if (distance >= 1000000) {
-        return `${(distance / 1000000).toFixed(1)} millones km`;
-      } else {
-        return `${distance.toLocaleString('es-ES')} km`;
-      }
-    };
-
-    const formatTipo = (tipo) => {
-      const tipos = {
-        'orbital': 'Destino Orbital',
-        'planetario': 'Destino Planetario',
-        'sistema': 'Sistema Planetario'
-      };
-      return tipos[tipo] || tipo;
-    };
-
-    const truncateText = (text, maxLength) => {
-      if (!text) return '';
-      if (text.length <= maxLength) return text;
-      return text.substring(0, maxLength) + '...';
-    };
-
-    // Función para obtener el ID del destino de múltiples fuentes
-    const getDestinoIdFromMultipleSources = () => {
-      // 1. Primero intentar usar el ID pasado como prop
-      if (props.destinoId) {
-        return parseInt(props.destinoId);
-      }
-      
-      // 2. Intentar obtener el ID de la URL si estamos en el navegador
-      if (typeof window !== 'undefined') {
-        const urlParts = window.location.pathname.split('/');
-        const idFromUrl = urlParts[urlParts.length - 1];
-        if (idFromUrl && !isNaN(parseInt(idFromUrl))) {
-          return parseInt(idFromUrl);
+    onMounted(async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/destinos/${props.destinoId || route.params.id}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        destino.value = await response.json();
+      } catch (error) {
+        console.error("Could not fetch destino:", error);
       }
-      
-      // 3. Intentar obtener el ID del estado global si existe
-      if (typeof window !== 'undefined' && window.__INITIAL_STATE__ && window.__INITIAL_STATE__.destinoId) {
-        return parseInt(window.__INITIAL_STATE__.destinoId);
-      }
-      
-      // 4. Si todo falla, usar un ID por defecto (puedes cambiarlo según necesites)
-      return 1;
-    };
-
-    const cargarDestino = async () => {
-      loading.value = true;
-      
-      // Obtener el ID del destino de múltiples fuentes
-      const id = getDestinoIdFromMultipleSources();
-      
-      // Simulamos una carga de datos
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      destino.value = getDestinoById(id);
-      destinosRelacionados.value = getDestinosRelacionados(id);
-      
-      loading.value = false;
-    };
-
-    onMounted(() => {
-      cargarDestino();
     });
 
     return {
       destino,
-      destinosRelacionados,
-      loading,
-      descriptionParagraphs,
-      formatPrice,
-      formatDistance,
-      formatTipo,
-      truncateText
     };
-  }
+  },
 };
 </script>
 

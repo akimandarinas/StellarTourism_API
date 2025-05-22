@@ -1,10 +1,5 @@
 <?php
-/**
- * Autoloader personalizado para el proyecto Stellar Tourism
- * 
- * Este archivo gestiona la carga automática de clases basada en su namespace
- * y evita problemas de dependencias entre archivos
- */
+/* Autoloader personalizado para el proyecto Stellar Tourism */
 
 spl_autoload_register(function ($class) {
     // Directorios base donde buscar las clases
@@ -33,7 +28,6 @@ spl_autoload_register(function ($class) {
     // Construir la ruta del archivo
     $classFile = $directories[$classType] . $class . '.php';
     
-    // Si existe el archivo con el nombre exacto de la clase, cargarlo
     if (file_exists($classFile)) {
         require_once $classFile;
         return;

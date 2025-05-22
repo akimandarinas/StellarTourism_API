@@ -316,7 +316,7 @@ import ThemeSettings from '../components/common/ThemeSettings.vue';
 import { ref, computed, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { CalendarIcon, CreditCardIcon, MessageSquareIcon, UserIcon } from 'lucide-vue-next';
+import { CalendarIcon, CreditCardIcon, MessageSquareIcon, UserIcon } from '@/utils/lucide-adapter';
 import MainLayout from '../layouts/MainLayout.vue';
 import LoadingSpinner from '../components/common/LoadingSpinner.vue';
 import Button from '../components/ui/Button.vue';

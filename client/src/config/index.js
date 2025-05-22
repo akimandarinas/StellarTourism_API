@@ -1,7 +1,3 @@
-/**
- * Configuración centralizada de la aplicación
- * Este archivo exporta toda la configuración necesaria para la aplicación
- */
 import * as firebaseConfig from "./firebase"
 import * as stripeConfig from "./stripe"
 
@@ -22,7 +18,7 @@ export const config = {
 
 export default config
 
-// Exportar variables individuales para facilitar su uso
+//Exportar variables individuales para facilitar su uso
 export const {
   firebase: FIREBASE_CONFIG,
   stripe: STRIPE_CONFIG,
@@ -30,5 +26,4 @@ export const {
   app: { name: APP_NAME, version: APP_VERSION, environment: APP_ENVIRONMENT },
 } = config
 
-// Exportar la clave VAPID para notificaciones push
 export const FIREBASE_VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY || ""

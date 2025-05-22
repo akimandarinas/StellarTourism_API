@@ -44,7 +44,6 @@ try {
             $foreignKeys[] = $foreignKey;
         }
         
-        // Generar código del adaptador
         $adapterCode = generateAdapterCode($tableName, $columns, $foreignKeys);
         
         $tables[$tableName] = [
@@ -66,9 +65,7 @@ try {
     sendErrorResponse('Error al generar adaptadores: ' . $e->getMessage());
 }
 
-/**
- * Genera el código del adaptador para una tabla
- */
+
 function generateAdapterCode($tableName, $columns, $foreignKeys) {
     $className = ucfirst($tableName) . 'Adapter';
     $singularName = rtrim($tableName, 's'); // Convertir plural a singular (simple)

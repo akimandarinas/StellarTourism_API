@@ -17,7 +17,6 @@
       </div>
     </div>
 
-    <!-- Acciones -->
     <div class="acciones-container">
       <button 
         v-if="showSaveButton" 
@@ -25,7 +24,6 @@
         class="btn-save-draft"
         :disabled="isSaving || !canSave"
       >
-        <SaveIcon size="16" />
         <span>Guardar borrador</span>
       </button>
       
@@ -34,7 +32,6 @@
         @click="$emit('resume')" 
         class="btn-resume"
       >
-        <PlayIcon size="16" />
         <span>Continuar reserva</span>
       </button>
       
@@ -55,7 +52,7 @@
 import { computed, ref } from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { CheckCircleIcon, AlertCircleIcon, SaveIcon, TrashIcon, PlayIcon } from 'lucide-vue-next';
+import { CheckCircleIcon, AlertCircleIcon, TrashIcon } from '@/utils/lucide-adapter';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const props = defineProps({
@@ -91,7 +88,6 @@ const props = defineProps({
 
 const emit = defineEmits(['save', 'clear', 'retry', 'resume']);
 
-// Formatear tiempo desde el último guardado
 const formatLastSaved = computed(() => {
   if (!props.lastSaved) return '';
   
@@ -101,21 +97,18 @@ const formatLastSaved = computed(() => {
   });
 });
 
-// Guardar como borrador
 const saveAsDraft = () => {
   if (props.canSave && !props.isSaving) {
     emit('save');
   }
 };
 
-// Confirmar antes de limpiar
 const confirmClear = () => {
   if (confirm('¿Estás seguro de que quieres descartar este borrador? Esta acción no se puede deshacer.')) {
     emit('clear');
   }
 };
 
-// Reintentar guardado
 const retry = () => {
   emit('retry');
 };

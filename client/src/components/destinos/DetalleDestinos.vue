@@ -133,7 +133,7 @@
               </div>
               <div class="info-item">
                 <div class="info-icon atmosphere-icon">
-                  <CloudIcon size="24" />
+               
                 </div>
                 <div class="info-content">
                   <h4>Atmósfera</h4>
@@ -522,9 +522,9 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { 
-  RocketIcon, ClockIcon, GlobeIcon, CloudIcon, ThermometerIcon, 
+  RocketIcon, ClockIcon, GlobeIcon, ThermometerIcon, 
   HeartIcon, ThumbsUpIcon, MessageSquareIcon 
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import AdaptiveImage from '../common/AdaptiveImage.vue';
 import Breadcrumb from '../common/Breadcrumb.vue';

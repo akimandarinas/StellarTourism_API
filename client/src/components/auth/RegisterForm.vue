@@ -208,7 +208,7 @@ import { ref, reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
 import { validateEmail, validatePassword, validateName } from '@/utils/validation';
-import { MailIcon, LockIcon, PhoneIcon } from 'lucide-vue-next';
+import { MailIcon, LockIcon, PhoneIcon } from '@/utils/lucide-adapter';
 import Input from '../ui/Input.vue';
 import Button from '../ui/Button.vue';
 import Checkbox from '../ui/Checkbox.vue';
@@ -236,7 +236,6 @@ const registerSuccess = ref(false);
 const attemptedSubmit = ref(false);
 
 const props = defineProps({
-  // Si hay props, asegurarse de que se validen correctamente
   redirectUrl: {
     type: String,
     default: '/dashboard'
@@ -246,11 +245,10 @@ const props = defineProps({
 const emit = defineEmits(['register-success', 'switch-to-login']);
 const router = useRouter();
 
-// Store
 const authStore = useAuthStore();
 const { loading } = storeToRefs(authStore);
 
-// Validación
+//Validación
 const validateNombre = () => {
   nombreError.value = '';
   
@@ -319,17 +317,17 @@ const validateTerms = () => {
   return true;
 };
 
-// Calcular fortaleza de la contraseña
+//Calcular fortaleza de la contraseña
 const calculatePasswordStrength = computed(() => {
   if (!password.value) return 0;
   
   let strength = 0;
   
-  // Longitud
+  //Longitud
   if (password.value.length >= 8) strength += 1;
   if (password.value.length >= 12) strength += 1;
   
-  // Complejidad
+  //Complejidad
   if (/[A-Z]/.test(password.value)) strength += 1; // Mayúsculas
   if (/[a-z]/.test(password.value)) strength += 1; // Minúsculas
   if (/[0-9]/.test(password.value)) strength += 1; // Números
@@ -377,7 +375,6 @@ const isFormValid = computed(() => {
   return true;
 });
 
-// Validar cuando cambian los valores
 watch(nombre, () => {
   if (attemptedSubmit.value) validateNombre();
 });
@@ -409,7 +406,6 @@ watch(acceptTerms, () => {
   if (attemptedSubmit.value) validateTerms();
 });
 
-// Métodos
 const clearError = (errorField) => {
   if (errorField && typeof errorField === 'string') {
     if (window[errorField]) {
@@ -450,9 +446,7 @@ const handleSubmit = async () => {
     
     if (result) {
       registerSuccess.value = true;
-      // Anunciar éxito para lectores de pantalla
       announceSuccess();
-      // Esperar un momento antes de emitir el evento para mostrar el mensaje de éxito
       setTimeout(() => {
         emit('register-success', { email: email.value, nombre: nombre.value });
       }, 1500);
@@ -460,7 +454,7 @@ const handleSubmit = async () => {
       error.value = authStore.error;
       announceError(error.value);
       
-      // Mejorar mensajes de error específicos
+      //Mejorar mensajes de error específicos
       if (error.value.includes('email-already-in-use')) {
         error.value = 'Este correo electrónico ya está registrado. Por favor, inicia sesión o utiliza otro correo.';
       } else if (error.value.includes('weak-password')) {
@@ -475,16 +469,13 @@ const handleSubmit = async () => {
 };
 
 const showTerms = () => {
-  // Implementar lógica para mostrar términos y condiciones
   router.push('/terminos-y-condiciones');
 };
 
 const showPrivacy = () => {
-  // Implementar lógica para mostrar política de privacidad
   router.push('/politica-de-privacidad');
 };
 
-// Métodos para anuncios de accesibilidad
 const announceErrors = () => {
   const errorMessages = [];
   if (nombreError.value) errorMessages.push(`Nombre: ${nombreError.value}`);
@@ -510,11 +501,7 @@ const announceError = (message) => {
 };
 
 const announceToScreenReader = (message) => {
-  // Esta función utilizaría un componente o servicio de anuncios para lectores de pantalla
-  // Por ahora, simplemente lo logueamos
   console.log('Anuncio para lector de pantalla:', message);
-  // En una implementación real, se usaría algo como:
-  // useAnnouncer().announce(message);
 };
 </script>
 

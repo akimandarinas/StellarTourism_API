@@ -42,7 +42,6 @@ const focusTrap = {
 
     el.addEventListener("keydown", el._focusTrapHandler)
 
-    // Enfocar el primer elemento al montar
     if (binding.value !== false) {
       setTimeout(() => {
         const focusableElement = el.querySelector(
@@ -61,7 +60,7 @@ const focusTrap = {
   },
 }
 
-// Directiva para lazy loading de imágenes
+//Directiva para lazy loading de imágenes
 const lazyLoad = {
   beforeMount(el: HTMLElement, binding: any) {
     function loadImage() {
@@ -99,7 +98,6 @@ const lazyLoad = {
   },
 }
 
-// Configurar directivas
 export function setupDirectives(app: App) {
   app.directive("click-outside", clickOutside)
   app.directive("focus-trap", focusTrap)

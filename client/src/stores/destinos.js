@@ -7,7 +7,7 @@ import {
   fetchActividades,
   fetchResenas,
   enviarResena,
-} from "../services/api"
+} from '@/services/api'
 
 export const useDestinosStore = defineStore("destinos", () => {
   // Estado

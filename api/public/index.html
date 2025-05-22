@@ -1950,7 +1950,6 @@ class Database {
            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
        }
 
-// Función para probar endpoints de la API
 function testApiEndpoint(endpoint) {
     // Mostrar el resultado
     document.getElementById('result').style.display = 'block';
@@ -1995,7 +1994,6 @@ function testApiEndpoint(endpoint) {
 // api/public/api/index.php
 header('Content-Type: application/json');
 
-// Devolver información de la API
 $apiInfo = [
     'api' => 'Stellar Tourism API',
     'version' => '1.0.0',
@@ -2072,10 +2070,8 @@ echo json_encode($apiInfo, JSON_PRETTY_PRINT);
         }, null, 2);
         
         sourceCode = `<?php
-// api/public/api/health.php
 header('Content-Type: application/json');
 
-// Verificar conexión a la base de datos
 function checkDatabase() {
     try {
         $db = Database::getInstance();
@@ -2105,7 +2101,6 @@ function checkDatabase() {
     }
 }
 
-// Verificar servicios externos
 function checkExternalServices() {
     return [
         'stripe' => [
@@ -2123,7 +2118,6 @@ function checkExternalServices() {
     ];
 }
 
-// Verificar recursos del sistema
 function checkSystemResources() {
     return [
         'cpu' => [
@@ -2623,7 +2617,6 @@ if (!$nave) {
     exit;
 }
 
-// Obtener características
 $caracteristicas = $db->select("
     SELECT nombre
     FROM caracteristicas_nave
@@ -2634,7 +2627,6 @@ $caracteristicasLista = array_map(function($car) {
     return $car['nombre'];
 }, $caracteristicas);
 
-// Obtener rutas disponibles
 $rutas = $db->select("
     SELECT r.id, d1.nombre as origen, d2.nombre as destino, r.duracion
     FROM rutas r
@@ -2644,7 +2636,6 @@ $rutas = $db->select("
     WHERE nr.nave_id = ?
 ", [$id]);
 
-// Añadir información adicional
 $nave['caracteristicas'] = $caracteristicasLista;
 $nave['rutas_disponibles'] = $rutas;
 
@@ -2672,14 +2663,12 @@ echo json_encode($response, JSON_PRETTY_PRINT);
         
         resultContent.appendChild(httpCodeElement);
         
-        // Añadir el contenido de la respuesta
         const responseElement = document.createElement('pre');
         responseElement.textContent = content;
         responseElement.className = httpCode >= 200 && httpCode < 300 ? 'success' : 'error';
         
         resultContent.appendChild(responseElement);
         
-        // Añadir el código fuente
         if (sourceCode) {
             const rawSourceElement = document.createElement('div');
             rawSourceElement.className = 'raw-source-code';
@@ -2702,18 +2691,15 @@ echo json_encode($response, JSON_PRETTY_PRINT);
             resultContent.appendChild(rawSourceElement);
         }
         
-        // Scroll to result
         document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Función para confirmar reinicio de base de datos
     function confirmDbReset() {
         if (confirm('¿Estás seguro de que deseas reiniciar la base de datos? Esta acción no se puede deshacer.')) {
             showDiagnosticResult('Reiniciar Base de Datos', 'La base de datos ha sido reiniciada correctamente.');
         }
     }
 
-    // Funciones auxiliares
     function getHttpStatusText(httpCode) {
         switch (httpCode) {
             case 200: return 'OK';
@@ -2744,7 +2730,6 @@ echo json_encode($response, JSON_PRETTY_PRINT);
         const systemStatusDiv = document.getElementById('system-status');
         const systemStatusDetailsDiv = document.getElementById('system-status-details');
 
-        // Limpiar contenido anterior
         systemStatusDiv.innerHTML = '';
         systemStatusDetailsDiv.innerHTML = '';
 
@@ -2767,7 +2752,6 @@ echo json_encode($response, JSON_PRETTY_PRINT);
         statusIndicator.className = `status-indicator ${statusIndicatorClass}`;
         systemStatusDiv.appendChild(statusIndicator);
 
-        // Crear texto de estado
         const statusSpan = document.createElement('span');
         statusSpan.textContent = statusText;
         systemStatusDiv.appendChild(statusSpan);
@@ -2876,7 +2860,6 @@ echo json_encode($response, JSON_PRETTY_PRINT);
         updateDashboardCounters();
     }
     
-    // Añadir botón para alternar modo oscuro
     const themeToggle = document.createElement('button');
     themeToggle.className = 'theme-toggle';
     themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
@@ -2884,7 +2867,6 @@ echo json_encode($response, JSON_PRETTY_PRINT);
     themeToggle.onclick = toggleDarkMode;
     document.body.appendChild(themeToggle);
     
-    // Función para alternar modo oscuro
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
         const icon = themeToggle.querySelector('i');
@@ -2895,7 +2877,6 @@ echo json_encode($response, JSON_PRETTY_PRINT);
         }
     }
 
-    // Función para actualizar los contadores en el dashboard
     function updateDashboardCounters() {
         const totalComponents = componentsData.length;
         const healthyComponents = componentsData.filter(c => c.status === 'success').length;

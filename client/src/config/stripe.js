@@ -1,8 +1,5 @@
-/**
- * Configuración de Stripe para la aplicación
- */
+/*Configuración de Stripe para la aplicación*/
 
-// Configuración para el entorno de desarrollo y producción
 const STRIPE_CONFIG = {
   development: {
     publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY_DEV || "pk_test_sample",
@@ -54,7 +51,7 @@ const STRIPE_CONFIG = {
   },
 }
 
-// Configuración para pagos
+//Configuración para pagos
 export const PAYMENT_CONFIG = {
   currency: "eur",
   supportedCountries: ["ES", "US", "GB", "FR", "DE", "IT"],
@@ -69,26 +66,17 @@ export const PAYMENT_CONFIG = {
   cancelUrl: "/pago-cancelado",
 }
 
-/**
- * Determina si la aplicación está en modo desarrollo
- * @returns {boolean} true si está en modo desarrollo
- */
+
 export function isDevMode() {
   return import.meta.env.DEV || import.meta.env.MODE === "development"
 }
 
-/**
- * Obtiene la configuración de Stripe según el entorno
- * @returns {Object} Configuración de Stripe
- */
+
 export function getStripeConfig() {
   return isDevMode() ? STRIPE_CONFIG.development : STRIPE_CONFIG.production
 }
 
-/**
- * Obtiene la configuración de pagos
- * @returns {Object} Configuración de pagos
- */
+/* Obtiene la configuración de pagos */
 export function getPaymentConfig() {
   return PAYMENT_CONFIG
 }

@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { AlertCircleIcon, AlertTriangleIcon, InfoIcon, RefreshCwIcon } from 'lucide-vue-next';
+import { AlertCircleIcon, AlertTriangleIcon, InfoIcon, RefreshCwIcon } from '@/utils/lucide-adapter';
 import { ApiError } from '../../types/api';
 import { getErrorMessage } from '../../utils/api-error-handler';
 import { useSlots } from 'vue';

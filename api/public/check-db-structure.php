@@ -1,5 +1,4 @@
 <?php
-// Definir la ruta base si no está definida
 if (!defined('BASE_PATH')) {
    define('BASE_PATH', dirname(dirname(__FILE__)));
 }
@@ -7,12 +6,9 @@ if (!defined('BASE_PATH')) {
 require_once BASE_PATH . '/config/database.php';
 require_once __DIR__ . '/../utils/response_utils.php';
 
-// Establecer cabeceras para JSON
 header('Content-Type: application/json');
 
-// Inicializar la conexión a la base de datos
 try {
-   // Usar la clase Database para obtener la conexión
    $db = Database::getInstance()->getConnection();
    
    if (!$db) {
@@ -58,7 +54,6 @@ function checkDatabaseConnection() {
    }
 }
 
-// Función para obtener todas las tablas de la base de datos
 function getAllTables() {
    global $db;
    
@@ -85,7 +80,6 @@ function checkTableStructure($tableName) {
    global $db;
    
    try {
-       // Verificar si la tabla existe
        $stmt = $db->query("SHOW TABLES LIKE '$tableName'");
        if ($stmt->rowCount() === 0) {
            return [
@@ -94,11 +88,8 @@ function checkTableStructure($tableName) {
            ];
        }
        
-       // Obtener la estructura de la tabla
        $stmt = $db->query("DESCRIBE $tableName");
        $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
-       
-       // Obtener índices de la tabla
        $stmt = $db->query("SHOW INDEX FROM $tableName");
        $indexes = $stmt->fetchAll(PDO::FETCH_ASSOC);
        
@@ -202,7 +193,6 @@ function checkExpectedStructure() {
    return $results;
 }
 
-// Función para verificar procedimientos almacenados y funciones
 function checkStoredProceduresAndFunctions() {
     global $db;
     
@@ -466,7 +456,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
    
    foreach ($missingColumns as $column) {
        switch ("$tableName.$column") {
-           // Destinos
            case "destinos.tipo":
                $sql[] = "ALTER TABLE destinos ADD COLUMN tipo ENUM('planeta', 'luna', 'estacion', 'asteroide') NOT NULL AFTER descripcion";
                break;
@@ -495,7 +484,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
                $sql[] = "ALTER TABLE destinos ADD COLUMN activo BOOLEAN DEFAULT TRUE AFTER destacado";
                break;
                
-           // Naves
            case "naves.tipo":
                $sql[] = "ALTER TABLE naves ADD COLUMN tipo ENUM('transporte', 'exploración', 'carga', 'lujo') NOT NULL AFTER descripcion";
                break;
@@ -517,8 +505,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
            case "naves.activo":
                $sql[] = "ALTER TABLE naves ADD COLUMN activo BOOLEAN DEFAULT TRUE AFTER destacado";
                break;
-               
-           // Rutas
            case "rutas.nombre":
                $sql[] = "ALTER TABLE rutas ADD COLUMN nombre VARCHAR(100) NOT NULL AFTER nave_id";
                break;
@@ -543,8 +529,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
            case "rutas.origen_id":
                $sql[] = "ALTER TABLE rutas ADD COLUMN origen_id INT NOT NULL DEFAULT 1 AFTER activo";
                break;
-               
-           // Actividades
            case "actividades.nivel_dificultad":
                $sql[] = "ALTER TABLE actividades ADD COLUMN nivel_dificultad ENUM('baja', 'media', 'alta') NOT NULL AFTER duracion";
                break;
@@ -554,8 +538,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
            case "actividades.activo":
                $sql[] = "ALTER TABLE actividades ADD COLUMN activo BOOLEAN DEFAULT TRUE AFTER imagen_url";
                break;
-               
-           // Reservas
            case "reservas.nave_id":
                $sql[] = "ALTER TABLE reservas ADD COLUMN nave_id INT NOT NULL DEFAULT 1 AFTER estado";
                break;
@@ -565,8 +547,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
            case "reservas.fecha_regreso":
                $sql[] = "ALTER TABLE reservas ADD COLUMN fecha_regreso DATE AFTER fecha_salida";
                break;
-               
-           // Pagos
            case "pagos.metodo_pago":
                $sql[] = "ALTER TABLE pagos ADD COLUMN metodo_pago ENUM('tarjeta', 'paypal', 'transferencia') NOT NULL AFTER monto";
                break;
@@ -577,7 +557,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
                $sql[] = "ALTER TABLE pagos ADD COLUMN fecha_pago TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER estado";
                break;
                
-           // Resenas
            case "resenas.titulo":
                $sql[] = "ALTER TABLE resenas ADD COLUMN titulo VARCHAR(100) NOT NULL AFTER destino_id";
                break;
@@ -585,7 +564,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
                $sql[] = "ALTER TABLE resenas ADD COLUMN puntuacion INT NOT NULL CHECK (puntuacion BETWEEN 1 AND 5) AFTER comentario";
                break;
                
-           // Usuarios
            case "usuarios.firebase_uid":
                $sql[] = "ALTER TABLE usuarios ADD COLUMN firebase_uid VARCHAR(128) UNIQUE AFTER id";
                break;
@@ -599,12 +577,10 @@ function generateAddColumnSQL($tableName, $missingColumns) {
                $sql[] = "ALTER TABLE usuarios ADD COLUMN nacionalidad VARCHAR(50) AFTER fecha_nacimiento";
                break;
                
-           // Actividades Reservadas
            case "actividades_reservadas.precio_total":
                $sql[] = "ALTER TABLE actividades_reservadas ADD COLUMN precio_total DECIMAL(10,2) NOT NULL AFTER cantidad";
                break;
                
-           // Notificaciones Suscripciones
            case "notificaciones_suscripciones.endpoint":
                $sql[] = "ALTER TABLE notificaciones_suscripciones ADD COLUMN endpoint VARCHAR(500) NOT NULL AFTER usuario_id";
                break;
@@ -615,7 +591,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
                $sql[] = "ALTER TABLE notificaciones_suscripciones ADD COLUMN p256dh VARCHAR(255) NOT NULL AFTER auth";
                break;
                
-           // Notificaciones Historial
            case "notificaciones_historial.titulo":
                $sql[] = "ALTER TABLE notificaciones_historial ADD COLUMN titulo VARCHAR(100) NOT NULL AFTER usuario_id";
                break;
@@ -632,7 +607,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
                $sql[] = "ALTER TABLE notificaciones_historial ADD COLUMN datos_adicionales TEXT COMMENT 'JSON con datos adicionales' AFTER leida";
                break;
                
-           // Webhook Events
            case "webhook_events.tipo_evento":
                $sql[] = "ALTER TABLE webhook_events ADD COLUMN tipo_evento VARCHAR(50) NOT NULL AFTER id";
                break;
@@ -664,7 +638,6 @@ function generateAddColumnSQL($tableName, $missingColumns) {
                $sql[] = "ALTER TABLE webhook_events ADD COLUMN codigo_respuesta INT AFTER respuesta";
                break;
                
-           // Webhook Configuracion
            case "webhook_configuracion.nombre":
                $sql[] = "ALTER TABLE webhook_configuracion ADD COLUMN nombre VARCHAR(100) NOT NULL AFTER id";
                break;
@@ -690,11 +663,9 @@ function generateAddColumnSQL($tableName, $missingColumns) {
    return $sql;
 }
 
-// Función para generar SQL para crear procedimientos almacenados y funciones
 function generateStoredProceduresAndFunctionsSQL() {
     $sql = [];
     
-    // Procedimiento buscar_destinos
     $sql['buscar_destinos'] = "
     CREATE PROCEDURE buscar_destinos(
         IN p_tipo VARCHAR(20),
@@ -717,7 +688,6 @@ function generateStoredProceduresAndFunctionsSQL() {
         ORDER BY d.destacado DESC, d.nombre;
     END";
     
-    // Función calcular_puntuacion_promedio
     $sql['calcular_puntuacion_promedio'] = "
     CREATE FUNCTION calcular_puntuacion_promedio(p_destino_id INT) 
     RETURNS DECIMAL(3,1)
@@ -788,7 +758,6 @@ function generateStoredProceduresAndFunctionsSQL() {
         END IF;
     END";
     
-    // Procedimiento crear_reserva_completa
     $sql['crear_reserva_completa'] = "
     CREATE PROCEDURE crear_reserva_completa(
         IN p_usuario_id INT,
@@ -914,7 +883,6 @@ foreach ($structureCheck as $tableName => $info) {
    }
 }
 
-// Verificar procedimientos almacenados y funciones
 $expectedProcedures = ['buscar_destinos', 'cancelar_reserva', 'crear_reserva_completa'];
 $expectedFunctions = ['calcular_puntuacion_promedio'];
 
@@ -958,6 +926,5 @@ $response = [
    'sql_scripts' => $sqlScripts
 ];
 
-// Enviar la respuesta
 echo json_encode($response, JSON_PRETTY_PRINT);
 ?>

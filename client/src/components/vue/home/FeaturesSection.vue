@@ -14,7 +14,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { Rocket, Shield, Users, Star, Clock, Award } from 'lucide-vue-next';
+import { Rocket, Shield, Users, Star, Clock, Award } from '@/utils/lucide-adapter';
 
 const features = ref([
   {

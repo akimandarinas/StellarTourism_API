@@ -1,19 +1,16 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { Mail, Lock, Eye, EyeOff, User, Loader2, X } from 'lucide-vue-next';
-// Actualizar importaciones para usar los componentes consolidados
+import { Mail, Lock, Eye, EyeOff, User, Loader2, X } from '@/utils/lucide-adapter';
 import { Form, FormField } from '@/components/form/Form.vue';
 import { Checkbox } from '@/ui/components/Checkbox.vue';
 import { useValidation } from '@/utils/validation.js';
 import { useAuth } from '../../composables/useAuth';
-import { CheckIcon } from 'lucide-vue-next';
+import { CheckIcon } from '@/utils/lucide-adapter';
 
 const emit = defineEmits(['login-success', 'register-success']);
 
-// Auth composable
 const { handleLogin: login, handleRegister: register, handleGoogleAuth, resetPassword, loading, loadingGoogle } = useAuth();
 
-// Estado
 const activeTab = ref('login');
 const showPassword = ref(false);
 const showForgotPassword = ref(false);
@@ -25,7 +22,6 @@ const success = ref(false);
 const successMessage = ref('');
 const formSubmitted = ref(false);
 
-// Formularios
 const loginForm = ref({
   email: '',
   password: '',
@@ -40,7 +36,6 @@ const registerForm = ref({
   terms: false
 });
 
-// Computed
 const passwordMismatch = computed(() => {
   return registerForm.value.password && 
          registerForm.value.confirmPassword && 
@@ -54,14 +49,12 @@ const passwordStrength = computed(() => {
     return { score: 0, text: '', class: '' };
   }
   
-  // Criterios de fortaleza
   const hasLowerCase = /[a-z]/.test(password);
   const hasUpperCase = /[A-Z]/.test(password);
   const hasNumber = /\d/.test(password);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const isLongEnough = password.length >= 8;
   
-  // Calcular puntuación
   let score = 0;
   if (hasLowerCase) score++;
   if (hasUpperCase) score++;
@@ -69,7 +62,6 @@ const passwordStrength = computed(() => {
   if (hasSpecialChar) score++;
   if (isLongEnough) score++;
   
-  // Determinar texto y clase
   let text = '';
   let className = '';
   
@@ -100,7 +92,6 @@ const passwordStrength = computed(() => {
   return { score, text, class: className };
 });
 
-// Métodos
 const clearError = () => {
   if (error.value) error.value = null;
 };
@@ -188,7 +179,6 @@ const handleResetPassword = async () => {
     if (result.success) {
       resetSuccess.value = true;
       
-      // Mostrar notificación de éxito
       if (window.$notifications) {
         window.$notifications.success(
           'Correo enviado',
@@ -196,7 +186,6 @@ const handleResetPassword = async () => {
         );
       }
       
-      // Cerrar modal después de un breve retraso
       setTimeout(() => {
         showForgotPassword.value = false;
         resetEmail.value = '';
@@ -213,7 +202,7 @@ const handleResetPassword = async () => {
   }
 };
 
-// Limpiar error al cambiar de pestaña
+//Limpiar error al cambiar de pestaña
 watch(activeTab, () => {
   error.value = null;
 });

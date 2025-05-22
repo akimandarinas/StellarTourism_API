@@ -1,20 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-// Datos para SEO
 const title = 'Registro | StellarTourism';
 const description = 'Crea una cuenta en StellarTourism para comenzar a explorar el universo y reservar tus viajes espaciales.';
 
-// Obtener parámetros de redirección si existen
 const { redirect } = Astro.url.searchParams;
 ---
 
 <Layout title={title} description={description}>
  <section style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0; background-color: #020617; position: relative; overflow: hidden;">
-   <!-- Fondo con estrellas -->
+   
    <div style="position: absolute; inset: 0; background-image: url('/images/stars-bg.png'); background-size: cover; background-position: center; opacity: 0.6;"></div>
    
-   <!-- Overlay gradiente -->
+   
    <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.95));"></div>
    
    <div style="max-width: 500px; width: 100%; padding: 0 1rem; position: relative; z-index: 10;">
@@ -54,7 +52,6 @@ const { redirect } = Astro.url.searchParams;
              <div id="email-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: none;"></div>
            </div>
            
-           <!-- Contraseña -->
            <div>
              <label for="password" style="display: block; font-size: 0.875rem; font-weight: 500; color: rgba(226, 232, 240, 0.9); margin-bottom: 0.5rem;">Contraseña</label>
              <div style="position: relative;">
@@ -92,7 +89,6 @@ const { redirect } = Astro.url.searchParams;
              </div>
            </div>
            
-           <!-- Confirmar contraseña -->
            <div>
              <label for="confirm-password" style="display: block; font-size: 0.875rem; font-weight: 500; color: rgba(226, 232, 240, 0.9); margin-bottom: 0.5rem;">Confirmar contraseña</label>
              <input 
@@ -106,7 +102,6 @@ const { redirect } = Astro.url.searchParams;
              <div id="confirm-password-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: none;"></div>
            </div>
            
-           <!-- Términos y condiciones -->
            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
              <input 
                type="checkbox" 
@@ -120,10 +115,8 @@ const { redirect } = Astro.url.searchParams;
              </label>
            </div>
            
-           <!-- Mensaje de error general -->
            <div id="form-error" style="color: #ef4444; font-size: 0.875rem; text-align: center; display: none; padding: 0.5rem; background-color: rgba(239, 68, 68, 0.1); border-radius: 0.5rem;"></div>
            
-           <!-- Botón de registro -->
            <button 
              type="submit" 
              id="register-button"
@@ -169,10 +162,8 @@ const { redirect } = Astro.url.searchParams;
 </Layout>
 
 <script>
- // Modo de desarrollo - Usar simulación local en lugar de Firebase
  const USE_LOCAL_AUTH = true;
  
- // Referencias a elementos del DOM
  const registerForm = document.getElementById('register-form');
  const nameInput = document.getElementById('name');
  const emailInput = document.getElementById('email');
@@ -190,7 +181,6 @@ const { redirect } = Astro.url.searchParams;
  const togglePasswordButton = document.getElementById('toggle-password');
  const googleLoginButton = document.getElementById('google-login');
  
- // Indicadores de fortaleza de contraseña
  const strengthBars = [
    document.getElementById('strength-1'),
    document.getElementById('strength-2'),
@@ -199,42 +189,30 @@ const { redirect } = Astro.url.searchParams;
  ];
  const strengthText = document.getElementById('strength-text');
  
- // Función para mostrar/ocultar contraseña
  togglePasswordButton.addEventListener('click', () => {
    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
    passwordInput.setAttribute('type', type);
    
-   // Cambiar el icono
    togglePasswordButton.innerHTML = type === 'password' 
      ? '<svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
      : '<svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
  });
  
- // Función para evaluar la fortaleza de la contraseña
+ //Función para evaluar la fortaleza de la contraseña
  function checkPasswordStrength(password) {
    let strength = 0;
-   
-   // Longitud mínima
    if (password.length >= 8) strength += 1;
-   
-   // Contiene números
    if (/\d/.test(password)) strength += 1;
-   
-   // Contiene letras minúsculas y mayúsculas
    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
-   
-   // Contiene caracteres especiales
    if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
    
    return strength;
  }
  
- // Actualizar indicador de fortaleza cuando se escribe la contraseña
  passwordInput.addEventListener('input', () => {
    const password = passwordInput.value;
    const strength = checkPasswordStrength(password);
    
-   // Resetear todos los indicadores
    strengthBars.forEach(bar => {
      bar.style.backgroundColor = 'rgba(226, 232, 240, 0.2)';
    });
@@ -248,7 +226,6 @@ const { redirect } = Astro.url.searchParams;
        '#4cc9f0';                    // Azul (muy fuerte)
    }
    
-   // Actualizar texto
    strengthText.textContent = 
      strength === 0 ? 'Débil' :
      strength === 1 ? 'Débil' :
@@ -263,46 +240,39 @@ const { redirect } = Astro.url.searchParams;
      '#4cc9f0';
  });
  
- // Función para mostrar errores
+ //Función para mostrar errores
  function showError(element, message) {
    element.textContent = message;
    element.style.display = 'block';
  }
  
- // Función para ocultar errores
  function hideError(element) {
    element.textContent = '';
    element.style.display = 'none';
  }
  
- // Función para mostrar el loader en el botón
  function showLoader() {
    buttonText.style.opacity = '0';
    buttonLoader.style.opacity = '1';
    registerButton.disabled = true;
  }
  
- // Función para ocultar el loader en el botón
  function hideLoader() {
    buttonText.style.opacity = '1';
    buttonLoader.style.opacity = '0';
    registerButton.disabled = false;
  }
  
- // Simulación local de autenticación
  const localAuth = {
    users: JSON.parse(localStorage.getItem('stellar_users') || '[]'),
    
-   // Registrar usuario
+   //Registrar usuario
    register: function(email, password, name) {
      return new Promise((resolve, reject) => {
-       // Verificar si el email ya existe
        const existingUser = this.users.find(user => user.email === email);
        if (existingUser) {
          return reject({ code: 'auth/email-already-in-use', message: 'Este correo electrónico ya está en uso.' });
        }
-       
-       // Crear nuevo usuario
        const newUser = {
          uid: 'user_' + Date.now(),
          email,
@@ -310,39 +280,32 @@ const { redirect } = Astro.url.searchParams;
          displayName: name,
          createdAt: new Date().toISOString()
        };
-       
-       // Guardar usuario
        this.users.push(newUser);
        localStorage.setItem('stellar_users', JSON.stringify(this.users));
        
-       // Simular retraso de red
        setTimeout(() => {
          resolve({ user: { ...newUser, password: undefined } });
        }, 800);
      });
    },
    
-   // Iniciar sesión
    login: function(email, password) {
      return new Promise((resolve, reject) => {
-       // Buscar usuario
        const user = this.users.find(user => user.email === email && user.password === password);
        
        if (!user) {
          return reject({ code: 'auth/user-not-found', message: 'Usuario no encontrado o contraseña incorrecta.' });
        }
        
-       // Simular retraso de red
        setTimeout(() => {
          resolve({ user: { ...user, password: undefined } });
        }, 800);
      });
    },
    
-   // Iniciar sesión con Google
+   //Iniciar sesión con Google
    loginWithGoogle: function() {
      return new Promise((resolve, reject) => {
-       // Simular usuario de Google
        const googleUser = {
          uid: 'google_' + Date.now(),
          email: 'usuario.google@gmail.com',
@@ -351,7 +314,6 @@ const { redirect } = Astro.url.searchParams;
          createdAt: new Date().toISOString()
        };
        
-       // Verificar si el usuario ya existe
        const existingUser = this.users.find(user => user.email === googleUser.email);
        
        if (!existingUser) {
@@ -360,7 +322,6 @@ const { redirect } = Astro.url.searchParams;
          localStorage.setItem('stellar_users', JSON.stringify(this.users));
        }
        
-       // Simular retraso de red
        setTimeout(() => {
          resolve({ user: existingUser || googleUser });
        }, 800);
@@ -368,32 +329,27 @@ const { redirect } = Astro.url.searchParams;
    }
  };
  
- // Validar formulario antes de enviar
  registerForm.addEventListener('submit', async (e) => {
    e.preventDefault();
    
-   // Resetear errores
    hideError(formError);
    hideError(nameError);
    hideError(emailError);
    hideError(passwordError);
    hideError(confirmPasswordError);
    
-   // Obtener valores
    const name = nameInput.value.trim();
    const email = emailInput.value.trim();
    const password = passwordInput.value;
    const confirmPassword = confirmPasswordInput.value;
    const acceptTerms = termsCheckbox.checked;
    
-   // Validar nombre
    if (!name) {
      showError(nameError, 'Por favor, introduce tu nombre completo');
      nameInput.focus();
      return;
    }
    
-   // Validar email
    if (!email) {
      showError(emailError, 'Por favor, introduce tu correo electrónico');
      emailInput.focus();
@@ -406,7 +362,6 @@ const { redirect } = Astro.url.searchParams;
      return;
    }
    
-   // Validar contraseña
    if (!password) {
      showError(passwordError, 'Por favor, introduce una contraseña');
      passwordInput.focus();
@@ -426,43 +381,36 @@ const { redirect } = Astro.url.searchParams;
      return;
    }
    
-   // Validar confirmación de contraseña
    if (password !== confirmPassword) {
      showError(confirmPasswordError, 'Las contraseñas no coinciden');
      confirmPasswordInput.focus();
      return;
    }
    
-   // Validar términos
    if (!acceptTerms) {
      showError(formError, 'Debes aceptar los términos y condiciones');
      termsCheckbox.focus();
      return;
    }
    
-   // Mostrar loader
    showLoader();
    
    try {
      let userCredential;
      
      if (USE_LOCAL_AUTH) {
-       // Usar autenticación local simulada
        userCredential = await localAuth.register(email, password, name);
      } else {
        // Aquí iría el código para Firebase Auth
        // Omitido para usar la simulación local
      }
      
-     // Registro exitoso, simular redirección
      setTimeout(() => {
        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/';
        
-       // Guardar información de sesión
        localStorage.setItem('stellar_current_user', JSON.stringify(userCredential.user));
        localStorage.setItem('stellar_auth_token', 'simulated_token_' + Date.now());
        
-       // Mostrar mensaje de éxito antes de redirigir
        hideLoader();
        showError(formError, '¡Registro exitoso! Redirigiendo...');
        formError.style.color = '#10b981';
@@ -474,10 +422,8 @@ const { redirect } = Astro.url.searchParams;
      }, 1000);
      
    } catch (error) {
-     // Ocultar loader
      hideLoader();
      
-     // Mostrar error
      let errorMessage = 'Error al crear la cuenta. Por favor, inténtalo de nuevo.';
      
      if (error.code === 'auth/email-already-in-use') {
@@ -495,34 +441,27 @@ const { redirect } = Astro.url.searchParams;
    }
  });
  
- // Iniciar sesión con Google
  googleLoginButton.addEventListener('click', async () => {
-   // Resetear errores
    hideError(formError);
    
-   // Mostrar loader
    showLoader();
    
    try {
      let result;
      
      if (USE_LOCAL_AUTH) {
-       // Usar autenticación local simulada
        result = await localAuth.loginWithGoogle();
      } else {
        // Aquí iría el código para Firebase Auth
        // Omitido para usar la simulación local
      }
      
-     // Inicio de sesión exitoso, simular redirección
      setTimeout(() => {
        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/';
        
-       // Guardar información de sesión
        localStorage.setItem('stellar_current_user', JSON.stringify(result.user));
        localStorage.setItem('stellar_auth_token', 'simulated_token_' + Date.now());
        
-       // Mostrar mensaje de éxito antes de redirigir
        hideLoader();
        showError(formError, '¡Inicio de sesión exitoso! Redirigiendo...');
        formError.style.color = '#10b981';
@@ -534,10 +473,8 @@ const { redirect } = Astro.url.searchParams;
      }, 1000);
      
    } catch (error) {
-     // Ocultar loader
      hideLoader();
      
-     // Mostrar error
      let errorMessage = 'Error al iniciar sesión con Google. Por favor, inténtalo de nuevo.';
      
      if (error.code === 'auth/popup-closed-by-user') {
@@ -553,7 +490,6 @@ const { redirect } = Astro.url.searchParams;
    }
  });
  
- // Animación para los inputs
  const inputs = [nameInput, emailInput, passwordInput, confirmPasswordInput];
  inputs.forEach(input => {
    input.addEventListener('focus', () => {
@@ -565,11 +501,9 @@ const { redirect } = Astro.url.searchParams;
    });
  });
  
- // Obtener parámetros de URL
  const urlParams = new URLSearchParams(window.location.search);
  const errorParam = urlParams.get('error');
  
- // Mostrar error si viene en la URL
  if (errorParam) {
    let errorMessage = 'Ha ocurrido un error. Por favor, inténtalo de nuevo.';
    
@@ -597,7 +531,6 @@ const { redirect } = Astro.url.searchParams;
    }
  }
  
- /* Estilos para el hover de los botones */
  #register-button:hover {
    box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
    transform: translateY(-2px);
@@ -609,7 +542,6 @@ const { redirect } = Astro.url.searchParams;
    transform: translateY(-2px);
  }
  
- /* Animación para las estrellas */
  @keyframes twinkle {
    0%, 100% { opacity: 0.5; }
    50% { opacity: 1; }

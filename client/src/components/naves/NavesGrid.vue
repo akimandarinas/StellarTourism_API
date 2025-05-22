@@ -3,7 +3,13 @@
     <div class="naves-grid">
       <div v-for="nave in naves" :key="nave.id" class="nave-card">
         <div class="nave-image-container">
-          <img :src="nave.imagen" :alt="nave.nombre" class="nave-image" loading="lazy" />
+          <img 
+            :src="nave.imagen" 
+            :alt="nave.nombre" 
+            class="nave-image" 
+            loading="lazy"
+            @error="handleImageError" 
+          />
         </div>
         <div class="nave-content">
           <h3 class="nave-title">{{ nave.nombre }}</h3>
@@ -33,7 +39,10 @@
 </template>
 
 <script setup>
-// Datos para las naves con imágenes 
+// URL de imagen de respaldo
+const fallbackImageUrl = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/aurora-estelar-cruiser-RQ8yt03mV9GFflJm8wrfYK83vB6ImU.png";
+
+// Datos de ejemplo para las naves con imágenes únicas
 const naves = [
   {
     id: 1,
@@ -43,7 +52,7 @@ const naves = [
     velocidad: "28,000 km/h",
     autonomia: "30 días",
     descripcion: "Crucero de lujo diseñado para viajes orbitales alrededor de la Tierra y la Luna, con amplias vistas panorámicas y comodidades de primera clase.",
-    imagen: "/images/naves/aurora-estelar-cruiser.png"
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/aurora-estelar-cruiser-RQ8yt03mV9GFflJm8wrfYK83vB6ImU.png"
   },
   {
     id: 2,
@@ -53,7 +62,7 @@ const naves = [
     velocidad: "40,000 km/h",
     autonomia: "14 días",
     descripcion: "Nave compacta y veloz especializada en viajes Tierra-Luna, ideal para expediciones cortas a la superficie lunar.",
-    imagen: "/images/naves/halcon-lunar-shuttle.png"
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/halcon-lunar-shuttle-QTNlppBIVLAihLCoKfG0xXzkPzD2xa.png"
   },
   {
     id: 3,
@@ -63,7 +72,7 @@ const naves = [
     velocidad: "120,000 km/h",
     autonomia: "180 días",
     descripcion: "Nave de largo alcance equipada para viajes a Marte, con sistemas de gravedad artificial y módulos de hibernación para los pasajeros.",
-    imagen: "/images/naves/voyager-marciano-cruiser.png"
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/voyager-marciano-cruiser.png-1lRnc8nBmVPVlMp40AuMoMTn0DErpu.jpeg"
   },
   {
     id: 4,
@@ -73,7 +82,7 @@ const naves = [
     velocidad: "27,600 km/h",
     autonomia: "Permanente",
     descripcion: "Estación espacial de última generación que sirve como punto de partida para expediciones más largas y como destino turístico por sí misma.",
-    imagen: "/images/naves/nexus-orbital-station.png"
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/nexus-orbital-station-5RJo0cfI0NUItzyPF6fCwYa04RduiQ.png"
   },
   {
     id: 5,
@@ -83,7 +92,7 @@ const naves = [
     velocidad: "150,000 km/h",
     autonomia: "90 días",
     descripcion: "Nave científica que permite a los turistas participar en expediciones de investigación solar con equipamiento de observación avanzado.",
-    imagen: "/images/naves/solar-explorer-research.png"
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/solar-explorer-research-T31AK5CsKfqxRlxZo9uHODArM3ZrGQ.png"
   },
   {
     id: 6,
@@ -93,9 +102,46 @@ const naves = [
     velocidad: "5,000 km/h",
     autonomia: "60 días",
     descripcion: "Base móvil que permite explorar diferentes regiones de la Luna, equipada con vehículos de superficie y módulos habitacionales.",
-    imagen: "/images/naves/artemisa-lunar-base.png"
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/artemisa-lunar-base.png-yinGoQ8HIqYQ3U9FfA2B8ZlER5CH6n.webp"
+  },
+  {
+    id: 7,
+    nombre: "Crucero Estelar",
+    tipo: "Crucero de Lujo",
+    capacidad: 60,
+    velocidad: "25,000 km/h",
+    autonomia: "90 días",
+    descripcion: "Nave de lujo exclusiva para viajes de placer con todas las comodidades imaginables y un diseño elegante de primera clase.",
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/eea7728b-18e0-4b08-8e12-128b50fbe0e2-xZASfQCe9tuHSpxcGQOGI1aNj05qsP.png"
+  },
+  {
+    id: 8,
+    nombre: "Defensor Espacial",
+    tipo: "Nave de Escolta",
+    capacidad: 25,
+    velocidad: "50,000 km/h",
+    autonomia: "120 días",
+    descripcion: "Nave de escolta que proporciona seguridad adicional para nuestras rutas más aventuradas con sistemas de detección avanzados.",
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8778798-fRteSwuh3yAfsk85nOtVyq3lwjJreq.png"
+  },
+  {
+    id: 9,
+    nombre: "Estación Comercial Nexus",
+    tipo: "Estación Comercial",
+    capacidad: 800,
+    velocidad: "5,000 km/h",
+    autonomia: "10 años",
+    descripcion: "Centro de negocios y entretenimiento flotante para transacciones comerciales, compras duty-free y experiencias de vida en el espacio.",
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bb155376-b4ec-492e-b057-614eedacff24-6vMOPBQJ7xYEu9TLIf75qX4WPfPipq.png"
   }
 ];
+
+// Función para manejar errores de carga de imágenes
+const handleImageError = (event) => {
+  console.log("Error al cargar imagen, usando imagen de respaldo");
+  // Usar una imagen de respaldo genérica
+  event.target.src = fallbackImageUrl;
+};
 </script>
 
 <style scoped>

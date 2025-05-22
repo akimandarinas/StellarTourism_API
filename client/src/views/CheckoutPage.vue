@@ -103,7 +103,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { AlertCircle, XCircle, AlertTriangle } from 'lucide-vue-next';
+import { AlertCircle, XCircle, AlertTriangle } from '@/utils/lucide-adapter';
 import LoadingSpinner from '../components/common/LoadingSpinner.vue';
 import CheckoutPayment from '../components/checkout/CheckoutPayment.vue';
 import { useReservas } from '../composables/useReservas';

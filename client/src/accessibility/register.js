@@ -1,6 +1,4 @@
-/**
- * Registro de componentes y utilidades de accesibilidad
- */
+/* Registro de componentes y utilidades de accesibilidad */
 
 import AccessibleImage from "./components/AccessibleImage.vue"
 import AccessibleVideo from "./components/AccessibleVideo.vue"
@@ -11,15 +9,10 @@ import SkipToContent from "./components/SkipToContent.vue"
 import AccessibleNavigation from "./components/AccessibleNavigation.vue"
 import AccessibleAudio from "./components/AccessibleAudio.vue"
 
-// Directivas
 import { directives } from "./directives"
 
-/**
- * Registra todos los componentes y directivas de accesibilidad en la aplicación
- * @param {Vue} app - Instancia de la aplicación Vue
- */
+
 export function registerAccessibility(app) {
-  // Registrar componentes
   app.component("AccessibleImage", AccessibleImage)
   app.component("AccessibleVideo", AccessibleVideo)
   app.component("AccessibleDialog", AccessibleDialog)
@@ -29,27 +22,20 @@ export function registerAccessibility(app) {
   app.component("AccessibleNavigation", AccessibleNavigation)
   app.component("AccessibleAudio", AccessibleAudio)
 
-  // Registrar directivas
   for (const [name, directive] of Object.entries(directives)) {
     app.directive(name, directive)
   }
 
-  // Inicializar anunciador global para lectores de pantalla
   initializeScreenReaderAnnouncer()
 
-  // Proporcionar directivas y utilidades de accesibilidad
   app.provide("accessibility", {
-    // Aquí se pueden agregar métodos y propiedades globales de accesibilidad
   })
 }
 
-/**
- * Inicializa el anunciador global para lectores de pantalla
- */
+
 function initializeScreenReaderAnnouncer() {
   if (typeof document === "undefined") return
 
-  // Verificar si ya existe un anunciador global
   if (!document.getElementById("a11y-announcer")) {
     const announcer = document.createElement("div")
     announcer.id = "a11y-announcer"
@@ -68,7 +54,6 @@ function initializeScreenReaderAnnouncer() {
   }
 }
 
-// Exportar componentes para uso individual
 export {
   AccessibleImage,
   AccessibleVideo,

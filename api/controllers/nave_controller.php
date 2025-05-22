@@ -1,28 +1,23 @@
 <?php
 require_once __DIR__ . '/../utils/response_utils.php';
 
-// Headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Incluir archivos de configuración y modelo
 include_once '../config/database.php';
 include_once '../models/Nave.php';
 
-// Crear instancia de la base de datos
 $database = new Database();
 $db = $database->getConnection();
 
 // Crear instancia del objeto Nave
 $nave = new Nave($db);
 
-// Obtener método de solicitud HTTP
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Procesar según el método
 switch($method) {
     case 'GET':
         // Verificar si se proporciona un ID
@@ -31,7 +26,6 @@ switch($method) {
             $nave->ID = $_GET['id'];
             
             if($nave->readOne()) {
-                // Crear array con los datos de la nave
                 $nave_arr = array(
                     "ID" => $nave->ID,
                     "NOMBRE" => $nave->NOMBRE,
@@ -48,7 +42,6 @@ switch($method) {
                     "UPDATED_AT" => $nave->UPDATED_AT
                 );
                 
-                // Obtener imágenes de la nave
                 $stmt_images = $nave->getImages();
                 $images_arr = array();
                 
@@ -65,8 +58,7 @@ switch($method) {
                 }
                 
                 $nave_arr["imagenes"] = $images_arr;
-                
-                // Obtener comodidades de la nave
+     
                 $stmt_amenities = $nave->getAmenities();
                 $amenities_arr = array();
                 
@@ -231,7 +223,7 @@ switch($method) {
 
 
 /**
- * Obtiene todos los registros
+Obtiene todos los registros
  */
 function getAll() {
     global $conn;
@@ -257,11 +249,6 @@ function getAll() {
     }
 }
 
-/**
- * Obtiene un registro por su ID
- * 
- * @param int $id ID del registro
- */
 function getById($id) {
     global $conn;
     
@@ -286,16 +273,10 @@ function getById($id) {
     }
 }
 
-/**
- * Crea un nuevo registro
- * 
- * @param array $data Datos del registro
- */
 function create($data) {
     global $conn;
     
     try {
-        // Validar datos
         if (empty($data)) {
             sendErrorResponse('No se proporcionaron datos', 400);
             return;
@@ -327,10 +308,8 @@ function create($data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
-        // Ejecutar la consulta
         if ($stmt->execute()) {
             $newId = $stmt->insert_id;
             sendJsonResponse([
@@ -346,17 +325,10 @@ function create($data) {
     }
 }
 
-/**
- * Actualiza un registro existente
- * 
- * @param int $id ID del registro
- * @param array $data Datos del registro
- */
 function update($id, $data) {
     global $conn;
     
     try {
-        // Validar datos
         if (empty($data)) {
             sendErrorResponse('No se proporcionaron datos', 400);
             return;
@@ -374,7 +346,6 @@ function update($id, $data) {
             return;
         }
         
-        // Preparar la consulta de actualización
         $updates = [];
         $values = [];
         
@@ -403,10 +374,8 @@ function update($id, $data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
-        // Ejecutar la consulta
         if ($stmt->execute()) {
             sendJsonResponse([
                 'status' => 'success',
@@ -422,9 +391,7 @@ function update($id, $data) {
 }
 
 /**
- * Elimina un registro
- * 
- * @param int $id ID del registro
+Elimina un registro
  */
 function delete($id) {
     global $conn;
@@ -442,12 +409,10 @@ function delete($id) {
             return;
         }
         
-        // Preparar la consulta de eliminación
         $sql = "DELETE FROM nave WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
         
-        // Ejecutar la consulta
         if ($stmt->execute()) {
             sendJsonResponse([
                 'status' => 'success',

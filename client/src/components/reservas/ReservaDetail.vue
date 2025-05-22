@@ -258,7 +258,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { Calendar, Ship, Users, Shield, User, Rocket, Printer, Mail, Phone, MessageSquare, X, Loader2, AlertTriangle } from 'lucide-vue-next';
+import { Calendar, Ship, Users, Shield, User, Rocket, Printer, Mail, Phone, MessageSquare, X, Loader2, AlertTriangle } from '@/utils/lucide-adapter';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { api } from '../../services/api';
 import { formatDate, formatPrice } from '../../utils/format';

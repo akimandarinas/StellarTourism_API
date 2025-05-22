@@ -1,8 +1,5 @@
-/**
- * Directivas Vue para accesibilidad
- */
+/*Directivas Vue para accesibilidad*/
 
-// Directiva para hacer que un elemento sea visible solo para lectores de pantalla
 const vSrOnly = {
   mounted(el) {
     el.classList.add("sr-only")
@@ -16,7 +13,6 @@ const vSrOnly = {
   },
 }
 
-// Directiva para anunciar cambios a lectores de pantalla
 const vAnnounce = {
   mounted(el, binding) {
     if (!binding.value) return
@@ -39,7 +35,6 @@ const vAnnounce = {
       document.body.appendChild(announcer)
     }
 
-    // Anunciar el mensaje
     announcer.textContent = ""
     setTimeout(() => {
       announcer.textContent = binding.value
@@ -59,7 +54,6 @@ const vAnnounce = {
   },
 }
 
-// Directiva para implementar una trampa de foco
 const vFocusTrap = {
   mounted(el, binding) {
     if (binding.value === false) return
@@ -68,7 +62,6 @@ const vFocusTrap = {
       handleKeyDown: (event) => {
         if (event.key !== "Tab") return
 
-        // Obtener elementos focusables
         const focusableElements = Array.from(
           el.querySelectorAll(
             'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
@@ -83,12 +76,10 @@ const vFocusTrap = {
         const firstElement = focusableElements[0]
         const lastElement = focusableElements[focusableElements.length - 1]
 
-        // Shift+Tab en el primer elemento -> ir al último
         if (event.shiftKey && document.activeElement === firstElement) {
           event.preventDefault()
           lastElement.focus()
         }
-        // Tab en el último elemento -> ir al primero
         else if (!event.shiftKey && document.activeElement === lastElement) {
           event.preventDefault()
           firstElement.focus()
@@ -99,7 +90,6 @@ const vFocusTrap = {
     // Añadir event listener
     document.addEventListener("keydown", el._focusTrap.handleKeyDown)
 
-    // Auto-focus al primer elemento focusable
     if (binding.modifiers.autoFocus !== false) {
       setTimeout(() => {
         const focusableElements = Array.from(
@@ -132,10 +122,8 @@ const vFocusTrap = {
   },
 }
 
-// Directiva para manejar el contraste
 const vContrast = {
   mounted(el, binding) {
-    // Verificar si el usuario prefiere alto contraste
     const prefersHighContrast = window.matchMedia("(prefers-contrast: more)").matches
 
     if (binding.value || prefersHighContrast) {
@@ -151,7 +139,6 @@ const vContrast = {
   },
 }
 
-// Directiva para manejar la reducción de movimiento
 const vReduceMotion = {
   mounted(el, binding) {
     // Verificar si el usuario prefiere reducción de movimiento
@@ -170,7 +157,6 @@ const vReduceMotion = {
   },
 }
 
-// Directiva para manejar el enfoque visible
 const focusVisible = {
   mounted(el) {
     el.addEventListener("focus", () => {
@@ -186,7 +172,6 @@ const focusVisible = {
   },
 }
 
-// Directiva para manejar el anuncio a lectores de pantalla
 const announce = {
   mounted(el, binding) {
     if (binding.value) {
@@ -221,5 +206,4 @@ export default {
   },
 }
 
-// Exportar directivas individuales
 export { vSrOnly, vAnnounce, vFocusTrap, vContrast, vReduceMotion, focusVisible, announce }

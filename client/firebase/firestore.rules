@@ -6,33 +6,28 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // Función para verificar si el usuario es propietario del documento
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Función para verificar si el documento es público
     function isPublic(resource) {
       return resource.data.isPublic == true;
     }
     
     // Reglas para la colección de usuarios
     match /usuarios/{userId} {
-      // Solo el propio usuario puede leer y escribir sus datos
       allow read: if isOwner(userId);
       allow write: if isOwner(userId);
     }
     
     // Reglas para la colección de destinos
     match /destinos/{destinoId} {
-      // Todos pueden leer destinos, solo administradores pueden escribir
       allow read: if true;
       allow write: if isAuthenticated() && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.role == 'admin';
     }
     
     // Reglas para la colección de naves
     match /naves/{naveId} {
-      // Todos pueden leer naves, solo administradores pueden escribir
       allow read: if true;
       allow write: if isAuthenticated() && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.role == 'admin';
     }

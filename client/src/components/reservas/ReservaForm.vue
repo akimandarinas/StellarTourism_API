@@ -284,7 +284,6 @@ export default {
     const precioActividades = ref(0);
     const descuento = ref(0);
     
-    // Formulario y validación
     const formData = ref({
       rutaId: '',
       fechaSalida: '',
@@ -297,11 +296,10 @@ export default {
       userId: null
     });
     
-    // Errores y estado de campos tocados
+    //Errores y estado de campos tocados
     const errors = ref({});
     const touched = ref({});
     
-    // Esquema de validación
     const validationSchema = {
       rutaId: [rules.required],
       fechaSalida: [rules.required, rules.futureDate],
@@ -318,14 +316,12 @@ export default {
       telefonoContacto: [rules.required, rules.phone]
     };
     
-    // Fecha mínima (hoy + 30 días)
     const minDate = computed(() => {
       const date = new Date();
       date.setDate(date.getDate() + 30);
       return date.toISOString().split('T')[0];
     });
     
-    // Mostrar secciones condicionales
     const showSeatSelector = computed(() => 
       formData.value.rutaId && formData.value.fechaSalida && asientosDisponibles.value.length > 0
     );
@@ -338,7 +334,6 @@ export default {
       formData.value.rutaId && precioBase.value > 0
     );
     
-    // Validación del formulario
     const validateAllFields = () => {
       errors.value = validateForm(formData.value, validationSchema);
       
@@ -351,7 +346,6 @@ export default {
     };
     
     const isValid = computed(() => {
-      // Validación básica para habilitar/deshabilitar el botón de envío
       return formData.value.rutaId && 
              formData.value.fechaSalida && 
              formData.value.numeroPasajeros > 0 &&
@@ -362,7 +356,6 @@ export default {
              Object.keys(errors.value).length === 0;
     });
     
-    // Precio total
     const precioTotal = computed(() => {
       return precioBase.value + precioActividades.value - descuento.value;
     });
@@ -378,11 +371,9 @@ export default {
 
     // Método para anuncios a lectores de pantalla
     const announceToScreenReader = (message) => {
-      // Esta función utilizaría un componente o servicio de anuncios para lectores de pantalla
-      // Por ahora, simplemente lo logueamos
+      
       console.log('Anuncio para lector de pantalla:', message);
-      // En una implementación real, se usaría algo como:
-      // useAnnouncer().announce(message);
+     
     };
     
     // Cargar datos iniciales
@@ -401,10 +392,8 @@ export default {
       }
     });
     
-    // Cargar rutas disponibles
     const cargarRutas = async () => {
       try {
-        // Simulación de carga de datos
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Datos de ejemplo
@@ -414,7 +403,6 @@ export default {
           { id: 3, nombre: 'Ruta Orbital', origen: 'Tierra', destino: 'Estación Espacial' }
         ];
         
-        // Si solo hay una ruta, seleccionarla automáticamente
         if (rutas.value.length === 1) {
           formData.value.rutaId = rutas.value[0].id;
           await loadDisponibilidad();
@@ -427,13 +415,11 @@ export default {
       }
     };
     
-    // Cargar actividades disponibles
+    //Cargar actividades disponibles
     const cargarActividades = async () => {
       try {
-        // Simulación de carga de datos
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Datos de ejemplo
         actividades.value = [
           { id: 1, nombre: 'Paseo espacial', precio: 500000 },
           { id: 2, nombre: 'Fotografía profesional', precio: 200000 },
@@ -447,7 +433,6 @@ export default {
       }
     };
     
-    // Cargar información del usuario actual
     const cargarUsuario = async () => {
       try {
         const user = await getCurrentUser();
@@ -462,19 +447,15 @@ export default {
       }
     };
     
-    // Cargar disponibilidad de asientos
     const loadDisponibilidad = async () => {
       if (!formData.value.rutaId || !formData.value.fechaSalida) return;
       
       try {
-        // Limpiar errores previos
         delete errors.value.rutaId;
         delete errors.value.fechaSalida;
         
-        // Simulación de carga de datos
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Datos de ejemplo
         asientosDisponibles.value = Array.from({ length: 20 }, (_, i) => ({
           id: i + 1,
           numero: `A${i + 1}`,
@@ -482,17 +463,13 @@ export default {
           clase: Math.random() > 0.7 ? 'premium' : 'standard'
         }));
         
-        // Filtrar solo asientos disponibles
         asientosDisponibles.value = asientosDisponibles.value.filter(a => a.disponible);
         
-        // Precio base por asiento
         const precioPorAsiento = 1000000; // 1 millón por asiento
         precioBase.value = precioPorAsiento;
         
-        // Limpiar asientos seleccionados
         formData.value.asientos = [];
         
-        // Calcular precio total
         calcularPrecio();
         
         return asientosDisponibles.value;
@@ -520,16 +497,13 @@ export default {
       calcularPrecio();
     };
     
-    // Manejar cambio en número de pasajeros
     const handlePasajerosChange = () => {
-      // Validar número de pasajeros
       if (formData.value.numeroPasajeros < 1) {
         formData.value.numeroPasajeros = 1;
       } else if (formData.value.numeroPasajeros > 10) {
         formData.value.numeroPasajeros = 10;
       }
       
-      // Validar campo
       const pasajerosRules = validationSchema.numeroPasajeros;
       let isValid = true;
       
@@ -548,18 +522,14 @@ export default {
       
       touched.value.numeroPasajeros = true;
       
-      // Limpiar asientos seleccionados
       formData.value.asientos = [];
       
-      // Recalcular precio
       calcularPrecio();
     };
     
-    // Manejar blur de campos
     const handleBlur = (field) => {
       touched.value[field] = true;
       
-      // Validar campo
       const fieldRules = validationSchema[field];
       if (!fieldRules) return;
       
@@ -579,18 +549,14 @@ export default {
       }
     };
     
-    // Calcular precio total
     const calcularPrecio = () => {
-      // Precio base por pasajero
       precioBase.value = formData.value.numeroPasajeros * 1000000;
       
-      // Precio de actividades
       precioActividades.value = formData.value.actividades.reduce((total, actividadId) => {
         const actividad = actividades.value.find(a => a.id === actividadId);
         return total + (actividad ? actividad.precio * formData.value.numeroPasajeros : 0);
       }, 0);
       
-      // Aplicar descuentos (ejemplo: 10% para grupos de 5 o más)
       if (formData.value.numeroPasajeros >= 5) {
         descuento.value = (precioBase.value + precioActividades.value) * 0.1;
       } else {
@@ -598,13 +564,10 @@ export default {
       }
     };
     
-    // Modificar el método handleSubmit
     const handleSubmit = async () => {
-      // Validar todos los campos
       const isFormValid = validateAllFields();
       
       if (!isFormValid || submitting.value) {
-        // Mostrar mensaje de error si hay campos inválidos
         if (!isFormValid) {
           // Crear un mensaje de error que liste todos los campos con problemas
           const errorFields = Object.keys(errors.value).map(field => {
@@ -633,7 +596,6 @@ export default {
       error.value = null;
       
       try {
-        // Validar que todos los campos requeridos estén presentes
         const requiredFields = [
           'rutaId', 'fechaSalida', 'numeroPasajeros', 
           'nombreContacto', 'emailContacto', 'telefonoContacto'
@@ -645,12 +607,10 @@ export default {
           throw new Error(`Faltan campos requeridos: ${missingFields.join(', ')}`);
         }
         
-        // Validar que se hayan seleccionado los asientos correctos
         if (showSeatSelector.value && formData.value.asientos.length !== formData.value.numeroPasajeros) {
           throw new Error(`Debes seleccionar exactamente ${formData.value.numeroPasajeros} asiento(s)`);
         }
         
-        // Simulación de envío de datos
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         const reservaData = {
@@ -667,13 +627,10 @@ export default {
           id: Math.floor(Math.random() * 1000000) // ID aleatorio para simulación
         };
         
-        // Anunciar éxito para lectores de pantalla
         announceToScreenReader('Reserva creada exitosamente. Redirigiendo al pago...');
         
-        // Mostrar mensaje de éxito
         success.value = true;
         
-        // Emitir evento después de un breve retraso
         setTimeout(() => {
           emit('reserva-creada', reservaData);
         }, 1000);
@@ -681,19 +638,16 @@ export default {
         console.error('Error al enviar reserva:', err);
         error.value = err.message || 'Ocurrió un error al procesar su reserva. Por favor, intente nuevamente.';
         
-        // Anunciar error para lectores de pantalla
         announceToScreenReader(`Error: ${error.value}`);
       } finally {
         submitting.value = false;
       }
     };
     
-    // Resetear formulario
     const resetForm = () => {
       error.value = null;
       loading.value = true;
       
-      // Resetear datos del formulario
       formData.value = {
         rutaId: '',
         fechaSalida: '',
@@ -706,7 +660,6 @@ export default {
         userId: null
       };
       
-      // Resetear errores y estado de campos tocados
       errors.value = {};
       touched.value = {};
       
@@ -723,7 +676,6 @@ export default {
       });
     };
     
-    // Formatear moneda
     const formatCurrency = (value) => {
       return new Intl.NumberFormat('es-ES', {
         style: 'currency',

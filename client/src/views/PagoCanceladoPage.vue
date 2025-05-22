@@ -42,7 +42,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { XCircle, AlertTriangle } from 'lucide-vue-next';
+import { XCircle, AlertTriangle } from '@/utils/lucide-adapter';
 import { useToast } from '../composables/useToast';
 import { pagosService } from '../services/pagos';
 import { useReservas } from '../composables/useReservas';

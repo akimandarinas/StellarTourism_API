@@ -60,7 +60,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { MailIcon } from 'lucide-vue-next';
+import { MailIcon } from '@/utils/lucide-adapter';
 import Input from '../ui/Input.vue';
 import Button from '../ui/Button.vue';
 import Alert from '../ui/Alert.vue';
@@ -75,14 +75,12 @@ const props = defineProps({
 
 const emit = defineEmits(['reset-sent', 'cancel']);
 
-// Estado
 const email = ref('');
 const error = ref('');
 const success = ref(false);
 const emailError = ref('');
 const attemptedSubmit = ref(false);
 
-// Store
 const authStore = useAuthStore();
 const loading = computed(() => authStore.loading);
 
@@ -111,12 +109,10 @@ const isEmailValid = computed(() => {
   return email.value.length > 0;
 });
 
-// Validar cuando cambia el email
 watch(email, () => {
   if (attemptedSubmit.value) validateEmail();
 });
 
-// Métodos
 const handleSubmit = async () => {
   attemptedSubmit.value = true;
   
@@ -134,7 +130,6 @@ const handleSubmit = async () => {
       success.value = true;
       emit('reset-sent', email.value);
       
-      // Anunciar para lectores de pantalla
       const statusElement = document.createElement('div');
       statusElement.setAttribute('role', 'status');
       statusElement.setAttribute('aria-live', 'polite');
@@ -145,7 +140,6 @@ const handleSubmit = async () => {
         document.body.removeChild(statusElement);
       }, 5000);
       
-      // Cerrar modal después de un breve retraso si no es standalone
       if (!props.standalone) {
         setTimeout(() => {
           emit('cancel');
@@ -154,7 +148,6 @@ const handleSubmit = async () => {
     } else if (authStore.error) {
       error.value = authStore.error;
       
-      // Mejorar mensajes de error específicos
       if (error.value.includes('user-not-found')) {
         error.value = 'No existe una cuenta con este correo electrónico.';
       } else if (error.value.includes('invalid-email')) {

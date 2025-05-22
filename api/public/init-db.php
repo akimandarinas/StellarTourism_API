@@ -1,24 +1,18 @@
 <?php
-// Cargar variables de entorno
 require_once __DIR__ . '/../config/env_loader.php';
 
-// Mostrar errores en desarrollo
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Usar la constante BASE_PATH si ya está definida
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
 // Cargar la clase Database
 require_once BASE_PATH . '/config/database.php';
-
-// Incluir el archivo de utilidades de respuesta
 $responseUtilsPath = __DIR__ . '/../utils/response_utils.php';
 if (!file_exists($responseUtilsPath)) {
-    // Si el archivo no existe, definir las funciones aquí
     function sendJsonSuccess($message, $data = []) {
         header("Content-Type: application/json");
         echo json_encode([
@@ -42,10 +36,7 @@ if (!file_exists($responseUtilsPath)) {
     require_once $responseUtilsPath;
 }
 
-// Establecer encabezados para JSON
 header('Content-Type: application/json');
-
-// Función para ejecutar un archivo SQL
 function executeSQLFile($db, $file) {
     if (!file_exists($file)) {
         return [
@@ -83,9 +74,7 @@ function executeSQLFile($db, $file) {
     }
 }
 
-// Función para inicializar la base de datos
 function initializeDatabase($db) {
-    // Crear tabla USUARIOS
     $sql = "CREATE TABLE IF NOT EXISTS USUARIOS (
         ID INT(11) NOT NULL AUTO_INCREMENT,
         NOMBRE VARCHAR(100) NOT NULL,
@@ -289,7 +278,6 @@ function initializeDatabase($db) {
         ];
     }
     
-    // Crear tabla RESENAS
     $sql = "CREATE TABLE IF NOT EXISTS RESENAS (
         ID INT(11) NOT NULL AUTO_INCREMENT,
         USUARIO_ID INT(11) NOT NULL,
@@ -315,7 +303,6 @@ function initializeDatabase($db) {
         ];
     }
     
-    // Crear tabla ACTIVIDADES_RESERVADAS
     $sql = "CREATE TABLE IF NOT EXISTS ACTIVIDADES_RESERVADAS (
         ID INT(11) NOT NULL AUTO_INCREMENT,
         RESERVA_ID INT(11) NOT NULL,
@@ -338,7 +325,6 @@ function initializeDatabase($db) {
         ];
     }
     
-    // Crear tabla NOTIFICACIONES_SUSCRIPCIONES
     $sql = "CREATE TABLE IF NOT EXISTS NOTIFICACIONES_SUSCRIPCIONES (
         ID INT(11) NOT NULL AUTO_INCREMENT,
         USUARIO_ID INT(11) NOT NULL,
@@ -561,17 +547,14 @@ function initializeDatabase($db) {
     ];
 }
 
-// Intentar conectar a la base de datos
 try {
     $dbInstance = Database::getInstance();
     $db = $dbInstance->getConnection();
     
-    // Verificar si se solicitó reiniciar la base de datos
     $reset = isset($_GET['reset']) && $_GET['reset'] === 'true';
     
     if ($reset) {
-        // Eliminar tablas existentes en orden inverso para respetar las restricciones de clave foránea
-        $tables = [
+       $tables = [
             'VISTA_RESERVAS_COMPLETAS', 'VISTA_ACTIVIDADES_POR_DESTINO', 'VISTA_RUTAS_DISPONIBLES', 'VISTA_DESTINOS_ACTIVOS',
             'WEBHOOK_CONFIGURACION', 'WEBHOOK_EVENTS', 'NOTIFICACIONES_HISTORIAL', 'NOTIFICACIONES_SUSCRIPCIONES',
             'ACTIVIDADES_RESERVADAS', 'RESENAS', 'PAGOS', 'RESERVAS', 'ACTIVIDADES', 'RUTAS', 
@@ -595,7 +578,6 @@ try {
         }
     }
     
-    // Inicializar la base de datos
     $result = initializeDatabase($db);
     
     if ($result['success']) {
@@ -625,35 +607,30 @@ try {
         if ($insertSampleData) {
             // Insertar datos de ejemplo en las tablas
             $sampleData = [
-                // Datos de ejemplo para usuarios
                 "INSERT INTO USUARIOS (NOMBRE, APELLIDOS, EMAIL, PASSWORD, TELEFONO, ROL, ESTADO) 
                  VALUES 
                  ('Admin', 'Sistema', 'admin@stellartourism.com', '$2y$10$abcdefghijklmnopqrstuv', '+34600000000', 'admin', 'activo'),
                  ('Juan', 'Pérez', 'juan@example.com', '$2y$10$abcdefghijklmnopqrstuv', '+34611111111', 'cliente', 'activo'),
                  ('María', 'González', 'maria@example.com', '$2y$10$abcdefghijklmnopqrstuv', '+34622222222', 'cliente', 'activo')",
                 
-                // Datos de ejemplo para destinos
                 "INSERT INTO DESTINOS (NOMBRE, DESCRIPCION, TIPO, DISTANCIA_TIERRA, TIEMPO_VIAJE, GRAVEDAD, TEMPERATURA_MIN, TEMPERATURA_MAX, IMAGEN_URL, DESTACADO, ACTIVO, PRECIO, DURACION, DISTANCIA, TEMPERATURA) 
                  VALUES 
                  ('Marte', 'El planeta rojo, cuarto planeta del sistema solar.', 'planeta', 225000000, 180, 0.38, -125, 20, '/images/destinos/marte.jpg', TRUE, TRUE, 12000000.00, 180, 225000000.00, -55.00),
                  ('Luna', 'Satélite natural de la Tierra.', 'luna', 384400, 3, 0.17, -173, 127, '/images/destinos/luna.jpg', TRUE, TRUE, 1500000.00, 7, 384400.00, -20.00),
                  ('Europa', 'Luna de Júpiter con océanos bajo su superficie helada.', 'luna', 628300000, 365, 0.13, -220, -160, '/images/destinos/europa.jpg', TRUE, TRUE, 25000000.00, 400, 628300000.00, -190.00)",
                 
-                // Datos de ejemplo para naves
                 "INSERT INTO NAVES (NOMBRE, DESCRIPCION, TIPO, CAPACIDAD_PASAJEROS, VELOCIDAD_MAXIMA, AUTONOMIA, IMAGEN_URL, DESTACADO, ACTIVO, CAPACIDAD, VELOCIDAD, ESTADO) 
                  VALUES 
                  ('Orion Explorer', 'Nave espacial de última generación para viajes interplanetarios.', 'exploración', 6, 28000, 100, '/images/naves/orion.jpg', TRUE, TRUE, 6, 28000, 'activa'),
                  ('Stellar Cruiser', 'Crucero espacial de lujo para viajes interplanetarios.', 'lujo', 120, 18000, 200, '/images/naves/cruiser.jpg', TRUE, TRUE, 120, 18000, 'activa'),
                  ('Mars Shuttle', 'Transporte rápido especializado en viajes a Marte.', 'transporte', 50, 25000, 120, '/images/naves/shuttle.jpg', TRUE, TRUE, 50, 25000, 'activa')",
                 
-                // Datos de ejemplo para rutas
                 "INSERT INTO RUTAS (DESTINO_ID, NAVE_ID, NOMBRE, DESCRIPCION, DURACION, DISTANCIA, PRECIO, PLAZAS_DISPONIBLES, FECHA_SALIDA, FECHA_REGRESO, DESTACADO, ACTIVO, ORIGEN_ID) 
                  VALUES 
                  (1, 3, 'Expedición a Marte', 'Viaje directo al planeta rojo.', 180, 225000000, 12000000.00, 40, '2024-06-15', '2024-12-15', TRUE, TRUE, 1),
                  (2, 1, 'Tour Lunar', 'Visita a la Luna con paseos por la superficie.', 7, 384400, 1500000.00, 60, '2024-05-10', '2024-05-17', TRUE, TRUE, 1),
                  (3, 2, 'Exploración de Europa', 'Viaje a la misteriosa luna de Júpiter.', 400, 628300000, 25000000.00, 80, '2024-08-01', '2025-09-05', TRUE, TRUE, 1)",
                 
-                // Datos de ejemplo para actividades
                 "INSERT INTO ACTIVIDADES (DESTINO_ID, NOMBRE, DESCRIPCION, DURACION, NIVEL_DIFICULTAD, PRECIO, IMAGEN_URL, ACTIVO, DIFICULTAD) 
                  VALUES 
                  (1, 'Exploración de Valles Marcianos', 'Recorrido por los impresionantes valles de Marte.', 8, 'media', 250000.00, '/images/actividades/valles_marte.jpg', TRUE, 'media'),

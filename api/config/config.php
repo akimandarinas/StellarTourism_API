@@ -1,12 +1,6 @@
 <?php
 /**
- * Archivo principal de configuración
- * 
- * Este archivo contiene todas las configuraciones globales de la aplicación
- * y carga las variables de entorno desde el archivo .env
- * 
- * @version 2.0
- * @author Stellar Tourism Team
+  Archivo principal de configuración
  */
 
 // Cargar variables de entorno

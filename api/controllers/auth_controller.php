@@ -1,14 +1,12 @@
 <?php
 require_once __DIR__ . '/../utils/response_utils.php';
 
-// Headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, GET");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Incluir archivos necesarios
 include_once '../config/database.php';
 include_once '../utils/auth_utils.php';
 
@@ -17,10 +15,8 @@ $request_uri = $_SERVER['REQUEST_URI'];
 $uri_parts = explode('/', trim(parse_url($request_uri, PHP_URL_PATH), '/'));
 $action = end($uri_parts);
 
-// Obtener método de solicitud HTTP
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Procesar según la acción y el método
 if ($method === 'POST') {
     // Obtener datos enviados
     $data = json_decode(file_get_contents("php://input"));
@@ -29,8 +25,6 @@ if ($method === 'POST') {
         case 'login':
             // Verificar que los datos no estén vacíos
             if (!empty($data->email) && !empty($data->password)) {
-                // Aquí iría la lógica de autenticación
-                // Por ahora, simulamos una respuesta exitosa
                 $token = generateJWT(['user_id' => 1, 'email' => $data->email]);
                 
                 sendJsonResponse([
@@ -52,10 +46,7 @@ if ($method === 'POST') {
             break;
             
         case 'register':
-            // Verificar que los datos no estén vacíos
             if (!empty($data->email) && !empty($data->password) && !empty($data->name)) {
-                // Aquí iría la lógica de registro
-                // Por ahora, simulamos una respuesta exitosa
                 sendJsonResponse([
                     'status' => 'success',
                     'message' => 'Registro exitoso',
@@ -74,7 +65,6 @@ if ($method === 'POST') {
             break;
             
         case 'logout':
-            // Aquí iría la lógica de cierre de sesión
             sendJsonResponse([
                 'status' => 'success',
                 'message' => 'Sesión cerrada exitosamente'
@@ -82,7 +72,6 @@ if ($method === 'POST') {
             break;
             
         case 'reset-password':
-            // Verificar que el email no esté vacío
             if (!empty($data->email)) {
                 // Aquí iría la lógica de restablecimiento de contraseña
                 sendJsonResponse([
@@ -108,7 +97,6 @@ if ($method === 'POST') {
 } else if ($method === 'GET') {
     switch ($action) {
         case 'verify':
-            // Verificar token de autenticación
             $headers = getallheaders();
             $auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
             
@@ -135,15 +123,12 @@ if ($method === 'POST') {
             break;
             
         case 'user':
-            // Obtener información del usuario autenticado
             $headers = getallheaders();
             $auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
             
             if (preg_match('/Bearer\s(\S+)/', $auth_header, $matches)) {
                 $token = $matches[1];
                 
-                // Aquí iría la lógica para obtener la información del usuario
-                // Por ahora, simulamos una respuesta exitosa
                 sendJsonResponse([
                     'status' => 'success',
                     'user' => [
@@ -177,9 +162,6 @@ if ($method === 'POST') {
     ], 405);
 
 
-/**
- * Obtiene todos los registros
- */
 function getAll() {
     global $conn;
     
@@ -205,9 +187,7 @@ function getAll() {
 }
 
 /**
- * Obtiene un registro por su ID
- * 
- * @param int $id ID del registro
+Obtiene un registro por su ID
  */
 function getById($id) {
     global $conn;
@@ -234,9 +214,7 @@ function getById($id) {
 }
 
 /**
- * Crea un nuevo registro
- * 
- * @param array $data Datos del registro
+ Crea un nuevo registro
  */
 function create($data) {
     global $conn;
@@ -248,7 +226,6 @@ function create($data) {
             return;
         }
         
-        // Preparar la consulta
         $columns = array_keys($data);
         $values = array_values($data);
         
@@ -260,7 +237,6 @@ function create($data) {
         $sql = "INSERT INTO auth ($columnsStr) VALUES ($placeholdersStr)";
         $stmt = $conn->prepare($sql);
         
-        // Determinar los tipos de datos
         $types = '';
         foreach ($values as $value) {
             if (is_int($value)) {
@@ -274,7 +250,6 @@ function create($data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
         // Ejecutar la consulta
@@ -293,12 +268,6 @@ function create($data) {
     }
 }
 
-/**
- * Actualiza un registro existente
- * 
- * @param int $id ID del registro
- * @param array $data Datos del registro
- */
 function update($id, $data) {
     global $conn;
     
@@ -321,7 +290,6 @@ function update($id, $data) {
             return;
         }
         
-        // Preparar la consulta de actualización
         $updates = [];
         $values = [];
         
@@ -350,7 +318,6 @@ function update($id, $data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
         // Ejecutar la consulta
@@ -368,11 +335,6 @@ function update($id, $data) {
     }
 }
 
-/**
- * Elimina un registro
- * 
- * @param int $id ID del registro
- */
 function delete($id) {
     global $conn;
     
@@ -389,7 +351,6 @@ function delete($id) {
             return;
         }
         
-        // Preparar la consulta de eliminación
         $sql = "DELETE FROM auth WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
@@ -410,5 +371,4 @@ function delete($id) {
 }
 }
 
-// Asegurar que el script termine aquí
 exit();

@@ -1,9 +1,5 @@
-/**
- * Directivas Vue para accesibilidad
- * Permiten aplicar atributos ARIA de manera declarativa en las plantillas
- */
 
-// Directiva para hacer que un elemento sea visible solo para lectores de pantalla
+//Directiva para hacer que un elemento sea visible solo para lectores de pantalla
 export const vSrOnly = {
   mounted(el) {
     el.classList.add("sr-only")
@@ -17,7 +13,6 @@ export const vSrOnly = {
   },
 }
 
-// Directiva para anunciar cambios a lectores de pantalla
 export const vAnnounce = {
   mounted(el, binding) {
     if (!binding.value) return
@@ -60,7 +55,7 @@ export const vAnnounce = {
   },
 }
 
-// Directiva para implementar una trampa de foco
+//Directiva para implementar un focustrap
 export const vFocusTrap = {
   mounted(el, binding) {
     if (binding.value === false) return
@@ -97,10 +92,8 @@ export const vFocusTrap = {
       },
     }
 
-    // Añadir event listener
     document.addEventListener("keydown", el._focusTrap.handleKeyDown)
 
-    // Auto-focus al primer elemento focusable
     if (binding.modifiers.autoFocus !== false) {
       setTimeout(() => {
         const focusableElements = Array.from(
@@ -126,14 +119,13 @@ export const vFocusTrap = {
       document.removeEventListener("keydown", el._focusTrap.handleKeyDown)
       delete el._focusTrap
     } else if (binding.value !== false && !el._focusTrap) {
-      // Reinicializar la trampa de foco
       const directive = vFocusTrap.mounted
       directive(el, binding)
     }
   },
 }
 
-// Directiva para manejar el contraste
+//Directiva parael contraste
 export const vContrast = {
   mounted(el, binding) {
     // Verificar si el usuario prefiere alto contraste
@@ -152,7 +144,6 @@ export const vContrast = {
   },
 }
 
-// Directiva para manejar la reducción de movimiento
 export const vReduceMotion = {
   mounted(el, binding) {
     // Verificar si el usuario prefiere reducción de movimiento
@@ -171,7 +162,6 @@ export const vReduceMotion = {
   },
 }
 
-// Exportar todas las directivas
 export default {
   install(app) {
     app.directive("sr-only", vSrOnly)

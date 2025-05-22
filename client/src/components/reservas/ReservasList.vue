@@ -21,12 +21,12 @@
     <!-- Empty State -->
     <div v-else-if="!reservas.length" class="py-8 text-center">
       <p class="text-gray-500">No tienes reservas</p>
-      <router-link 
-        to="/destinos" 
+      <a 
+        href="/destinos" 
         class="mt-4 inline-block px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
       >
         Explorar destinos
-      </router-link>
+      </a>
     </div>
 
     <!-- Content -->

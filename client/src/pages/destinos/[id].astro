@@ -3,27 +3,55 @@ import Layout from '../../layouts/Layout.astro';
 import DetalleDestinoPage from '../../views/DetalleDestinoPage.vue';
 import { destinos } from '../../data/destinos-data';
 
-// Obtener parámetros de la ruta
+// Importar los iconos directamente en el archivo Astro
+import { 
+  RocketIcon, CalendarIcon, StarIcon, ClockIcon, 
+  TagIcon, AlertCircleIcon, CheckCircleIcon, ActivityIcon 
+} from 'lucide-vue-next';
+
+export async function getStaticPaths() {
+  return destinos.map(destino => ({
+    params: { id: destino.id.toString() },
+    props: { destino },
+  }));
+}
+
+interface Props {
+  destino: {
+    id: number;
+    nombre: string;
+    subtitulo: string;
+  };
+}
+
+const { destino } = Astro.props as Props;
 const { id } = Astro.params;
 
-// Intentar obtener datos del destino para SEO
-const destinoId = parseInt(id);
-const destino = destinos.find(d => d.id === destinoId);
-
-// Datos para SEO
+//Datos para SEO
 const title = destino ? `${destino.nombre} | StellarTourism` : 'Destino Espacial | StellarTourism';
 const description = destino 
   ? `Explora ${destino.nombre}, ${destino.subtitulo}. Reserva tu viaje con StellarTourism.`
   : 'Explora este fascinante destino espacial y reserva tu viaje con StellarTourism.';
 
-// Pasar datos iniciales para hidratación
+//Pasar datos iniciales para hidratación
 const initialState = {
   destino
 };
 ---
 
 <Layout title={title} description={description}>
-  <DetalleDestinoPage client:load destinoId={id} />
+  <DetalleDestinoPage 
+    client:load 
+    destinoId={id} 
+    RocketIcon={RocketIcon} 
+    CalendarIcon={CalendarIcon} 
+    StarIcon={StarIcon} 
+    ClockIcon={ClockIcon}
+    TagIcon={TagIcon} 
+    AlertCircleIcon={AlertCircleIcon} 
+    CheckCircleIcon={CheckCircleIcon} 
+    ActivityIcon={ActivityIcon}
+  />
 </Layout>
 
 <script define:vars={{ initialState, id }}>

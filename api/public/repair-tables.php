@@ -7,10 +7,8 @@ header('Content-Type: application/json');
 try {
     $conn = getConnection();
     
-    // Configurar PDO para que lance excepciones en caso de error
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Definir la estructura esperada de todas las tablas
     $expectedTables = [
         'destinos' => [
             'id' => ['type' => 'INT(11)', 'null' => 'NOT NULL', 'key' => 'PRI', 'extra' => 'AUTO_INCREMENT'],
@@ -236,12 +234,9 @@ try {
         ]
     ];
     
-    // Primero, arreglar el problema de fechas '0000-00-00 00:00:00'
     try {
-        // Actualizar fechas inválidas en la tabla rutas
         $conn->exec("SET SQL_MODE = ''");
         
-        // Actualizar fechas inválidas en la tabla rutas
         $fixDatesQuery = "UPDATE rutas SET fecha_llegada = '2023-01-01 00:00:00' WHERE fecha_llegada = '0000-00-00 00:00:00' OR fecha_llegada IS NULL";
         $conn->exec($fixDatesQuery);
         
@@ -251,11 +246,9 @@ try {
         $fixDatesQuery = "UPDATE rutas SET fecha_regreso = '2023-01-10' WHERE fecha_regreso = '0000-00-00' OR fecha_regreso IS NULL";
         $conn->exec($fixDatesQuery);
         
-        // Actualizar fechas inválidas en la tabla resenas
         $fixDatesQuery = "UPDATE resenas SET fecha_resena = '2023-01-01 00:00:00' WHERE fecha_resena = '0000-00-00 00:00:00' OR fecha_resena IS NULL";
         $conn->exec($fixDatesQuery);
         
-        // Actualizar valores NULL en reserva_id en resenas
         $fixNullsQuery = "UPDATE resenas SET reserva_id = (SELECT id FROM reservas LIMIT 1) WHERE reserva_id IS NULL";
         $conn->exec($fixNullsQuery);
     } catch (PDOException $e) {
@@ -264,14 +257,11 @@ try {
     
     $results = [];
     
-    // Verificar y reparar cada tabla
     foreach ($expectedTables as $tableName => $columns) {
-        // Verificar si la tabla existe
         $tableExistsQuery = "SHOW TABLES LIKE '$tableName'";
         $tableExistsResult = $conn->query($tableExistsQuery);
         
         if ($tableExistsResult->rowCount() == 0) {
-            // La tabla no existe, crearla
             $createTableSQL = "CREATE TABLE $tableName (";
             $columnDefs = [];
             
@@ -295,7 +285,6 @@ try {
                 $results[$tableName] = "Error al crear la tabla: " . $e->getMessage();
             }
         } else {
-            // La tabla existe, verificar columnas
             $columnsQuery = "DESCRIBE $tableName";
             $columnsResult = $conn->query($columnsQuery);
             
@@ -309,16 +298,13 @@ try {
             // Verificar columnas existentes y modificarlas si es necesario
             foreach ($columns as $columnName => $columnProps) {
                 if (isset($existingColumns[$columnName])) {
-                    // La columna existe, verificar si necesita ser modificada
                     $existingColumn = $existingColumns[$columnName];
                     $needsModification = false;
                     
-                    // Verificar tipo
                     if (strtoupper($existingColumn['Type']) != strtoupper($columnProps['type'])) {
                         $needsModification = true;
                     }
                     
-                    // Verificar si permite NULL
                     $isNullable = $existingColumn['Null'] == 'YES';
                     $shouldBeNullable = strpos($columnProps['null'], 'DEFAULT NULL') !== false || strpos($columnProps['null'], 'NULL') !== false;
                     if ($isNullable != $shouldBeNullable) {
@@ -335,7 +321,6 @@ try {
                         }
                     }
                 } else {
-                    // La columna no existe, añadirla
                     $addSQL = "ALTER TABLE $tableName ADD COLUMN $columnName {$columnProps['type']} {$columnProps['null']}";
                     if (isset($columnProps['extra'])) {
                         $addSQL .= " {$columnProps['extra']}";
@@ -373,7 +358,6 @@ try {
                     $existingFKs[$fk['COLUMN_NAME']] = $fk;
                 }
                 
-                // Verificar cada clave foránea esperada
                 foreach ($foreignKeys[$tableName] as $fk) {
                     $column = $fk['column'];
                     $references = $fk['references'];
@@ -402,7 +386,6 @@ try {
                             }
                         }
                         
-                        // La clave foránea no existe, añadirla
                         $constraintName = "fk_{$tableName}_{$column}";
                         $addFKSQL = "ALTER TABLE $tableName ADD CONSTRAINT $constraintName FOREIGN KEY ($column) REFERENCES $references";
                         
@@ -412,11 +395,9 @@ try {
                         } catch (PDOException $e) {
                             $tableResults[] = "Error al añadir clave foránea para '$column': " . $e->getMessage();
                             
-                            // Intentar arreglar problemas de integridad referencial
                             try {
                                 list($refTable, $refColumn) = explode('(', str_replace(')', '', $references));
                                 
-                                // Identificar registros huérfanos
                                 $orphansQuery = "
                                     SELECT t.$column 
                                     FROM $tableName t 
@@ -426,14 +407,12 @@ try {
                                 $orphansResult = $conn->query($orphansQuery);
                                 
                                 if ($orphansResult->rowCount() > 0) {
-                                    // Hay registros huérfanos, intentar arreglarlos
                                     $defaultValueQuery = "SELECT $refColumn FROM $refTable LIMIT 1";
                                     $defaultValueResult = $conn->query($defaultValueQuery);
                                     
                                     if ($defaultValueResult->rowCount() > 0) {
                                         $defaultValue = $defaultValueResult->fetch(PDO::FETCH_ASSOC)[$refColumn];
                                         
-                                        // Actualizar registros huérfanos
                                         $updateOrphansQuery = "
                                             UPDATE $tableName t 
                                             LEFT JOIN $refTable r ON t.$column = r.$refColumn 
@@ -443,7 +422,6 @@ try {
                                         $conn->exec($updateOrphansQuery);
                                         $tableResults[] = "Registros huérfanos en '$column' actualizados a $defaultValue";
                                         
-                                        // Intentar añadir la clave foránea de nuevo
                                         try {
                                             $conn->exec($addFKSQL);
                                             $tableResults[] = "Clave foránea para '$column' añadida correctamente después de arreglar registros huérfanos";
@@ -529,7 +507,6 @@ try {
         }
     }
     
-    // Verificar y crear procedimientos almacenados
     $procedures = [
         'buscar_destinos' => "
             DROP PROCEDURE IF EXISTS buscar_destinos;

@@ -1,23 +1,18 @@
 <?php
-// Cargar variables de entorno
 require_once __DIR__ . '/../config/env_loader.php';
 
-// Mostrar errores en desarrollo
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Definir la ruta base de la aplicación
 define('BASE_PATH', dirname(__DIR__));
 
-// Establecer encabezados para JSON
 header('Content-Type: application/json');
 
 // Verificar si se ha enviado un archivo SQL
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['sql_file'])) {
     $uploadedFile = $_FILES['sql_file'];
     
-    // Verificar errores de carga
     if ($uploadedFile['error'] !== UPLOAD_ERR_OK) {
         echo json_encode([
             'status' => 'error',
@@ -26,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['sql_file'])) {
         exit;
     }
     
-    // Verificar tipo de archivo
     $fileType = mime_content_type($uploadedFile['tmp_name']);
     if ($fileType !== 'text/plain' && $fileType !== 'application/sql' && $fileType !== 'application/octet-stream') {
         echo json_encode([
@@ -36,27 +30,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['sql_file'])) {
         exit;
     }
     
-    // Cargar configuración de la base de datos
     $dbHost = getenv('DB_HOST') ?: 'localhost';
     $dbName = getenv('DB_DATABASE') ?: 'stellar_tourism';
     $dbUser = getenv('DB_USERNAME') ?: 'root';
     $dbPass = getenv('DB_PASSWORD') ?: '';
     
-    // Intentar importar el archivo SQL
     $output = [];
     $returnVar = 0;
     
-    // Crear un archivo temporal con las credenciales
     $tmpCredentialsFile = tempnam(sys_get_temp_dir(), 'mysql_');
     file_put_contents($tmpCredentialsFile, "[client]\nuser={$dbUser}\npassword={$dbPass}\nhost={$dbHost}\n");
     
-    // Comando para importar
     $command = "mysql --defaults-file={$tmpCredentialsFile} {$dbName} < " . escapeshellarg($uploadedFile['tmp_name']);
     
-    // Ejecutar el comando
     exec($command . " 2>&1", $output, $returnVar);
     
-    // Eliminar el archivo temporal de credenciales
     unlink($tmpCredentialsFile);
     
     if ($returnVar !== 0) {
@@ -72,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['sql_file'])) {
         ]);
     }
 } else {
-    // Mostrar formulario de carga
     ?>
     <!DOCTYPE html>
     <html lang="es">

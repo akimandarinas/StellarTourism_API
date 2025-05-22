@@ -1,14 +1,7 @@
 <template>
-  <div 
-    :class="['loading-spinner', size]" 
-    :aria-label="ariaLabel"
-    role="status"
-    :aria-live="ariaLive"
-  >
-    <div class="spinner-circle"></div>
+  <div :class="['loading-spinner', size]" role="status" aria-label="Cargando...">
+    <div class="spinner"></div>
     <span v-if="text" class="spinner-text">{{ text }}</span>
-    <span v-if="text" class="sr-only">{{ text }}</span>
-    <span v-else class="sr-only">Cargando...</span>
   </div>
 </template>
 
@@ -18,21 +11,12 @@ export default {
   props: {
     size: {
       type: String,
-      default: 'medium',
-      validator: (value) => ['small', 'medium', 'large'].includes(value)
+      default: 'md',
+      validator: (value) => ['sm', 'md', 'lg'].includes(value)
     },
     text: {
       type: String,
       default: ''
-    },
-    ariaLabel: {
-      type: String,
-      default: 'Cargando'
-    },
-    ariaLive: {
-      type: String,
-      default: 'polite',
-      validator: (value) => ['off', 'polite', 'assertive'].includes(value)
     }
   }
 }
@@ -40,44 +24,43 @@ export default {
 
 <style scoped>
 .loading-spinner {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.spinner-circle {
+.spinner {
+  border: 3px solid rgba(124, 58, 237, 0.2);
   border-radius: 50%;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  animation: spin 0.75s linear infinite;
+  border-top: 3px solid var(--color-primary, #7c3aed);
+  animation: spin 1s linear infinite;
 }
 
 .spinner-text {
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  color: var(--color-text-secondary, #4a5568);
   font-size: 0.875rem;
 }
 
 /* Tamaños */
-.small .spinner-circle {
-  width: 1rem;
-  height: 1rem;
-  border-width: 2px;
+.sm .spinner {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-.medium .spinner-circle {
-  width: 2rem;
-  height: 2rem;
-  border-width: 3px;
+.md .spinner {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
-.large .spinner-circle {
-  width: 3rem;
-  height: 3rem;
-  border-width: 4px;
+.lg .spinner {
+  width: 3.5rem;
+  height: 3.5rem;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import NavesGrid from '../../components/naves/NavesGrid.vue';
 
-// Datos para SEO
+//Datos para SEO
 const title = "Naves Espaciales | StellarTourism";
 const description = "Explora nuestra flota de naves espaciales para turismo. Desde lanzaderas orbitales hasta cruceros interplanetarios.";
 ---
@@ -20,7 +20,7 @@ const description = "Explora nuestra flota de naves espaciales para turismo. Des
       <NavesGrid client:visible />
     </div>
     
-    <!-- Sección CTA estática (no necesita interactividad) -->
+    <!-- Sección estática (no necesita interactividad) -->
     <section class="section cta-section">
       <div class="cta-content">
         <h2>¿Listo para tu aventura espacial?</h2>
@@ -77,7 +77,6 @@ const description = "Explora nuestra flota de naves espaciales para turismo. Des
   padding: 2rem 0 4rem;
 }
 
-/* Estilos para la sección CTA (copiados de la página principal) */
 .section {
   margin: 4rem auto;
   max-width: var(--content-max-width);

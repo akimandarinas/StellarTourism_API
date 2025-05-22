@@ -1,6 +1,5 @@
-// Asegurarse de que el archivo tailwind.config.js sea compatible con la versión 3.x
+//Asegurarse de que el archivo tailwind.config.js sea compatible con la versión 3.x
 
-/** @type {import('tailwindcss').Config} */
 export default {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
   darkMode: "class",
@@ -114,7 +113,6 @@ export default {
     },
   },
   plugins: [
-    // Plugin para mejorar la accesibilidad
     ({ addBase, addComponents }) => {
       addBase({
         // Mejora de contraste para elementos interactivos

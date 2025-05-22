@@ -97,7 +97,6 @@
                 <span>{{ formatPrice(actividad.precio) }}</span>
               </div>
               <div class="meta-item">
-                <ActivityIcon class="meta-icon" />
                 <span>Dificultad: {{ actividad.dificultad }}</span>
               </div>
             </div>
@@ -168,8 +167,8 @@ import { useRoute } from 'vue-router';
 import { getDestinoById, getDestinosRelacionados } from '../data/destinos-data';
 import { 
   RocketIcon, CalendarIcon, StarIcon, ClockIcon, 
-  TagIcon, AlertCircleIcon, CheckCircleIcon, ActivityIcon 
-} from 'lucide-vue-next';
+  TagIcon, AlertCircleIcon, CheckCircleIcon 
+} from '@/utils/lucide-adapter';
 
 export default {
   name: 'DetalleDestinoPage',
@@ -180,8 +179,7 @@ export default {
     ClockIcon,
     TagIcon,
     AlertCircleIcon,
-    CheckCircleIcon,
-    ActivityIcon
+    CheckCircleIcon
   },
   setup() {
     const route = useRoute();

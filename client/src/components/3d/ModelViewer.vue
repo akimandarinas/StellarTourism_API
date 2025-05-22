@@ -5,7 +5,6 @@
     :class="{ 'loading': loading }"
     :style="{ height: height, width: width }"
   >
-    <!-- Overlay de carga -->
     <div v-if="loading" class="loading-overlay">
       <div class="spinner"></div>
       <p>Cargando modelo...</p>
@@ -51,13 +50,11 @@
       </button>
     </div>
     
-    <!-- Información del modelo -->
     <div v-if="showInfo && !loading && modelInfo" class="model-info">
       <h3>{{ modelInfo.name }}</h3>
       <p v-if="modelInfo.description">{{ modelInfo.description }}</p>
     </div>
     
-    <!-- Botón de pantalla completa -->
     <button 
       v-if="enableFullscreen && !loading" 
       @click="toggleFullscreen" 
@@ -96,7 +93,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 const props = defineProps({
-  // Modelo
   modelUrl: {
     type: String,
     required: true
@@ -111,7 +107,6 @@ const props = defineProps({
     default: null
   },
   
-  // Dimensiones
   width: {
     type: String,
     default: '100%'
@@ -121,13 +116,11 @@ const props = defineProps({
     default: '400px'
   },
   
-  // Opciones de cámara
   cameraPosition: {
     type: Object,
     default: () => ({ x: 0, y: 0, z: 5 })
   },
   
-  // Opciones de iluminación
   ambientLightIntensity: {
     type: Number,
     default: 0.5
@@ -137,7 +130,7 @@ const props = defineProps({
     default: 0.8
   },
   
-  // Opciones de interacción
+  //Opciones de interacción
   enableRotation: {
     type: Boolean,
     default: true
@@ -155,7 +148,7 @@ const props = defineProps({
     default: false
   },
   
-  // Opciones de UI
+  //Opciones de UI
   showControls: {
     type: Boolean,
     default: true
@@ -169,7 +162,7 @@ const props = defineProps({
     default: true
   },
   
-  // Opciones de rendimiento
+  //Opciones de rendimiento
   enableShadows: {
     type: Boolean,
     default: false
@@ -179,7 +172,7 @@ const props = defineProps({
     default: true
   },
   
-  // Opciones de accesibilidad
+  //Opciones de accesibilidad
   ariaLabel: {
     type: String,
     default: 'Visualizador de modelo 3D'
@@ -188,23 +181,19 @@ const props = defineProps({
 
 const emit = defineEmits(['loaded', 'error', 'click']);
 
-// Referencias y estado
 const container = ref(null);
 const loading = ref(true);
 const isFullscreen = ref(false);
 const accessibilityMessage = ref('Cargando modelo 3D...');
 
-// Variables para Three.js
 let scene, camera, renderer, controls, model;
 let animationFrameId = null;
 
-// Inicializar Three.js
+//Inicializar Three.js
 const initThree = () => {
-  // Crear escena
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf0f0f0);
   
-  // Crear cámara
   const { clientWidth, clientHeight } = container.value;
   camera = new THREE.PerspectiveCamera(75, clientWidth / clientHeight, 0.1, 1000);
   camera.position.set(
@@ -213,7 +202,6 @@ const initThree = () => {
     props.cameraPosition.z
   );
   
-  // Crear renderer
   renderer = new THREE.WebGLRenderer({ 
     antialias: props.antialiasing,
     alpha: true
@@ -223,7 +211,6 @@ const initThree = () => {
   renderer.shadowMap.enabled = props.enableShadows;
   container.value.appendChild(renderer.domElement);
   
-  // Añadir luces
   const ambientLight = new THREE.AmbientLight(0xffffff, props.ambientLightIntensity);
   scene.add(ambientLight);
   
@@ -232,7 +219,6 @@ const initThree = () => {
   directionalLight.castShadow = props.enableShadows;
   scene.add(directionalLight);
   
-  // Añadir controles
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
@@ -241,22 +227,17 @@ const initThree = () => {
   controls.enablePan = props.enablePan;
   controls.autoRotate = props.autoRotate;
   
-  // Cargar modelo
   loadModel();
   
-  // Iniciar animación
   animate();
   
-  // Manejar redimensionamiento
   window.addEventListener('resize', handleResize);
 };
 
-// Cargar modelo
 const loadModel = () => {
   loading.value = true;
   accessibilityMessage.value = 'Cargando modelo 3D...';
   
-  // Configurar loader según el tipo de modelo
   if (props.modelType === 'gltf') {
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('/draco/');
@@ -269,12 +250,12 @@ const loadModel = () => {
       (gltf) => {
         model = gltf.scene;
         
-        // Centrar el modelo
+        //Centrar el modelo
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         model.position.sub(center);
         
-        // Escalar el modelo para que se ajuste a la vista
+        //Escalar el modelo para que se ajuste a la vista
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
         const scale = 2 / maxDim;
@@ -301,10 +282,8 @@ const loadModel = () => {
       }
     );
   }
-  // Añadir soporte para otros formatos si es necesario
 };
 
-// Animar escena
 const animate = () => {
   animationFrameId = requestAnimationFrame(animate);
   
@@ -317,7 +296,6 @@ const animate = () => {
   }
 };
 
-// Manejar redimensionamiento
 const handleResize = () => {
   if (!container.value || !camera || !renderer) return;
   
@@ -329,7 +307,6 @@ const handleResize = () => {
   renderer.setSize(clientWidth, clientHeight);
 };
 
-// Métodos de control de cámara
 const resetCamera = () => {
   if (!controls) return;
   
@@ -351,7 +328,6 @@ const zoomOut = () => {
   accessibilityMessage.value = 'Alejando.';
 };
 
-// Manejar pantalla completa
 const toggleFullscreen = () => {
   if (!container.value) return;
   
@@ -384,7 +360,6 @@ const toggleFullscreen = () => {
   }
 };
 
-// Manejar eventos de pantalla completa
 const handleFullscreenChange = () => {
   isFullscreen.value = !!(
     document.fullscreenElement ||
@@ -394,7 +369,7 @@ const handleFullscreenChange = () => {
   );
 };
 
-// Ciclo de vida del componente
+//Ciclo de vida del componente
 onMounted(() => {
   if (container.value) {
     initThree();
@@ -425,7 +400,6 @@ onBeforeUnmount(() => {
     }
   }
   
-  // Eliminar event listeners
   window.removeEventListener('resize', handleResize);
   document.removeEventListener('fullscreenchange', handleFullscreenChange);
   document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
@@ -433,15 +407,13 @@ onBeforeUnmount(() => {
   document.removeEventListener('msfullscreenchange', handleFullscreenChange);
 });
 
-// Observar cambios en el modelUrl
 watch(() => props.modelUrl, () => {
-  // Limpiar modelo anterior
+  //Limpiar modelo anterior
   if (model) {
     scene.remove(model);
     model = null;
   }
   
-  // Cargar nuevo modelo
   loadModel();
 });
 </script>
@@ -565,7 +537,6 @@ watch(() => props.modelUrl, () => {
   transform: translateY(0);
 }
 
-/* Estilos para pantalla completa */
 :fullscreen .model-viewer {
   width: 100vw;
   height: 100vh;

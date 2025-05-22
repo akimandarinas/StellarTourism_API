@@ -1,14 +1,10 @@
 <?php
-// Verificación de la base de datos para la API de Stellar Tourism
-
-// Configuración
 header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Función para verificar el estado de la base de datos
 function checkDatabaseStatus() {
-    // Tablas de la base de datos (simulado)
     $tables = [
         'destinos' => [
             'name' => 'destinos',
@@ -219,7 +215,6 @@ function checkDatabaseStatus() {
         ]
     ];
     
-    // Procedimientos almacenados (simulado)
     $storedProcedures = [
         'buscar_destinos' => [
             'name' => 'buscar_destinos',
@@ -270,7 +265,6 @@ function checkDatabaseStatus() {
         ]
     ];
     
-    // Triggers (simulado)
     $triggers = [
         'actualizar_disponibilidad_nave' => [
             'name' => 'actualizar_disponibilidad_nave',
@@ -310,7 +304,6 @@ function checkDatabaseStatus() {
         ]
     ];
     
-    // Estadísticas de la base de datos (simulado)
     $databaseStats = [
         'size' => '24.5 MB',
         'tables' => count($tables),
@@ -333,7 +326,6 @@ function checkDatabaseStatus() {
         ]
     ];
     
-    // Verificar integridad de la base de datos (simulado)
     $integrityChecks = [
         'foreign_keys' => [
             'status' => 'success',
@@ -357,7 +349,6 @@ function checkDatabaseStatus() {
         ]
     ];
     
-    // Recomendaciones de optimización (simulado)
     $optimizationRecommendations = [
         [
             'table' => 'reservas',
@@ -432,8 +423,6 @@ function checkDatabaseStatus() {
     return $response;
 }
 
-// Ejecutar verificación
 $databaseStatus = checkDatabaseStatus();
 
-// Devolver resultado
 echo json_encode($databaseStatus, JSON_PRETTY_PRINT);

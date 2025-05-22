@@ -206,7 +206,6 @@ try {
         ]
     ];
     
-    // Generar recomendaciones
     $recommendations = [];
     
     // Verificar directorios faltantes
@@ -229,17 +228,11 @@ try {
         }
     }
     
-    // Añadir una función para verificar la funcionalidad de los endpoints de reservas
-
-    /**
-     * Verifica la funcionalidad de los endpoints de reservas
-     * @return array Resultado de la verificación
-     */
+    
     function verificarEndpointsReservas() {
         $resultados = [];
         $baseUrl = getBaseUrl();
         
-        // Verificar endpoint de listado de reservas
         $url = $baseUrl . '/api/controllers/reserva_controller.php';
         $response = realizarPeticion($url);
         $resultados['listado'] = [
@@ -257,7 +250,6 @@ try {
             'data' => $response
         ];
         
-        // Verificar endpoint de disponibilidad
         $url = $baseUrl . '/api/controllers/reserva_controller.php?action=disponibilidad&ruta_id=1&fecha=2025-07-15&pasajeros=2';
         $response = realizarPeticion($url);
         $resultados['disponibilidad'] = [
@@ -278,11 +270,6 @@ try {
         return $resultados;
     }
 
-    /**
-     * Realiza una petición HTTP a la URL especificada
-     * @param string $url URL a la que realizar la petición
-     * @return mixed Respuesta de la petición o false en caso de error
-     */
     function realizarPeticion($url) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -299,10 +286,6 @@ try {
         return false;
     }
 
-    /**
-     * Obtiene la URL base de la aplicación
-     * @return string URL base
-     */
     function getBaseUrl() {
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'];
@@ -311,7 +294,6 @@ try {
         return $protocol . '://' . $host . $script;
     }
 
-    // Añadir la verificación de endpoints de reservas al array de verificaciones
     $verificaciones = [];
     $verificaciones['endpoints_reservas'] = verificarEndpointsReservas();
     

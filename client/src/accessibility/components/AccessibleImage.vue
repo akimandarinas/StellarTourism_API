@@ -4,7 +4,7 @@
     :style="containerStyle"
     ref="container"
   >
-    <!-- Imagen principal con atributos de accesibilidad -->
+    <!-- Imagen con atributos de accesibilidad -->
     <img 
       :src="src"
       :srcset="srcset"
@@ -33,7 +33,6 @@
       <span class="sr-only">Cargando imagen</span>
     </div>
     
-    <!-- Leyenda de la imagen (opcional) -->
     <figcaption 
       v-if="caption" 
       class="accessible-image-caption"
@@ -42,7 +41,6 @@
       {{ caption }}
     </figcaption>
     
-    <!-- Descripción larga (opcional) -->
     <div 
       v-if="longDescription" 
       class="accessible-image-long-description"
@@ -74,7 +72,6 @@
       </div>
     </div>
     
-    <!-- Indicador de error -->
     <div 
       v-if="error" 
       class="accessible-image-error"
@@ -110,7 +107,6 @@ export default {
       type: String,
       default: '',
       validator: (value) => {
-        // Validar que el alt no esté vacío a menos que sea una imagen decorativa
         if (value === '') {
           console.warn('AccessibleImage: El atributo alt está vacío. Si la imagen es decorativa, use decorative=true');
           return true;
@@ -186,16 +182,13 @@ export default {
     const loaded = ref(false);
     const showLongDescription = ref(false);
     
-    // Generar IDs únicos para accesibilidad
     const captionId = ref(generateId('img-caption'));
     const longDescId = ref(generateId('img-desc'));
     
-    // Alternar descripción larga
     const toggleLongDescription = () => {
       showLongDescription.value = !showLongDescription.value;
     };
     
-    // Manejar carga de imagen
     const onImageLoad = (event) => {
       loading.value = false;
       loaded.value = true;
@@ -221,13 +214,12 @@ export default {
         console.warn(`AccessibleImage: Se recomienda proporcionar width y height para evitar cambios de diseño durante la carga. Src: ${props.src}`);
       }
       
-      // Validar relación entre caption y longDescription
       if (props.caption && props.longDescription && props.caption === props.longDescription) {
         console.warn('AccessibleImage: caption y longDescription son idénticos. Considere usar solo uno de ellos o proporcionar información diferente.');
       }
     });
     
-    // Observar cambios en src para resetear estados
+    // Observar cambios en src para resetear 
     watch(() => props.src, () => {
       error.value = false;
       loading.value = true;

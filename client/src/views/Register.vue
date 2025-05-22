@@ -128,7 +128,7 @@ import Input from '../components/ui/Input.vue';
 import Label from '../components/ui/Label.vue';
 import Checkbox from '../components/ui/Checkbox.vue';
 import { useToast } from '../composables/useToast';
-import { crearUsuario } from '../services/api';
+import { crearUsuario } from '@/services/api';
 
 const router = useRouter();
 

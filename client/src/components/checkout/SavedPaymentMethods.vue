@@ -100,7 +100,7 @@ import {
   CheckIcon, 
   TrashIcon, 
   Loader2 
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 
 const props = defineProps({
   initialSelected: {

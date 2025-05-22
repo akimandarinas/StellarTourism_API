@@ -1,29 +1,59 @@
 /**
- * Genera una URL de imagen placeholder basada en el nombre del destino
- * @param {string} nombre - Nombre del destino
- * @returns {string} URL de la imagen placeholder
+ * Utilidades para manejar imágenes placeholder
  */
-export function getDestinationPlaceholder(nombre) {
-  if (!nombre) return "/images/placeholder.svg"
 
-  // Mapeo de palabras clave a imágenes específicas
-  const keywordMap = {
-    luna: "/images/luna-base.png",
-    marte: "/images/marte.png",
-    estación: "/images/estacion-orbital.png",
-    venus: "/images/venus-clouds.png",
-    júpiter: "/images/jupiter-moons.png",
-    saturno: "/images/saturn-rings.png",
-  }
+/**
+ * Obtiene una URL de imagen placeholder para un destino
+ * @param {string} name - Nombre del destino
+ * @returns {string} - URL de la imagen placeholder
+ */
+export function getDestinationPlaceholder(name) {
+  // Simplemente devuelve la ruta a la imagen placeholder local
+  return "/images/placeholder.svg"
+}
 
-  // Buscar coincidencias en el nombre (case insensitive)
-  const nombreLower = nombre.toLowerCase()
-  for (const [keyword, image] of Object.entries(keywordMap)) {
-    if (nombreLower.includes(keyword.toLowerCase())) {
-      return image
-    }
-  }
+/**
+ * Obtiene una URL de imagen placeholder para una nave
+ * @param {string} name - Nombre de la nave
+ * @returns {string} - URL de la imagen placeholder
+ */
+export function getShipPlaceholder(name) {
+  // Simplemente devuelve la ruta a la imagen placeholder local
+  return "/images/placeholder.svg"
+}
 
-  // Si no hay coincidencias, generar un placeholder basado en el nombre
-  return `/images/placeholder.svg?text=${encodeURIComponent(nombre)}`
+/**
+ * Obtiene una URL de imagen placeholder para una actividad
+ * @param {string} name - Nombre de la actividad
+ * @returns {string} - URL de la imagen placeholder
+ */
+export function getActivityPlaceholder(name) {
+  // Simplemente devuelve la ruta a la imagen placeholder local
+  return "/images/placeholder.svg"
+}
+
+/**
+ * Obtiene una URL de imagen placeholder para un usuario
+ * @returns {string} - URL de la imagen placeholder
+ */
+export function getUserPlaceholder() {
+  // Simplemente devuelve la ruta a la imagen placeholder de usuario local
+  return "/images/placeholder-user.jpg"
+}
+
+/**
+ * Obtiene una URL de imagen placeholder genérica
+ * @returns {string} - URL de la imagen placeholder
+ */
+export function getPlaceholderUrl() {
+  // Simplemente devuelve la ruta a la imagen placeholder local
+  return "/images/placeholder.svg"
+}
+
+export default {
+  getDestinationPlaceholder,
+  getShipPlaceholder,
+  getActivityPlaceholder,
+  getUserPlaceholder,
+  getPlaceholderUrl,
 }

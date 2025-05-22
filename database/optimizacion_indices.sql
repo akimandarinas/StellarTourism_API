@@ -99,7 +99,6 @@ JOIN rutas rt ON r.ruta_id = rt.id
 JOIN destinos d ON rt.destino_id = d.id
 JOIN naves n ON rt.nave_id = n.id;
 
--- Procedimientos almacenados para operaciones comunes
 DELIMITER //
 
 CREATE PROCEDURE actualizar_plazas_disponibles(IN ruta_id_param INT, IN cantidad INT)

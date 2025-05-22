@@ -15,7 +15,6 @@ export async function post({ request }) {
     const credential = GoogleAuthProvider.credential(idToken)
     const userCredential = await signInWithCredential(auth, credential)
 
-    // Verificar que el usuario existe
     if (!userCredential.user) {
       return new Response(
         JSON.stringify({
@@ -35,14 +34,11 @@ export async function post({ request }) {
     const expiresAt = Date.now() + 3600 * 1000 // 1 hora
     const sessionId = `google-${uid}-${Date.now()}`
 
-    // En un entorno real, aquí generarías tokens JWT firmados
     const accessToken = `simulated-access-token-${Date.now()}`
     const refreshToken = `simulated-refresh-token-${Date.now()}`
 
-    // Guardar información de sesión
     await sessionManager.startSession(uid)
 
-    // Devolver respuesta exitosa
     return new Response(
       JSON.stringify({
         success: true,

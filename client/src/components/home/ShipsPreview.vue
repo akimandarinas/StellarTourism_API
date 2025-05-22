@@ -27,31 +27,35 @@
         >
           <div 
             v-for="ship in ships" 
-            :key="ship.ID" 
+            :key="ship.id" 
             class="ship-slide"
           >
             <div class="ship-card">
-              <div class="ship-image" :style="{ backgroundImage: `url(${ship.IMAGEN || '/placeholder.svg?height=400&width=600'})` }">
-                <div class="ship-badge">{{ ship.TIPO }}</div>
+              <div class="ship-image">
+                <img :src="ship.imagen" :alt="ship.nombre" class="ship-img" @error="handleImageError" />
+                <div class="ship-badge">{{ ship.tipo }}</div>
               </div>
               <div class="ship-content">
-                <h3 class="ship-title">{{ ship.NOMBRE }}</h3>
-                <p class="ship-description">{{ truncateText(ship.DESCRIPCION, 120) }}</p>
+                <h3 class="ship-title">{{ ship.nombre }}</h3>
+                <p class="ship-description">{{ truncateText(ship.descripcion, 120) }}</p>
                 <div class="ship-specs">
                   <div class="spec-item">
                     <span class="spec-label">Capacidad:</span>
-                    <span class="spec-value">{{ ship.CAPACIDAD }} pasajeros</span>
+                    <span class="spec-value">{{ ship.capacidad }} pasajeros</span>
                   </div>
                   <div class="spec-item">
                     <span class="spec-label">Velocidad:</span>
-                    <span class="spec-value">{{ ship.VELOCIDAD }} km/s</span>
+                    <span class="spec-value">{{ ship.velocidad }}</span>
                   </div>
                   <div class="spec-item">
                     <span class="spec-label">Autonomía:</span>
-                    <span class="spec-value">{{ ship.AUTONOMIA }} días</span>
+                    <span class="spec-value">{{ ship.autonomia }}</span>
                   </div>
                 </div>
-                <a :href="`/naves/${ship.ID}`" class="btn">Ver Detalles</a>
+                <a :href="`/naves/${ship.id}`" class="btn-ship">
+                  Ver Detalles
+                  <span class="btn-arrow">→</span>
+                </a>
               </div>
             </div>
           </div>
@@ -80,15 +84,14 @@
     </div>
     
     <div class="view-all-link">
-      <a href="/naves" class="btn btn-outline">Ver Todas las Naves</a>
+      <a href="/naves" class="btn-outline">Ver Todas las Naves</a>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { api } from '../../services/api';
-import { AccessibleImage } from '@/accessibility/components';
+import { DEFAULT_FALLBACK_IMAGE } from '../../utils/image-utils';
 
 // Estado
 const ships = ref([]);
@@ -98,47 +101,47 @@ const currentSlide = ref(0);
 const sliderContainer = ref(null);
 const slidesToShow = ref(1);
 
- 
+// Datos de ejemplo para desarrollo con URLs de imágenes actualizadas
 const mockShips = [
   {
-    ID: 1,
-    NOMBRE: 'Surora Estelar',
-    DESCRIPCION: 'Nuestra nave insignia, diseñada para viajes interplanetarios de larga duración con todas las comodidades que puedas imaginar.',
-    TIPO: 'Crucero Espacial',
-    CAPACIDAD: 200,
-    VELOCIDAD: 30,
-    AUTONOMIA: 500,
-    IMAGEN: '/placeholder.svg?height=400&width=600'
+    id: 1,
+    nombre: "Aurora Estelar",
+    descripcion: "Nuestra nave insignia, diseñada para viajes interplanetarios de larga duración con todas las comodidades que puedas imaginar.",
+    tipo: "Crucero Espacial",
+    capacidad: 200,
+    velocidad: "30,000 km/h",
+    autonomia: "500 días",
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/aurora-estelar-cruiser-RQ8yt03mV9GFflJm8wrfYK83vB6ImU.png"
   },
   {
-    ID: 2,
-    NOMBRE: 'Lunar Shuttle',
-    DESCRIPCION: 'Perfecta para viajes cortos a la Luna, esta nave compacta ofrece una experiencia rápida y cómoda para turistas espaciales.',
-    TIPO: 'Transporte',
-    CAPACIDAD: 50,
-    VELOCIDAD: 15,
-    AUTONOMIA: 10,
-    IMAGEN: '/placeholder.svg?height=400&width=600&text=Lunar+Shuttle'
+    id: 2,
+    nombre: "Halcón Lunar",
+    descripcion: "Perfecta para viajes cortos a la Luna, esta nave compacta ofrece una experiencia rápida y cómoda para turistas espaciales.",
+    tipo: "Transporte",
+    capacidad: 50,
+    velocidad: "15,000 km/h",
+    autonomia: "10 días",
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/halcon-lunar-shuttle-QTNlppBIVLAihLCoKfG0xXzkPzD2xa.png"
   },
   {
-    ID: 3,
-    NOMBRE: 'Red Planet Pioneer',
-    DESCRIPCION: 'Especializada en viajes a Marte, esta nave cuenta con sistemas avanzados de soporte vital y entretenimiento para el largo viaje.',
-    TIPO: 'Explorador',
-    CAPACIDAD: 100,
-    VELOCIDAD: 25,
-    AUTONOMIA: 300,
-    IMAGEN: '/placeholder.svg?height=400&width=600&text=Red+Planet+Pioneer'
+    id: 3,
+    nombre: "Voyager Marciano",
+    descripcion: "Especializada en viajes a Marte, esta nave cuenta con sistemas avanzados de soporte vital y entretenimiento para el largo viaje.",
+    tipo: "Explorador",
+    capacidad: 100,
+    velocidad: "25,000 km/h",
+    autonomia: "300 días",
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/voyager-marciano-cruiser.png-1lRnc8nBmVPVlMp40AuMoMTn0DErpu.jpeg"
   },
   {
-    ID: 4,
-    NOMBRE: 'Orbital Experience',
-    DESCRIPCION: 'Diseñada para órbitas terrestres, ofrece vistas espectaculares de nuestro planeta y la experiencia de ingravidez.',
-    TIPO: 'Orbital',
-    CAPACIDAD: 30,
-    VELOCIDAD: 8,
-    AUTONOMIA: 15,
-    IMAGEN: '/placeholder.svg?height=400&width=600&text=Orbital+Experience'
+    id: 4,
+    nombre: "Nexus Orbital",
+    descripcion: "Diseñada para órbitas terrestres, ofrece vistas espectaculares de nuestro planeta y la experiencia de ingravidez.",
+    tipo: "Orbital",
+    capacidad: 30,
+    velocidad: "8,000 km/h",
+    autonomia: "15 días",
+    imagen: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/nexus-orbital-station-5RJo0cfI0NUItzyPF6fCwYa04RduiQ.png"
   }
 ];
 
@@ -148,9 +151,6 @@ const fetchShips = async () => {
   error.value = null;
   
   try {
-    // En un entorno real, esto sería una llamada a la API
-    // const data = await api.naves.getAll();
-    
     // Simulamos una llamada a la API con un pequeño retraso
     await new Promise(resolve => setTimeout(resolve, 1000));
     
@@ -194,6 +194,12 @@ const goToSlide = (index) => {
   currentSlide.value = index;
 };
 
+// Función para manejar errores de carga de imágenes
+const handleImageError = (event) => {
+  console.log("Error al cargar imagen, usando imagen de respaldo");
+  event.target.src = DEFAULT_FALLBACK_IMAGE;
+};
+
 // Ciclo de vida
 onMounted(() => {
   fetchShips();
@@ -231,11 +237,13 @@ watch(slidesToShow, () => {
 .slider-container {
   width: 100%;
   overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .slider-track {
   display: flex;
-  transition: transform 0.5s ease;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ship-slide {
@@ -244,79 +252,172 @@ watch(slidesToShow, () => {
 }
 
 .ship-card {
-  background-color: var(--color-surface);
-  border-radius: var(--border-radius-md);
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(15, 15, 26, 0.9));
+  border-radius: 16px;
   overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(76, 201, 240, 0.2);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.ship-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(76, 201, 240, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ship-card:hover::before {
+  opacity: 1;
 }
 
 .ship-image {
-  height: 250px;
-  background-size: cover;
-  background-position: center;
+  height: 300px;
   position: relative;
+  overflow: hidden;
+}
+
+.ship-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.ship-card:hover .ship-img {
+  transform: scale(1.05);
 }
 
 .ship-badge {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background-color: var(--color-secondary);
+  background: linear-gradient(90deg, #4cc9f0, #4361ee);
   color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.8rem;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
   font-weight: 600;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(76, 201, 240, 0.4);
 }
 
 .ship-content {
-  padding: 1.5rem;
+  padding: 2rem;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
 .ship-title {
-  font-size: 1.8rem;
-  color: var(--color-primary);
-  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  background: linear-gradient(90deg, #4cc9f0, #4361ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 15px rgba(76, 201, 240, 0.3);
 }
 
 .ship-description {
-  color: var(--color-text-secondary);
+  color: #a0a0a7;
   margin-bottom: 1.5rem;
+  line-height: 1.7;
+  font-size: 1.1rem;
 }
 
 .ship-specs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(76, 201, 240, 0.1);
 }
 
 .spec-item {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .spec-label {
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
-  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: #a0a0a7;
+  margin-bottom: 0.5rem;
 }
 
 .spec-value {
   font-weight: 600;
+  color: #f5f5f7;
+  font-size: 1.1rem;
+}
+
+.btn-ship {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(90deg, #4cc9f0, #4361ee);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+  margin-top: auto;
+  box-shadow: 0 4px 15px rgba(76, 201, 240, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ship::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+              transparent, 
+              rgba(255, 255, 255, 0.2), 
+              transparent);
+  transition: left 0.7s ease;
+}
+
+.btn-ship:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(76, 201, 240, 0.5);
+}
+
+.btn-ship:hover::before {
+  left: 100%;
+}
+
+.btn-arrow {
+  transition: transform 0.3s ease;
+}
+
+.btn-ship:hover .btn-arrow {
+  transform: translateX(5px);
 }
 
 .slider-arrow {
-  background-color: var(--color-primary);
+  background: linear-gradient(135deg, #4cc9f0, #4361ee);
   color: white;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -324,35 +425,39 @@ watch(slidesToShow, () => {
   cursor: pointer;
   border: none;
   z-index: 2;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 201, 240, 0.3);
 }
 
 .slider-arrow:hover {
-  background-color: var(--color-primary-dark);
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(76, 201, 240, 0.5);
 }
 
 .slider-arrow:disabled {
-  background-color: var(--color-text-muted);
+  background: linear-gradient(135deg, #a0a0a7, #6e6e78);
   cursor: not-allowed;
+  transform: scale(1);
+  box-shadow: none;
 }
 
 .slider-prev {
-  margin-right: 1rem;
+  margin-right: 1.5rem;
 }
 
 .slider-next {
-  margin-left: 1rem;
+  margin-left: 1.5rem;
 }
 
 .arrow-icon {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
 .slider-dots {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   margin-bottom: 2rem;
 }
 
@@ -360,18 +465,60 @@ watch(slidesToShow, () => {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: var(--color-text-muted);
+  background-color: rgba(76, 201, 240, 0.3);
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .slider-dot.active {
-  background-color: var(--color-primary);
+  background: linear-gradient(135deg, #4cc9f0, #4361ee);
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
 }
 
 .view-all-link {
   text-align: center;
+  margin-top: 2rem;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: #4cc9f0;
+  border: 2px solid #4cc9f0;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-outline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+              transparent, 
+              rgba(76, 201, 240, 0.2), 
+              transparent);
+  transition: left 0.7s ease;
+}
+
+.btn-outline:hover {
+  background: rgba(76, 201, 240, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(76, 201, 240, 0.2);
+}
+
+.btn-outline:hover::before {
+  left: 100%;
 }
 
 .loading-container, .error-container {
@@ -381,14 +528,18 @@ watch(slidesToShow, () => {
   justify-content: center;
   padding: 3rem;
   text-align: center;
+  background: rgba(26, 26, 46, 0.5);
+  border-radius: 16px;
+  border: 1px solid rgba(76, 201, 240, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 5px solid rgba(0, 180, 216, 0.3);
+  border: 5px solid rgba(76, 201, 240, 0.3);
   border-radius: 50%;
-  border-top-color: var(--color-primary);
+  border-top-color: #4cc9f0;
   animation: spin 1s ease-in-out infinite;
   margin-bottom: 1rem;
 }
@@ -405,14 +556,34 @@ watch(slidesToShow, () => {
   }
   
   .slider-arrow {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .ship-title {
+    font-size: 1.5rem;
+  }
+  
+  .ship-description {
+    font-size: 1rem;
   }
 }
 
 @media (max-width: 576px) {
   .ship-specs {
     grid-template-columns: 1fr;
+  }
+  
+  .slider-prev {
+    margin-right: 0.5rem;
+  }
+  
+  .slider-next {
+    margin-left: 0.5rem;
+  }
+  
+  .ship-content {
+    padding: 1.5rem;
   }
 }
 </style>

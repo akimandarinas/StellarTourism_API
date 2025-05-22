@@ -197,7 +197,7 @@
 </template>
 
 <script setup>
-import { Globe, Rocket, Star, Clock } from 'lucide-vue-next';
+import { Globe, Rocket, Star, Clock } from '@/utils/lucide-adapter';
 </script>
 
 <style scoped>

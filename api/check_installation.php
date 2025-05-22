@@ -14,8 +14,6 @@ echo "<br>Estado: " . (version_compare(phpversion(), '8.0.0', '>=') ? '<span sty
 
 // Verificar extensiones requeridas
 echo "<h2>Extensiones  : '<span style="color:red">ERROR</span>');
-
-// Verificar extensiones requeridas
 echo "<h2>Extensiones PHP requeridas</h2>";
 $required_extensions = ['pdo', 'pdo_mysql', 'json', 'mbstring', 'curl', 'fileinfo'];
 $missing_extensions = [];

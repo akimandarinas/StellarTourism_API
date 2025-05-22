@@ -1,12 +1,10 @@
 <?php
-// Headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Definir la ruta base si no está definida
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', dirname(dirname(__FILE__)));
 }
@@ -16,13 +14,11 @@ require_once BASE_PATH . '/config/database.php';
 require_once BASE_PATH . '/models/Actividad.php';
 require_once BASE_PATH . '/utils/response_utils.php';
 
-// Crear instancia del objeto Actividad
 $actividad = new Actividad();
 
 // Obtener método de solicitud HTTP
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Procesar según el método
 switch($method) {
     case 'GET':
         // Verificar si se proporciona un ID
@@ -39,7 +35,6 @@ switch($method) {
                 sendJsonResponse(array("message" => "Actividad no encontrada."), 404);
             }
         } 
-        // Verificar si se proporciona un ID de destino
         else if(isset($_GET['destination_id'])) {
             // Leer actividades por destino
             $destino_id = $_GET['destination_id'];
@@ -56,14 +51,10 @@ switch($method) {
                 ), 404);
             }
         } else {
-            // Leer todas las actividades
             $actividades_data = $actividad->getAll(array("orderBy" => "nombre ASC"));
-            
             if(count($actividades_data) > 0) {
-                // Enviar respuesta
                 sendJsonResponse(array("records" => $actividades_data));
             } else {
-                // No se encontraron actividades
                 sendJsonResponse(array(
                     "status" => "info",
                     "message" => "No se encontraron actividades."
@@ -74,10 +65,7 @@ switch($method) {
         
     case 'POST':
         // Crear una actividad
-        // Obtener los datos enviados
         $data = json_decode(file_get_contents("php://input"), true);
-        
-        // Verificar que los datos no estén vacíos
         if(
             !empty($data['nombre']) &&
             !empty($data['duracion']) &&
@@ -87,21 +75,18 @@ switch($method) {
             $result = $actividad->create($data);
             
             if($result) {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "success",
                     "message" => "Actividad creada.",
                     "id" => $result
                 ), 201);
             } else {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "error",
                     "message" => "No se pudo crear la actividad."
                 ), 503);
             }
         } else {
-            // Enviar respuesta
             sendJsonResponse(array(
                 "status" => "error",
                 "message" => "No se puede crear la actividad. Datos incompletos."
@@ -111,16 +96,11 @@ switch($method) {
         
     case 'PUT':
         // Actualizar una actividad
-        // Obtener el ID de la actividad a actualizar
         $data = json_decode(file_get_contents("php://input"), true);
-        
-        // Verificar que el ID no esté vacío
         if(!empty($data['id'])) {
             // Obtener ID a actualizar
             $id = $data['id'];
             unset($data['id']); // Eliminar el ID de los datos a actualizar
-            
-            // Actualizar la actividad
             if($actividad->update($id, $data)) {
                 // Enviar respuesta
                 sendJsonResponse(array(
@@ -128,14 +108,12 @@ switch($method) {
                     "message" => "Actividad actualizada."
                 ));
             } else {
-                // Enviar respuesta
                 sendJsonResponse(array(
                     "status" => "error",
                     "message" => "No se pudo actualizar la actividad."
                 ), 503);
             }
         } else {
-            // Enviar respuesta
             sendJsonResponse(array(
                 "status" => "error",
                 "message" => "No se puede actualizar la actividad. ID no proporcionado."
@@ -144,8 +122,6 @@ switch($method) {
         break;
         
     case 'DELETE':
-        // Eliminar una actividad
-        // Obtener el ID de la actividad a eliminar
         $data = json_decode(file_get_contents("php://input"), true);
         
         // Verificar que el ID no esté vacío
@@ -165,16 +141,13 @@ switch($method) {
                 ), 503);
             }
         } else {
-            // Enviar respuesta
             sendJsonResponse(array(
                 "status" => "error",
                 "message" => "No se puede eliminar la actividad. ID no proporcionado."
             ), 400);
         }
         break;
-        
     default:
-        // Método no permitido
         sendJsonResponse(array(
             "status" => "error",
             "message" => "Método no permitido."
@@ -183,7 +156,7 @@ switch($method) {
 
 
 /**
- * Obtiene todos los registros
+Obtiene todos los registros
  */
 function getAll() {
     global $conn;
@@ -209,11 +182,7 @@ function getAll() {
     }
 }
 
-/**
- * Obtiene un registro por su ID
- * 
- * @param int $id ID del registro
- */
+
 function getById($id) {
     global $conn;
     
@@ -238,11 +207,7 @@ function getById($id) {
     }
 }
 
-/**
- * Crea un nuevo registro
- * 
- * @param array $data Datos del registro
- */
+
 function create($data) {
     global $conn;
     
@@ -253,7 +218,6 @@ function create($data) {
             return;
         }
         
-        // Preparar la consulta
         $columns = array_keys($data);
         $values = array_values($data);
         
@@ -265,7 +229,6 @@ function create($data) {
         $sql = "INSERT INTO actividad ($columnsStr) VALUES ($placeholdersStr)";
         $stmt = $conn->prepare($sql);
         
-        // Determinar los tipos de datos
         $types = '';
         foreach ($values as $value) {
             if (is_int($value)) {
@@ -279,10 +242,8 @@ function create($data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
-        // Ejecutar la consulta
         if ($stmt->execute()) {
             $newId = $stmt->insert_id;
             sendJsonResponse([
@@ -298,12 +259,6 @@ function create($data) {
     }
 }
 
-/**
- * Actualiza un registro existente
- * 
- * @param int $id ID del registro
- * @param array $data Datos del registro
- */
 function update($id, $data) {
     global $conn;
     
@@ -314,7 +269,6 @@ function update($id, $data) {
             return;
         }
         
-        // Verificar si el registro existe
         $checkSql = "SELECT id FROM actividad WHERE id = ?";
         $checkStmt = $conn->prepare($checkSql);
         $checkStmt->bind_param("i", $id);
@@ -326,7 +280,6 @@ function update($id, $data) {
             return;
         }
         
-        // Preparar la consulta de actualización
         $updates = [];
         $values = [];
         
@@ -341,7 +294,6 @@ function update($id, $data) {
         $sql = "UPDATE actividad SET $updatesStr WHERE id = ?";
         $stmt = $conn->prepare($sql);
         
-        // Determinar los tipos de datos
         $types = '';
         foreach ($values as $value) {
             if (is_int($value)) {
@@ -355,7 +307,6 @@ function update($id, $data) {
             }
         }
         
-        // Bind parameters
         $stmt->bind_param($types, ...$values);
         
         // Ejecutar la consulta
@@ -373,11 +324,7 @@ function update($id, $data) {
     }
 }
 
-/**
- * Elimina un registro
- * 
- * @param int $id ID del registro
- */
+
 function delete($id) {
     global $conn;
     
@@ -394,7 +341,6 @@ function delete($id) {
             return;
         }
         
-        // Preparar la consulta de eliminación
         $sql = "DELETE FROM actividad WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
@@ -415,5 +361,4 @@ function delete($id) {
 }
 }
 
-// Asegurar que el script termine aquí
 exit();

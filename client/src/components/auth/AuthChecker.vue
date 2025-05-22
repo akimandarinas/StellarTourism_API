@@ -115,7 +115,6 @@ const tokenExpiryFormatted = computed(() => {
   return `${diffMins} min ${diffSecs} seg`;
 });
 
-// Métodos
 const checkToken = () => {
   try {
     error.value = null;
@@ -145,9 +144,7 @@ const checkApiConnection = async () => {
   }
 };
 
-// Lifecycle hooks
 onMounted(() => {
-  // Verificar conexión con API al montar el componente
   checkApiConnection();
 });
 </script>

@@ -3,21 +3,18 @@ import { createPinia } from "pinia"
 import App from "./App.vue"
 import { getRouter } from "./router"
 
-// Función para determinar si estamos en el cliente
+// Determinar si estamos en el cliente
 function isClient() {
   return typeof window !== "undefined" && typeof document !== "undefined"
 }
 
 // Función para crear la aplicación Vue
 export async function createApp() {
-  // Crear instancias de Vue y store
   const app = createVueApp(App)
   const pinia = createPinia()
 
-  // Registrar el store PRIMERO
   app.use(pinia)
 
-  // Solo inicializar el router en el cliente
   if (isClient()) {
     try {
       const router = await getRouter()
@@ -29,7 +26,6 @@ export async function createApp() {
     }
   }
 
-  // Registrar directivas globales
   if (isClient()) {
     try {
       const { registerDirectives } = await import("./directives")
@@ -45,7 +41,6 @@ export async function createApp() {
     console.error("Component:", instance)
     console.error("Info:", info)
 
-    // Registrar el error en un servicio de seguimiento si está disponible
     if (isClient()) {
       import("./utils/error-handling")
         .then(({ logError }) => {
@@ -58,7 +53,6 @@ export async function createApp() {
   return { app, pinia }
 }
 
-// Exportar una función para montar la aplicación
 export async function mountApp() {
   if (isClient()) {
     const { app } = await createApp()
@@ -66,7 +60,7 @@ export async function mountApp() {
   }
 }
 
-// Montar la aplicación automáticamente en el cliente
+// Montar la aplicación automáticamente
 if (isClient()) {
   // Usar setTimeout para asegurarnos de que se ejecute después de que el DOM esté listo
   setTimeout(() => {

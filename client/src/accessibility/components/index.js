@@ -1,4 +1,3 @@
-// Exportar componentes de accesibilidad
 export { default as AccessibilitySettings } from "./AccessibilitySettings.vue"
 export { default as AccessibleDialog } from "./AccessibleDialog.vue"
 export { default as AccessibleImage } from "./AccessibleImage.vue"

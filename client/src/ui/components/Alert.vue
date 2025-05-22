@@ -32,7 +32,7 @@ import {
   InfoIcon, 
   AlertTriangleIcon,
   XIcon
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 
 const props = defineProps({
   variant: {

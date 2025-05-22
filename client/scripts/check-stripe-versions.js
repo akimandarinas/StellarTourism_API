@@ -1,16 +1,12 @@
 #!/usr/bin/env node
 
-/**
- * Script para verificar la compatibilidad de versiones de Stripe
- * entre el cliente y la API.
- */
+/* Script para verificar la compatibilidad de Stripe entre el cliente y la API. */
 
 const fs = require("fs")
 const path = require("path")
 const axios = require("axios")
 const dotenv = require("dotenv")
 
-// Cargar variables de entorno
 dotenv.config()
 
 // Configuración
@@ -18,7 +14,6 @@ const API_URL = process.env.PUBLIC_API_URL || "http://localhost:8000/api"
 const STRIPE_CHECK_ENDPOINT = `${API_URL}/stripe-check.php`
 const CLIENT_PACKAGE_JSON = path.resolve(__dirname, "../package.json")
 
-// Colores para la consola
 const colors = {
   reset: "\x1b[0m",
   red: "\x1b[31m",
@@ -29,18 +24,16 @@ const colors = {
   cyan: "\x1b[36m",
 }
 
-// Función principal
 async function checkStripeVersions() {
   console.log(`${colors.blue}Verificando compatibilidad de versiones de Stripe...${colors.reset}\n`)
 
   try {
-    // Obtener la versión de Stripe del cliente
+    // Obtener Stripe del cliente
     const clientPackageJson = JSON.parse(fs.readFileSync(CLIENT_PACKAGE_JSON, "utf8"))
     const clientStripeVersion = clientPackageJson.dependencies["@stripe/stripe-js"] || "No encontrado"
 
     console.log(`${colors.cyan}Versión de Stripe en el cliente:${colors.reset} ${clientStripeVersion}`)
 
-    // Verificar la configuración de Stripe en la API
     console.log(`\n${colors.cyan}Verificando configuración de Stripe en la API...${colors.reset}`)
 
     const response = await axios.get(STRIPE_CHECK_ENDPOINT)
@@ -65,7 +58,6 @@ async function checkStripeVersions() {
     console.log(`- Directorio de webhooks: ${getDirStatus(apiStripeConfig.directories.webhook_dir)}`)
     console.log(`- Archivo de logs: ${getDirStatus(apiStripeConfig.directories.stripe_log_file)}`)
 
-    // Verificar modo de prueba
     console.log(`\n${colors.cyan}Modo de prueba:${colors.reset}`)
     console.log(`- Habilitado: ${apiStripeConfig.test_mode.enabled ? "✅ Sí" : "❌ No"}`)
     console.log(
@@ -75,7 +67,6 @@ async function checkStripeVersions() {
       `- Simulador de webhooks: ${apiStripeConfig.test_mode.webhook_simulator_available ? "✅ Disponible" : "❌ No disponible"}`,
     )
 
-    // Resumen
     console.log(`\n${colors.blue}Resumen:${colors.reset}`)
     if (apiStripeConfig.status === "success") {
       console.log(
@@ -104,7 +95,6 @@ async function checkStripeVersions() {
   }
 }
 
-// Función para obtener el color según el estado
 function getStatusColor(status) {
   switch (status) {
     case "success":
@@ -118,7 +108,6 @@ function getStatusColor(status) {
   }
 }
 
-// Función para obtener el estado de un directorio
 function getDirStatus(dir) {
   if (!dir.exists) {
     return `❌ No existe (${dir.path})`
@@ -129,5 +118,4 @@ function getDirStatus(dir) {
   }
 }
 
-// Ejecutar la función principal
 checkStripeVersions()

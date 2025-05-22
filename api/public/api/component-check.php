@@ -1,14 +1,11 @@
 <?php
-// Verificación de componentes para la API de Stellar Tourism
+//Verificación de componentes para la API de Stellar Tourism
 
-// Configuración
 header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Función para verificar el estado de los componentes
 function checkComponentsStatus() {
-    // Datos de componentes (simulados)
     $componentsData = [
         'api_core' => [
             'id' => 'api_core',
@@ -240,7 +237,6 @@ function checkComponentsStatus() {
         'error' => count(array_filter($componentsData, function($c) { return $c['status'] === 'error'; }))
     ];
 
-    // Determinar estado general
     $status = 'success';
     if ($summary['error'] > 0) {
         $status = 'error';
@@ -248,7 +244,6 @@ function checkComponentsStatus() {
         $status = 'warning';
     }
 
-    // Construir respuesta
     $response = [
         'status' => $status,
         'message' => $status === 'success' ? 'Todos los componentes están funcionando correctamente' : 
@@ -262,8 +257,5 @@ function checkComponentsStatus() {
     return $response;
 }
 
-// Ejecutar verificación
 $componentsStatus = checkComponentsStatus();
-
-// Devolver resultado
 echo json_encode($componentsStatus, JSON_PRETTY_PRINT);

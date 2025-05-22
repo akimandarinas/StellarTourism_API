@@ -279,7 +279,7 @@ import {
   XIcon, 
   ChevronDownIcon, 
   SearchIcon 
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 
 export default {
   name: 'FiltrosDestinosMobile',

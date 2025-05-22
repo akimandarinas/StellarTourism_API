@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import { ref, computed, onMounted } from "vue"
 import firebaseAuthService from "../services/auth/firebase-auth"
-import { apiService } from "../services/api"
+import { apiService } from '@/services/api'
 import tokenService from "../services/auth/token-service"
 import sessionManager from "../services/auth/session-manager"
 import registerAuthInterceptor from "../services/api/auth-interceptor"

@@ -1,26 +1,19 @@
 <?php
-/**
- * Utilidad para gestión de caché con soporte para múltiples backends
- * Implementa patrón de diseño Strategy para diferentes mecanismos de almacenamiento
- * Versión optimizada y limpia
+/*
+Utilidad para gestión de caché 
+Implementa patrón de diseño Strategy 
+Versión optimizada y limpia
  */
+
 class CacheUtils {
     private $prefix;
     private $defaultTtl;
     private $driver;
     
-    /**
-     * Constructor
-     * 
-     * @param string $prefix Prefijo para las claves de caché
-     * @param int $defaultTtl Tiempo de vida por defecto en segundos
-     * @param string $driver Driver de caché a utilizar ('redis', 'apcu', 'file')
-     */
     public function __construct($prefix = 'app', $defaultTtl = 3600, $driver = null) {
         $this->prefix = $prefix;
         $this->defaultTtl = $defaultTtl;
         
-        // Determinar el mejor driver disponible si no se especifica
         if ($driver === null) {
             if (extension_loaded('redis') && class_exists('Redis')) {
                 $driver = 'redis';
@@ -30,8 +23,7 @@ class CacheUtils {
                 $driver = 'file';
             }
         }
-        
-        // Inicializar el driver seleccionado
+
         switch ($driver) {
             case 'redis':
                 $this->driver = new RedisCacheDriver();
@@ -46,106 +38,55 @@ class CacheUtils {
         }
     }
     
-    /**
-     * Obtiene un valor del caché
-     * 
-     * @param string $key Clave
-     * @return mixed Valor almacenado o null si no existe o expiró
-     */
+    /*Obtiene un valor del caché*/
     public function get($key) {
         $fullKey = $this->getFullKey($key);
         return $this->driver->get($fullKey);
     }
     
-    /**
-     * Almacena un valor en el caché
-     * 
-     * @param string $key Clave
-     * @param mixed $value Valor a almacenar
-     * @param int|null $ttl Tiempo de vida en segundos (null para usar el valor por defecto)
-     * @return bool Éxito de la operación
-     */
+    /*Almacena un valor en el caché*/
     public function set($key, $value, $ttl = null) {
         $fullKey = $this->getFullKey($key);
         $ttl = $ttl === null ? $this->defaultTtl : $ttl;
         return $this->driver->set($fullKey, $value, $ttl);
     }
     
-    /**
-     * Elimina un valor del caché
-     * 
-     * @param string $key Clave
-     * @return bool Éxito de la operación
-     */
+    /*Elimina un valor del caché*/
     public function delete($key) {
         $fullKey = $this->getFullKey($key);
         return $this->driver->delete($fullKey);
     }
     
-    /**
-     * Elimina valores que coinciden con un patrón
-     * 
-     * @param string $pattern Patrón (con comodines *)
-     * @return bool Éxito de la operación
-     */
+    /*Elimina valores que coinciden con un patrón*/
     public function deletePattern($pattern) {
         $fullPattern = $this->getFullKey($pattern);
         return $this->driver->deletePattern($fullPattern);
     }
     
-    /**
-     * Verifica si una clave existe en el caché
-     * 
-     * @param string $key Clave
-     * @return bool True si existe y no ha expirado
-     */
+    /*Verifica si una clave existe en el caché*/
     public function has($key) {
         $fullKey = $this->getFullKey($key);
         return $this->driver->has($fullKey);
     }
     
-    /**
-     * Incrementa un valor numérico en el caché
-     * 
-     * @param string $key Clave
-     * @param int $value Valor a incrementar
-     * @return int|bool Nuevo valor o false en caso de error
-     */
+    /*Incrementa un valor numérico en el caché*/
     public function increment($key, $value = 1) {
         $fullKey = $this->getFullKey($key);
         return $this->driver->increment($fullKey, $value);
     }
     
-    /**
-     * Decrementa un valor numérico en el caché
-     * 
-     * @param string $key Clave
-     * @param int $value Valor a decrementar
-     * @return int|bool Nuevo valor o false en caso de error
-     */
+    /*Decrementa un valor numérico en el caché*/
     public function decrement($key, $value = 1) {
         $fullKey = $this->getFullKey($key);
         return $this->driver->decrement($fullKey, $value);
     }
     
-    /**
-     * Limpia todo el caché
-     * 
-     * @return bool Éxito de la operación
-     */
+    /*Limpia todo el caché*/
     public function clear() {
         return $this->driver->clear($this->prefix);
     }
     
-    /**
-     * Obtiene o establece un valor en el caché
-     * Si no existe, ejecuta la función callback y almacena su resultado
-     * 
-     * @param string $key Clave
-     * @param callable $callback Función a ejecutar si la clave no existe
-     * @param int|null $ttl Tiempo de vida en segundos
-     * @return mixed Valor del caché o resultado del callback
-     */
+    /*Obtiene o establece un valor en el caché*/
     public function remember($key, $callback, $ttl = null) {
         $value = $this->get($key);
         
@@ -159,20 +100,12 @@ class CacheUtils {
         return $value;
     }
     
-    /**
-     * Genera la clave completa con prefijo
-     * 
-     * @param string $key Clave
-     * @return string Clave completa
-     */
     private function getFullKey($key) {
         return $this->prefix . ':' . $key;
     }
 }
 
-/**
- * Interfaz para drivers de caché
- */
+/*Interfaz para drivers de caché*/
 interface CacheDriver {
     public function get($key);
     public function set($key, $value, $ttl);
@@ -184,9 +117,6 @@ interface CacheDriver {
     public function clear($prefix);
 }
 
-/**
- * Driver de caché para Redis
- */
 class RedisCacheDriver implements CacheDriver {
     private $redis;
     
@@ -256,9 +186,6 @@ class RedisCacheDriver implements CacheDriver {
     }
 }
 
-/**
- * Driver de caché para APCu
- */
 class ApcuCacheDriver implements CacheDriver {
     public function get($key) {
         $success = false;
@@ -298,17 +225,12 @@ class ApcuCacheDriver implements CacheDriver {
     }
 }
 
-/**
- * Driver de caché para sistema de archivos
- */
 class FileCacheDriver implements CacheDriver {
     private $cachePath;
     
     public function __construct() {
-        // Determinar ruta de caché
         $this->cachePath = defined('CACHE_PATH') ? CACHE_PATH : sys_get_temp_dir() . '/app_cache';
         
-        // Crear directorio si no existe
         if (!is_dir($this->cachePath)) {
             mkdir($this->cachePath, 0755, true);
         }
@@ -323,7 +245,6 @@ class FileCacheDriver implements CacheDriver {
         
         $data = unserialize(file_get_contents($path));
         
-        // Verificar expiración
         if ($data['expiration'] !== 0 && $data['expiration'] < time()) {
             $this->delete($key);
             return null;
@@ -384,7 +305,6 @@ class FileCacheDriver implements CacheDriver {
         
         $data = unserialize(file_get_contents($path));
         
-        // Verificar expiración
         if ($data['expiration'] !== 0 && $data['expiration'] < time()) {
             $this->delete($key);
             return false;

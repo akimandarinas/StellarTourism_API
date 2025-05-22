@@ -328,7 +328,7 @@ import { useRouter } from 'vue-router';
 import { 
   RefreshCwIcon, SearchIcon, XIcon, AlertTriangleIcon, 
   EyeIcon, RocketIcon, SearchXIcon 
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 import { formatNumber, formatPrice } from '../../utils/format';
 import VirtualList from '../common/VirtualList.vue';
 import { useNavesStore } from '../../stores/naves';

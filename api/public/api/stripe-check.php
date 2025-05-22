@@ -1,12 +1,10 @@
 <?php
 // Script para verificar la configuración de Stripe en la API
 
-// Configuración
 header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Función para verificar la configuración de Stripe
 function checkStripeConfig() {
     // Verificar si las variables de entorno están configuradas
     $requiredEnvVars = [
@@ -22,13 +20,11 @@ function checkStripeConfig() {
         }
     }
     
-    // Verificar si la extensión cURL está habilitada
     $hasCurl = function_exists('curl_version');
     
     // Verificar si la extensión JSON está habilitada
     $hasJson = function_exists('json_encode') && function_exists('json_decode');
     
-    // Verificar si el directorio de webhooks existe y tiene permisos de escritura
     $webhookDir = dirname(dirname(__DIR__)) . '/webhooks';
     $webhookDirExists = file_exists($webhookDir);
     $webhookDirWritable = $webhookDirExists && is_writable($webhookDir);
@@ -38,7 +34,6 @@ function checkStripeConfig() {
     $stripeLogFileExists = file_exists($stripeLogFile);
     $stripeLogFileWritable = $stripeLogFileExists && is_writable($stripeLogFile);
     
-    // Crear el directorio de webhooks si no existe
     if (!$webhookDirExists) {
         mkdir($webhookDir, 0755, true);
         $webhookDirExists = file_exists($webhookDir);
@@ -58,7 +53,6 @@ function checkStripeConfig() {
         $stripeLogFileWritable = $stripeLogFileExists && is_writable($stripeLogFile);
     }
     
-    // Determinar el estado general
     $status = 'success';
     $message = 'La configuración de Stripe está correcta';
     
@@ -120,5 +114,4 @@ function checkStripeConfig() {
 // Ejecutar verificación
 $checkResult = checkStripeConfig();
 
-// Devolver resultado
 echo json_encode($checkResult, JSON_PRETTY_PRINT);

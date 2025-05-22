@@ -57,7 +57,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { CheckCircle, AlertCircle } from 'lucide-vue-next';
+import { CheckCircle, AlertCircle } from '@/utils/lucide-adapter';
 import { useToast } from '../composables/useToast';
 import { pagosService } from '../services/pagos';
 import { useReservas } from '../composables/useReservas';

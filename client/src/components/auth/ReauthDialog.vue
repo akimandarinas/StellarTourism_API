@@ -67,9 +67,9 @@
 
 <script setup>
 import { ref, onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
-import { XIcon, LoaderIcon } from 'lucide-vue-next';
+import { XIcon, LoaderIcon } from '@/utils/lucide-adapter';
 import firebaseAuthService from '../../services/auth/firebase-auth';
-import { handleFirebaseError } from '../../utils/error-handler';
+import { handleFirebaseError } from '@/utils/error-handler';
 
 const props = defineProps({
   isOpen: {
@@ -88,7 +88,6 @@ const passwordInput = ref(null);
 const modalRef = ref(null);
 const previousActiveElement = ref(null);
 
-// Enfocar el campo de contraseña cuando se abre el diálogo
 onMounted(() => {
   if (props.isOpen) {
     focusPasswordInput();
@@ -96,10 +95,8 @@ onMounted(() => {
   }
 });
 
-// Observar cambios en isOpen para enfocar el campo cuando se abre
 watch(() => props.isOpen, (newValue) => {
   if (newValue) {
-    // Guardar el elemento activo actual para restaurarlo después
     previousActiveElement.value = document.activeElement;
     
     nextTick(() => {
@@ -114,12 +111,11 @@ watch(() => props.isOpen, (newValue) => {
   }
 });
 
-// Limpiar al desmontar
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeyDown);
 });
 
-// Validar contraseña
+//Validar contraseña
 const validatePassword = () => {
   passwordError.value = '';
   
@@ -150,7 +146,6 @@ function handleKeyDown(event) {
     return;
   }
   
-  // Atrapar el foco dentro del modal
   if (event.key === 'Tab' && modalRef.value) {
     const focusableElements = modalRef.value.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -178,19 +173,16 @@ async function handleSubmit() {
   loading.value = true;
 
   try {
-    // Intentar reautenticar al usuario
     await firebaseAuthService.reauthenticate(password.value);
     
-    // Emitir evento de éxito
+    //Emitir evento de éxito
     emit('success');
     
-    // Limpiar formulario
     password.value = '';
     passwordError.value = '';
   } catch (err) {
     error.value = handleFirebaseError(err, { toast: false, silent: true });
     
-    // Mejorar mensajes de error específicos
     if (error.value.includes('wrong-password')) {
       error.value = 'La contraseña es incorrecta. Por favor, inténtalo de nuevo.';
     } else if (error.value.includes('too-many-requests')) {

@@ -141,7 +141,6 @@ export default {
     const closeButtonRef = ref(null);
     const previousActiveElement = ref(null);
     
-    // IDs únicos para accesibilidad
     const titleId = ref(`dialog-title-${generateId()}`);
     const descriptionId = ref(`dialog-description-${generateId()}`);
     
@@ -150,13 +149,11 @@ export default {
     const { announce } = useAccessibility();
     const { onKeyDown } = useKeyboard();
     
-    // Cerrar el diálogo
     const close = () => {
       emit('update:modelValue', false);
       emit('close');
     };
     
-    // Manejar clic en el overlay
     const handleOverlayClick = () => {
       if (props.closeOnOverlayClick) {
         close();
@@ -171,7 +168,6 @@ export default {
       }
     };
     
-    // Prevenir scroll del body cuando el diálogo está abierto
     const preventBodyScroll = (prevent) => {
       if (!props.preventScroll) return;
       
@@ -186,7 +182,6 @@ export default {
       }
     };
     
-    // Enfocar el elemento inicial cuando se abre el diálogo
     const focusInitialElement = () => {
       nextTick(() => {
         if (!dialogRef.value) return;
@@ -219,7 +214,6 @@ export default {
       }
     };
     
-    // Hooks de transición
     const beforeEnter = () => {
       previousActiveElement.value = document.activeElement;
       preventBodyScroll(true);
@@ -230,7 +224,6 @@ export default {
       focusInitialElement();
       emit('open');
       
-      // Anunciar apertura del diálogo a lectores de pantalla
       const dialogTitle = props.title || 'Diálogo';
       announce(`Diálogo abierto: ${dialogTitle}`);
     };
@@ -243,11 +236,9 @@ export default {
       preventBodyScroll(false);
       restoreFocus();
       
-      // Anunciar cierre del diálogo a lectores de pantalla
       announce('Diálogo cerrado');
     };
     
-    // Observar cambios en modelValue
     watch(() => props.modelValue, (isOpen) => {
       if (isOpen) {
         nextTick(() => {

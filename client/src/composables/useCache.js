@@ -2,118 +2,102 @@ import { ref } from "vue"
 
 /**
  * Composable para gestionar caché en memoria y localStorage
- * @param {Object} options - Opciones de configuración
- * @param {number} options.defaultExpiration - Tiempo de expiración por defecto en ms (default: 5 minutos)
- * @param {boolean} options.useLocalStorage - Indica si se debe usar localStorage además de memoria (default: true)
- * @param {string} options.prefix - Prefijo para las claves en localStorage (default: 'stellar_cache_')
  * @returns {Object} - Métodos para gestionar la caché
  */
-export function useCache(options = {}) {
-  const {
-    defaultExpiration = 5 * 60 * 1000, // 5 minutos
-    useLocalStorage = true,
-    prefix = "stellar_cache_",
-  } = options
-
+export function useCache() {
   // Caché en memoria
   const memoryCache = ref(new Map())
 
+  // Prefijo para las claves en localStorage
+  const STORAGE_PREFIX = "stellar_tourism_cache_"
+
   /**
    * Obtiene un valor de la caché
-   * @param {string} key - Clave del valor a obtener
-   * @returns {any} - Valor almacenado o null si no existe o expiró
+   * @param {string} key - Clave del valor
+   * @param {boolean} useStorage - Si debe buscar también en localStorage
+   * @returns {any} - Valor almacenado o undefined si no existe
    */
-  const get = (key) => {
-    // Intentar obtener de la caché en memoria primero
+  const get = (key, useStorage = true) => {
+    // Primero buscar en memoria
     if (memoryCache.value.has(key)) {
-      const cacheItem = memoryCache.value.get(key)
+      const item = memoryCache.value.get(key)
 
-      // Verificar si el item ha expirado
-      if (cacheItem.expiration > Date.now()) {
-        return cacheItem.value
-      } else {
-        // Si expiró, eliminarlo
+      // Verificar si el valor ha expirado
+      if (item.expiry && item.expiry < Date.now()) {
         memoryCache.value.delete(key)
+        return undefined
       }
+
+      return item.value
     }
 
-    // Si no está en memoria o expiró, intentar obtener de localStorage
-    if (useLocalStorage && typeof localStorage !== "undefined") {
+    // Si no está en memoria y useStorage es true, buscar en localStorage
+    if (useStorage) {
       try {
-        const storedItem = localStorage.getItem(`${prefix}${key}`)
+        const storageKey = `${STORAGE_PREFIX}${key}`
+        const storedItem = localStorage.getItem(storageKey)
 
         if (storedItem) {
-          const parsedItem = JSON.parse(storedItem)
+          const item = JSON.parse(storedItem)
 
-          // Verificar si el item ha expirado
-          if (parsedItem.expiration > Date.now()) {
-            // Guardar en memoria para acceso más rápido la próxima vez
-            memoryCache.value.set(key, parsedItem)
-            return parsedItem.value
-          } else {
-            // Si expiró, eliminarlo
-            localStorage.removeItem(`${prefix}${key}`)
+          // Verificar si el valor ha expirado
+          if (item.expiry && item.expiry < Date.now()) {
+            localStorage.removeItem(storageKey)
+            return undefined
           }
+
+          // Guardar en memoria para acceso más rápido
+          memoryCache.value.set(key, item)
+
+          return item.value
         }
       } catch (error) {
-        console.error("Error al obtener de localStorage:", error)
+        console.error("Error al leer de localStorage:", error)
       }
     }
 
-    return null
+    return undefined
   }
 
   /**
-   * Almacena un valor en la caché
-   * @param {string} key - Clave para almacenar el valor
-   * @param {any} value - Valor a almacenar
-   * @param {number} expiration - Tiempo de expiración en ms (opcional)
+   * Guarda un valor en la caché
+   * @param {string} key - Clave del valor
+   * @param {any} value - Valor a guardar
+   * @param {number} ttl - Tiempo de vida en milisegundos (0 para no expirar)
+   * @param {boolean} useStorage - Si debe guardar también en localStorage
    */
-  const set = (key, value, expiration = defaultExpiration) => {
-    const expirationTime = Date.now() + expiration
-
-    const cacheItem = {
+  const set = (key, value, ttl = 0, useStorage = true) => {
+    const item = {
       value,
-      expiration: expirationTime,
+      expiry: ttl > 0 ? Date.now() + ttl : null,
     }
 
     // Guardar en memoria
-    memoryCache.value.set(key, cacheItem)
+    memoryCache.value.set(key, item)
 
-    // Guardar en localStorage si está habilitado
-    if (useLocalStorage && typeof localStorage !== "undefined") {
+    // Si useStorage es true, guardar en localStorage
+    if (useStorage) {
       try {
-        localStorage.setItem(`${prefix}${key}`, JSON.stringify(cacheItem))
+        localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(item))
       } catch (error) {
-        console.error("Error al guardar en localStorage:", error)
-
-        // Si hay error (ej: localStorage lleno), intentar limpiar items expirados
-        if (error instanceof DOMException && error.name === "QuotaExceededError") {
-          clearExpired()
-
-          // Intentar guardar de nuevo
-          try {
-            localStorage.setItem(`${prefix}${key}`, JSON.stringify(cacheItem))
-          } catch (retryError) {
-            console.error("Error al guardar después de limpiar caché:", retryError)
-          }
-        }
+        console.error("Error al escribir en localStorage:", error)
       }
     }
   }
 
   /**
    * Elimina un valor de la caché
-   * @param {string} key - Clave del valor a eliminar
+   * @param {string} key - Clave del valor
+   * @param {boolean} useStorage - Si debe eliminar también de localStorage
    */
-  const remove = (key) => {
+  const remove = (key, useStorage = true) => {
     // Eliminar de memoria
     memoryCache.value.delete(key)
 
-    // Eliminar de localStorage
-    if (useLocalStorage && typeof localStorage !== "undefined") {
+    // Si useStorage es true, eliminar de localStorage
+    if (useStorage) {
       try {
-        localStorage.removeItem(`${prefix}${key}`)
+        localStorage.removeItem(`${STORAGE_PREFIX}${key}`)
       } catch (error) {
         console.error("Error al eliminar de localStorage:", error)
       }
@@ -121,18 +105,19 @@ export function useCache(options = {}) {
   }
 
   /**
-   * Limpia todos los valores de la caché
+   * Limpia toda la caché
+   * @param {boolean} useStorage - Si debe limpiar también localStorage
    */
-  const clear = () => {
+  const clear = (useStorage = true) => {
     // Limpiar memoria
     memoryCache.value.clear()
 
-    // Limpiar localStorage
-    if (useLocalStorage && typeof localStorage !== "undefined") {
+    // Si useStorage es true, limpiar localStorage
+    if (useStorage) {
       try {
-        // Solo eliminar items con el prefijo específico
+        // Solo eliminar las claves que empiezan con el prefijo
         Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith(prefix)) {
+          if (key.startsWith(STORAGE_PREFIX)) {
             localStorage.removeItem(key)
           }
         })
@@ -143,47 +128,28 @@ export function useCache(options = {}) {
   }
 
   /**
-   * Limpia solo los valores expirados de la caché
+   * Obtiene un valor de la caché o lo establece si no existe
+   * @param {string} key - Clave del valor
+   * @param {Function} fallbackFn - Función para obtener el valor si no existe
+   * @param {number} ttl - Tiempo de vida en milisegundos
+   * @param {boolean} useStorage - Si debe usar localStorage
+   * @returns {Promise<any>} - Valor almacenado o resultado de fallbackFn
    */
-  const clearExpired = () => {
-    const now = Date.now()
+  const getOrSet = async (key, fallbackFn, ttl = 0, useStorage = true) => {
+    const cachedValue = get(key, useStorage)
 
-    // Limpiar memoria
-    for (const [key, cacheItem] of memoryCache.value.entries()) {
-      if (cacheItem.expiration <= now) {
-        memoryCache.value.delete(key)
-      }
+    if (cachedValue !== undefined) {
+      return cachedValue
     }
 
-    // Limpiar localStorage
-    if (useLocalStorage && typeof localStorage !== "undefined") {
-      try {
-        Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith(prefix)) {
-            try {
-              const item = JSON.parse(localStorage.getItem(key))
-              if (item && item.expiration <= now) {
-                localStorage.removeItem(key)
-              }
-            } catch (e) {
-              // Si no se puede parsear, eliminar el item
-              localStorage.removeItem(key)
-            }
-          }
-        })
-      } catch (error) {
-        console.error("Error al limpiar items expirados de localStorage:", error)
-      }
+    try {
+      const value = await fallbackFn()
+      set(key, value, ttl, useStorage)
+      return value
+    } catch (error) {
+      console.error("Error al obtener valor para caché:", error)
+      throw error
     }
-  }
-
-  /**
-   * Verifica si una clave existe en la caché y no ha expirado
-   * @param {string} key - Clave a verificar
-   * @returns {boolean} - true si existe y no ha expirado
-   */
-  const has = (key) => {
-    return get(key) !== null
   }
 
   return {
@@ -191,10 +157,9 @@ export function useCache(options = {}) {
     set,
     remove,
     clear,
-    clearExpired,
-    has,
+    getOrSet,
   }
 }
 
-// Exportar una instancia por defecto para uso común
+// Exportar también como default para compatibilidad
 export default useCache

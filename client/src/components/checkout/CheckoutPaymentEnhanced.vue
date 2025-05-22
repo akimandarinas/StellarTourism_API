@@ -244,7 +244,6 @@
     <div v-if="showErrorModal" class="error-modal">
       <div class="error-modal-content">
         <div class="error-modal-header">
-          <AlertOctagonIcon size="32" class="error-modal-icon" />
           <h3>Error en el pago</h3>
         </div>
         <div class="error-modal-body">
@@ -299,9 +298,9 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { 
   CalendarIcon, CheckIcon, InfoIcon, CopyIcon, AlertCircleIcon,
-  ArrowLeftIcon, CreditCardIcon, LockIcon, AlertOctagonIcon,
+  ArrowLeftIcon, CreditCardIcon, LockIcon,
   CheckCircleIcon, LoaderIcon, AlertTriangleIcon
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import ErrorNotification from '../common/ErrorNotification.vue';
 import { useToast } from '../../composables/useToast';
@@ -324,7 +323,6 @@ export default {
     ArrowLeftIcon,
     CreditCardIcon,
     LockIcon,
-    AlertOctagonIcon,
     CheckCircleIcon,
     LoaderIcon,
     AlertTriangleIcon

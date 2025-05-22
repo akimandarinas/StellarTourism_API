@@ -8,19 +8,12 @@ use Firebase\JWT\BeforeValidException;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\ServiceAccount;
 
-/**
- * Clase para gestionar la autenticación y autorización
- * Versión optimizada y limpia
- */
+/* Clase para gestionar la autenticación y autorización */
+
 class AuthService {
     private static $instance = null;
     private $tokenBlacklist = [];
     private $lastBlacklistCleanup = 0;
-    
-    /**
-     * Obtener instancia singleton
-     * @return AuthService
-     */
     public static function getInstance() {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -28,18 +21,13 @@ class AuthService {
         return self::$instance;
     }
     
-    /**
-     * Constructor privado para el patrón Singleton
-     */
     private function __construct() {
         // Cargar la lista negra de tokens desde el almacenamiento persistente si existe
         $this->loadTokenBlacklist();
         $this->lastBlacklistCleanup = time();
     }
     
-    /**
-     * Cargar la lista negra de tokens desde el almacenamiento
-     */
+    /* Cargar la lista negra de tokens desde el almacenamiento */
     private function loadTokenBlacklist() {
         $blacklistFile = __DIR__ . '/../data/token_blacklist.json';
         if (file_exists($blacklistFile)) {
@@ -50,17 +38,14 @@ class AuthService {
         }
     }
     
-    /**
-     * Guardar la lista negra de tokens en el almacenamiento
-     */
+    /* Guardar la lista negra de tokens en el almacenamiento */
+
     private function saveTokenBlacklist() {
-        // Limpiar tokens expirados antes de guardar
         $this->cleanupBlacklist();
         
         $blacklistFile = __DIR__ . '/../data/token_blacklist.json';
         $blacklistDir = dirname($blacklistFile);
         
-        // Asegurarse de que el directorio existe
         if (!is_dir($blacklistDir)) {
             mkdir($blacklistDir, 0755, true);
         }
@@ -68,9 +53,8 @@ class AuthService {
         file_put_contents($blacklistFile, json_encode($this->tokenBlacklist));
     }
     
-    /**
-     * Limpiar tokens expirados de la lista negra
-     */
+    /* Limpiar tokens expirados de la lista negra */
+
     private function cleanupBlacklist() {
         $now = time();
         
@@ -88,20 +72,13 @@ class AuthService {
         $this->lastBlacklistCleanup = $now;
     }
     
-    /**
-     * Añadir un token a la lista negra
-     * @param string $token Token a invalidar
-     * @param int $expiry Tiempo de expiración del token
-     */
+    /* Añadir un token a la lista negra */
+
     public function blacklistToken($token, $expiry = null) {
         try {
-            // Decodificar el token sin verificar para obtener el ID y la expiración
+            
             $decoded = JWT::decode($token, new Key(JWT_SECRET, 'HS256'));
-            
-            // Usar el jti como identificador único del token
             $jti = $decoded->jti ?? hash('sha256', $token);
-            
-            // Si no se proporciona expiración, usar la del token o 24 horas
             if ($expiry === null) {
                 $expiry = isset($decoded->exp) ? $decoded->exp : (time() + 86400);
             }
@@ -111,7 +88,6 @@ class AuthService {
             
             return true;
         } catch (\Exception $e) {
-            // Si hay un error al decodificar, usar un hash del token como identificador
             $jti = hash('sha256', $token);
             $expiry = time() + 86400; // 24 horas por defecto
             
@@ -122,31 +98,21 @@ class AuthService {
         }
     }
     
-    /**
-     * Verificar si un token está en la lista negra
-     * @param string $token Token a verificar
-     * @return bool
-     */
+    /* Verificar si un token está en la lista negra */
+
     public function isTokenBlacklisted($token) {
         try {
-            // Decodificar el token sin verificar para obtener el ID
             $decoded = JWT::decode($token, new Key(JWT_SECRET, 'HS256'));
             
-            // Usar el jti como identificador único del token
             $jti = $decoded->jti ?? hash('sha256', $token);
             
             return isset($this->tokenBlacklist[$jti]) && $this->tokenBlacklist[$jti] >= time();
         } catch (\Exception $e) {
-            // Si hay un error al decodificar, usar un hash del token
             $jti = hash('sha256', $token);
             return isset($this->tokenBlacklist[$jti]) && $this->tokenBlacklist[$jti] >= time();
         }
     }
     
-    /**
-     * Obtener el encabezado de autorización
-     * @return string|null
-     */
     public function getAuthorizationHeader() {
         $headers = null;
         
@@ -169,11 +135,6 @@ class AuthService {
         return $headers;
     }
     
-    /**
-     * Obtener el token Bearer del encabezado de autorización
-     * @param string|null $authHeader
-     * @return string|null
-     */
     public function getBearerToken($authHeader = null) {
         if (!$authHeader) {
             $authHeader = $this->getAuthorizationHeader();
@@ -190,20 +151,14 @@ class AuthService {
         return null;
     }
     
-    /**
-     * Validar un token de Firebase
-     * @param string $token
-     * @return object|bool Datos del usuario o false si el token es inválido
-     */
+    /*Validar un token de Firebase */
+
     public function validateFirebaseToken($token) {
         try {
-            // Verificar si el token está en la lista negra
             if ($this->isTokenBlacklisted($token)) {
                 $this->logAuthAttempt('firebase_token_blacklisted', false);
                 return false;
             }
-            
-            // Inicializar Firebase
             $serviceAccount = ServiceAccount::fromArray([
                 'type' => 'service_account',
                 'project_id' => FIREBASE_PROJECT_ID,
@@ -220,20 +175,17 @@ class AuthService {
             // Verificar el token con Firebase Auth
             $verifiedToken = $auth->verifyIdToken($token, true); // true para verificar si el token ha sido revocado
             
-            // Verificar la fecha de expiración
             if ($verifiedToken->getClaim('exp') < time()) {
                 $this->logAuthAttempt('firebase_token_expired', false);
                 return false;
             }
             
-            // Verificar el emisor (debe ser Firebase)
             $iss = $verifiedToken->getClaim('iss');
             if (strpos($iss, 'securetoken.google.com') === false && strpos($iss, 'firebase') === false) {
                 $this->logAuthAttempt('firebase_token_invalid_issuer', false);
                 return false;
             }
             
-            // Verificar la audiencia (debe ser nuestro proyecto)
             $aud = $verifiedToken->getClaim('aud');
             if ($aud !== FIREBASE_PROJECT_ID) {
                 $this->logAuthAttempt('firebase_token_invalid_audience', false);
@@ -272,12 +224,8 @@ class AuthService {
         }
     }
     
-    /**
-     * Generar un token JWT
-     * @param array $payload
-     * @param int $expiration Tiempo de expiración en segundos (por defecto 1 hora)
-     * @return string
-     */
+    /* Generar un token JWT */
+
     public function generateJWT($payload, $expiration = 3600) {
         $header = [
             'alg' => 'HS256',
@@ -296,11 +244,7 @@ class AuthService {
         return "$header_encoded.$payload_encoded.$signature_encoded";
     }
     
-    /**
-     * Verificar un token JWT
-     * @param string $token
-     * @return object|bool Datos del payload o false si el token es inválido
-     */
+    /*Verificar un token JWT*/
     public function verifyJWT($token) {
         $parts = explode('.', $token);
         
@@ -326,19 +270,12 @@ class AuthService {
         return $payload;
     }
     
-    /**
-     * Obtener la clave secreta para firmar tokens
-     * @return string
-     */
+    /*Obtener la clave secreta para firmar tokens*/
     private function getSecretKey() {
-        // Obtener de variable de entorno o usar una clave por defecto
         return getenv('JWT_SECRET') ?: 'stellar_tourism_secret_key';
     }
     
-    /**
-     * Verificar si el usuario está autenticado
-     * @return bool
-     */
+    /*Verificar si el usuario está autenticado*/
     public function isAuthenticated() {
         $headers = getallheaders();
         $auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
@@ -351,10 +288,7 @@ class AuthService {
         return false;
     }
     
-    /**
-     * Obtener el ID del usuario actual
-     * @return string|null
-     */
+    /*Obtener el ID del usuario actual*/
     public function getCurrentUserId() {
         $payload = $this->isAuthenticated();
         
@@ -365,11 +299,6 @@ class AuthService {
         return null;
     }
     
-    /**
-     * Verificar si el usuario tiene un rol específico
-     * @param string $role
-     * @return bool
-     */
     public function hasRole($role) {
         $payload = $this->isAuthenticated();
         
@@ -380,12 +309,7 @@ class AuthService {
         return false;
     }
     
-    /**
-     * Verificar si el usuario tiene permiso para acceder a un recurso
-     * @param string $resource
-     * @param string $action
-     * @return bool
-     */
+   
     public function hasPermission($resource, $action) {
         $payload = $this->isAuthenticated();
         
@@ -397,41 +321,21 @@ class AuthService {
         return false;
     }
     
-    /**
-     * Generar un hash seguro para contraseñas
-     * @param string $password
-     * @return string
-     */
+    /*Generar un hash seguro para contraseñas*/
     public function hashPassword($password) {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
     }
     
-    /**
-     * Verificar una contraseña contra su hash
-     * @param string $password
-     * @param string $hash
-     * @return bool
-     */
     public function verifyPassword($password, $hash) {
         return password_verify($password, $hash);
     }
     
-    /**
-     * Generar un token aleatorio para restablecimiento de contraseña
-     * @param int $length Longitud del token
-     * @return string
-     */
+    /*Generar un token aleatorio para restablecimiento de contraseña*/
     public function generateRandomToken($length = 32) {
         return bin2hex(random_bytes($length / 2));
     }
     
-    /**
-     * Registrar intento de autenticación
-     * @param string $type Tipo de intento
-     * @param bool $success Si fue exitoso
-     * @param string|null $user Usuario que intentó autenticarse
-     * @param string|null $message Mensaje adicional
-     */
+    /*Registrar intento de autenticación*/
     private function logAuthAttempt($type, $success, $user = null, $message = null) {
         if (!defined('LOG_ENABLED') || !LOG_ENABLED) {
             return;
@@ -462,19 +366,10 @@ class AuthService {
         );
     }
     
-    /**
-     * Verificar si un usuario tiene un rol específico
-     * @param object $userData
-     * @param string $role
-     * @return bool
-     */
     public function hasRoleOld($userData, $role) {
         if (!$userData || !isset($userData->email)) {
             return false;
         }
-        
-        // Obtener roles del usuario desde la base de datos
-        // Esta es una implementación simplificada, en producción debería consultar la BD
         switch ($role) {
             case 'admin':
                 return strpos($userData->email, 'admin@') !== false;
@@ -490,25 +385,13 @@ class AuthService {
         }
     }
     
-    /**
-     * Verificar si un usuario tiene permiso para acceder a un recurso
-     * @param object $userData
-     * @param string $resource
-     * @param string $action
-     * @param string|null $resourceId
-     * @return bool
-     */
     public function hasPermissionOld($userData, $resource, $action, $resourceId = null) {
         if (!$userData) {
             return false;
         }
-        
-        // Los administradores tienen acceso a todo
         if ($this->hasRoleOld($userData, 'admin')) {
             return true;
         }
-        
-        // El personal tiene acceso a ciertos recursos
         if ($this->hasRoleOld($userData, 'staff')) {
             switch ($resource) {
                 case 'destinos':
@@ -526,8 +409,6 @@ class AuthService {
                     return false;
             }
         }
-        
-        // Los usuarios normales tienen acceso limitado
         switch ($resource) {
             case 'destinos':
             case 'naves':
@@ -574,25 +455,16 @@ class AuthService {
         }
     }
     
-    /**
-     * Verificar si un recurso pertenece al usuario
-     * @param string $userId
-     * @param string $resourceType
-     * @param string $resourceId
-     * @return bool
-     */
+    
     private function verifyResourceOwnership($userId, $resourceType, $resourceId) {
-        // Implementación real requeriría consultar la base de datos
+       
         $db = Database::getInstance();
         $sql = "SELECT COUNT(*) FROM {$resourceType} WHERE id = ? AND user_id = ?";
         $count = $db->getValue($sql, [(int)$resourceId, $userId]);
         return $count > 0;
     }
     
-    /**
-     * Autenticar al usuario actual
-     * @return object|bool Datos del usuario o false si no está autenticado
-     */
+   
     public function authenticateCurrentUser() {
         $token = $this->getBearerToken();
         
@@ -611,14 +483,7 @@ class AuthService {
         return $userData;
     }
     
-    /**
-     * Requerir autenticación para acceder a un recurso
-     * @param string $resource
-     * @param string $action
-     * @param string|null $resourceId
-     * @return object Datos del usuario autenticado
-     * @throws Exception Si el usuario no está autenticado o no tiene permisos
-     */
+    /*Requerir autenticación para acceder a un recurso*/
     public function requireAuth($resource, $action, $resourceId = null) {
         $userData = $this->authenticateCurrentUser();
         
@@ -635,11 +500,7 @@ class AuthService {
         return $userData;
     }
     
-    /**
-     * Verificar la fortaleza de una contraseña
-     * @param string $password
-     * @return array Resultado de la verificación
-     */
+    /*Verificar la fortaleza de una contraseña*/
     public function checkPasswordStrength($password) {
         $result = [
             'strong' => false,
@@ -647,172 +508,86 @@ class AuthService {
             'errors' => []
         ];
         
-        // Verificar longitud mínima
+       
         if (strlen($password) < 8) {
             $result['errors'][] = 'La contraseña debe tener al menos 8 caracteres';
         } else {
             $result['score']++;
         }
         
-        // Verificar si contiene al menos una letra mayúscula
+       
         if (!preg_match('/[A-Z]/', $password)) {
             $result['errors'][] = 'La contraseña debe contener al menos una letra mayúscula';
         } else {
             $result['score']++;
         }
         
-        // Verificar si contiene al menos una letra minúscula
+       
         if (!preg_match('/[a-z]/', $password)) {
             $result['errors'][] = 'La contraseña debe contener al menos una letra minúscula';
         } else {
             $result['score']++;
         }
         
-        // Verificar si contiene al menos un número
+       
         if (!preg_match('/[0-9]/', $password)) {
             $result['errors'][] = 'La contraseña debe contener al menos un número';
         } else {
             $result['score']++;
         }
         
-        // Verificar si contiene al menos un carácter especial
+       
         if (!preg_match('/[^A-Za-z0-9]/', $password)) {
             $result['errors'][] = 'La contraseña debe contener al menos un carácter especial';
         } else {
             $result['score']++;
         }
         
-        // Verificar si la contraseña es fuerte (cumple con todos los requisitos)
+        
         $result['strong'] = empty($result['errors']);
         
         return $result;
     }
 }
-
-// Funciones de ayuda para mantener compatibilidad con el código existente
-
-/**
- * Obtener el encabezado de autorización
- * @return string|null
- */
 function getAuthorizationHeader() {
     return AuthService::getInstance()->getAuthorizationHeader();
 }
-
-/**
- * Obtener el token Bearer del encabezado de autorización
- * @param string|null $authHeader
- * @return string|null
- */
 function getBearerToken($authHeader = null) {
     return AuthService::getInstance()->getBearerToken($authHeader);
 }
-
-/**
- * Validar un token de Firebase
- * @param string $token
- * @return object|bool Datos del usuario o false si el token es inválido
- */
 function validateFirebaseToken($token) {
     return AuthService::getInstance()->validateFirebaseToken($token);
 }
-
-/**
- * Generar un token JWT
- * @param array $payload
- * @param int $expiration Tiempo de expiración en segundos (por defecto 1 hora)
- * @return string
- */
 function generateJWT($payload, $expiration = 3600) {
     return AuthService::getInstance()->generateJWT($payload, $expiration);
 }
-
-/**
- * Verificar un token JWT
- * @param string $token
- * @return object|bool Datos del payload o false si el token es inválido
- */
 function verifyJWT($token) {
     return AuthService::getInstance()->verifyJWT($token);
 }
-
-/**
- * Verificar si el usuario está autenticado
- * @return bool
- */
 function isAuthenticated() {
     return AuthService::getInstance()->isAuthenticated();
 }
-
-/**
- * Obtener el ID del usuario actual
- * @return string|null
- */
 function getCurrentUserId() {
     return AuthService::getInstance()->getCurrentUserId();
 }
-
-/**
- * Verificar si el usuario tiene un rol específico
- * @param string $role
- * @return bool
- */
 function hasRole($role) {
     return AuthService::getInstance()->hasRole($role);
 }
-
-/**
- * Verificar si el usuario tiene permiso para acceder a un recurso
- * @param string $resource
- * @param string $action
- * @return bool
- */
 function hasPermission($resource, $action) {
     return AuthService::getInstance()->hasPermission($resource, $action);
 }
-
-/**
- * Revocar un token JWT
- * @param string $token
- * @return bool
- */
 function revokeToken($token) {
     return AuthService::getInstance()->blacklistToken($token);
 }
-
-/**
- * Verificar la fortaleza de una contraseña
- * @param string $password
- * @return array Resultado de la verificación
- */
 function checkPasswordStrength($password) {
     return AuthService::getInstance()->checkPasswordStrength($password);
 }
-
-/**
- * Generar un hash seguro para contraseñas
- * @param string $password
- * @return string
- */
 function hashPassword($password) {
     return AuthService::getInstance()->hashPassword($password);
 }
-
-/**
- * Verificar una contraseña contra su hash
- * @param string $password
- * @param string $hash
- * @return bool
- */
 function verifyPassword($password, $hash) {
     return AuthService::getInstance()->verifyPassword($password, $hash);
 }
-
-/**
- * Generar un token aleatorio para restablecimiento de contraseña
- * @param int $length Longitud del token
- * @return string
- */
 function generateRandomToken($length = 32) {
     return AuthService::getInstance()->generateRandomToken($length);
 }

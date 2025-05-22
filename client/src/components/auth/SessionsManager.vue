@@ -94,7 +94,6 @@
       </div>
     </div>
     
-    <!-- Modal de confirmación -->
     <ConfirmationDialog
       v-if="showConfirmDialog"
       title="Cerrar todas las sesiones"
@@ -111,12 +110,11 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
-import { ComputerIcon, SmartphoneIcon, TabletIcon, XIcon, LoaderIcon } from 'lucide-vue-next'
+import { ComputerIcon, SmartphoneIcon, TabletIcon, XIcon, LoaderIcon } from '@/utils/lucide-adapter'
 import Button from '../ui/Button.vue'
 import Alert from '../ui/Alert.vue'
 import ConfirmationDialog from '../common/ConfirmationDialog.vue'
 
-// Props
 const props = defineProps({
   allowCloseCurrent: {
     type: Boolean,
@@ -124,10 +122,10 @@ const props = defineProps({
   }
 })
 
-// Store
+//Store
 const authStore = useAuthStore()
 
-// Estado
+//Estado
 const loading = ref(false)
 const closingSession = ref(null)
 const closingAll = ref(false)
@@ -135,10 +133,8 @@ const closingOthers = ref(false)
 const error = ref('')
 const showConfirmDialog = ref(false)
 
-// Computed
 const sessions = computed(() => authStore.activeSessions)
 
-// Métodos
 const fetchSessions = async () => {
   loading.value = true
   error.value = ''
@@ -239,7 +235,6 @@ const getDeviceDescription = (session) => {
 }
 
 const announceMessage = (message) => {
-  // Crear un elemento para anunciar mensajes a lectores de pantalla
   const announcer = document.createElement('div')
   announcer.setAttribute('aria-live', 'polite')
   announcer.setAttribute('class', 'sr-only')
@@ -247,13 +242,11 @@ const announceMessage = (message) => {
   
   document.body.appendChild(announcer)
   
-  // Eliminar después de un tiempo
   setTimeout(() => {
     document.body.removeChild(announcer)
   }, 3000)
 }
 
-// Ciclo de vida
 onMounted(() => {
   fetchSessions()
 })

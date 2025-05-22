@@ -38,7 +38,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { ChevronDownIcon } from 'lucide-vue-next';
+import { ChevronDownIcon } from '@/utils/lucide-adapter';
 import { generateId } from '../../utils/id';
 
 const props = defineProps({

@@ -1,5 +1,4 @@
 <?php
-// Establecer encabezados para JSON y CORS
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
@@ -374,11 +373,9 @@ function generateUsuariosData() {
     ];
 }
 
-// Obtener la ruta solicitada
 $requestUri = $_SERVER['REQUEST_URI'];
 $path = parse_url($requestUri, PHP_URL_PATH);
 
-// Eliminar la parte inicial de la ruta si es necesario
 $path = preg_replace('/^\/api\/test-endpoints\.php/', '', $path);
 $path = preg_replace('/^\/api/', '', $path);
 
@@ -417,5 +414,4 @@ switch ($path) {
         ];
 }
 
-// Devolver la respuesta como JSON
 echo json_encode($response, JSON_PRETTY_PRINT);

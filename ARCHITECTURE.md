@@ -28,7 +28,7 @@ La aplicación sigue una arquitectura de "Separación por Propósito" para maxim
 
 ## Diagrama de Arquitectura
 
-\`\`\`
+
 stellar-tourism/
 ├── client/                # Aplicación cliente
 │   ├── src/

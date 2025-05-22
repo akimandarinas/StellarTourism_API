@@ -507,27 +507,22 @@ export function getDestinoById(id) {
   return destinos.find((destino) => destino.id === Number.parseInt(id)) || null
 }
 
-// Función para obtener destinos relacionados
 export function getDestinosRelacionados(id, limit = 3) {
   const currentDestino = getDestinoById(id)
   if (!currentDestino) return []
 
-  // Filtrar por tipo similar y excluir el destino actual
   return destinos
     .filter((destino) => destino.id !== Number.parseInt(id) && destino.tipo === currentDestino.tipo)
     .slice(0, limit)
 }
 
-// Función para obtener destinos destacados
 export function getDestinosDestacados(limit = 3) {
   return destinos.filter((destino) => destino.destacado).slice(0, limit)
 }
 
-// Función para buscar destinos
 export function buscarDestinos(query = "", filters = {}) {
   let results = [...destinos]
 
-  // Filtrar por texto
   if (query) {
     const searchQuery = query.toLowerCase()
     results = results.filter(
@@ -536,22 +531,18 @@ export function buscarDestinos(query = "", filters = {}) {
     )
   }
 
-  // Filtrar por tipo
   if (filters.tipo && filters.tipo !== "todos") {
     results = results.filter((destino) => destino.tipo === filters.tipo)
   }
 
-  // Filtrar por precio máximo
   if (filters.precioMax) {
     results = results.filter((destino) => destino.precio <= filters.precioMax)
   }
 
-  // Filtrar por duración máxima
   if (filters.duracionMax) {
     results = results.filter((destino) => destino.duracion <= filters.duracionMax)
   }
 
-  // Ordenar resultados
   if (filters.ordenar) {
     switch (filters.ordenar) {
       case "precio-asc":

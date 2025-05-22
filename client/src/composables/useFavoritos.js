@@ -3,7 +3,7 @@
 import { ref } from "vue"
 import { useAuthStore } from "../stores/auth"
 import { useToast } from "./useToast"
-import { api } from "../services/api"
+import { api } from '@/services/api'
 import { useRouter } from "vue-router"
 
 export function useFavoritos() {

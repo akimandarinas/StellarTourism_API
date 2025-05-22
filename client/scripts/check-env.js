@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 
-/**
- * Script para verificar que todas las variables de entorno requeridas estén definidas
- */
+/* Script para verificar que todas las variables de entorno estén definidas */
 
 import fs from "fs"
 import path from "path"
 import dotenv from "dotenv"
 
-// Cargar variables de entorno
 dotenv.config()
 
-// Colores para la consola
 const colors = {
   reset: "\x1b[0m",
   red: "\x1b[31m",
@@ -22,7 +18,6 @@ const colors = {
   cyan: "\x1b[36m",
 }
 
-// Función para imprimir mensajes con colores
 function log(message, color = colors.reset) {
   console.log(`${color}${message}${colors.reset}`)
 }
@@ -57,7 +52,7 @@ const requiredEnvVars = [
   },
 ]
 
-// Función para verificar las variables de entorno
+// Función para verificarlas
 function checkEnvVars() {
   log("Verificando variables de entorno...", colors.cyan)
 
@@ -94,7 +89,7 @@ function checkEnvVars() {
   log("\n✓ Todas las variables de entorno están configuradas correctamente", colors.green)
 }
 
-// Verificar si existe el archivo .env
+// Verificar si existe .env
 function checkEnvFile() {
   log("Verificando archivo .env...", colors.cyan)
 
@@ -109,7 +104,9 @@ function checkEnvFile() {
   log("✓ Archivo .env encontrado", colors.green)
 }
 
-// Función principal
+
+
+
 function main() {
   log("=== Verificación de variables de entorno ===", colors.magenta)
 

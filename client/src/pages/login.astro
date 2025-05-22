@@ -1,20 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-// Datos para SEO
+//Datos para SEO
 const title = 'Iniciar sesión | StellarTourism';
 const description = 'Accede a tu cuenta de StellarTourism para gestionar tus reservas y explorar nuevos destinos espaciales.';
 
-// Obtener parámetros de redirección si existen
 const { redirect } = Astro.url.searchParams;
 ---
 
 <Layout title={title} description={description}>
  <section style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0; background-color: #020617; position: relative; overflow: hidden;">
-   <!-- Fondo con estrellas -->
+   
    <div style="position: absolute; inset: 0; background-image: url('/images/stars-bg.png'); background-size: cover; background-position: center; opacity: 0.6;"></div>
    
-   <!-- Overlay gradiente -->
    <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.95));"></div>
    
    <div style="max-width: 450px; width: 100%; padding: 0 1rem; position: relative; z-index: 10;">
@@ -26,7 +24,7 @@ const { redirect } = Astro.url.searchParams;
          </div>
          
          <form id="login-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
-           <!-- Email -->
+           
            <div>
              <label for="email" style="display: block; font-size: 0.875rem; font-weight: 500; color: rgba(226, 232, 240, 0.9); margin-bottom: 0.5rem;">Correo electrónico</label>
              <input 
@@ -40,7 +38,6 @@ const { redirect } = Astro.url.searchParams;
              <div id="email-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: none;"></div>
            </div>
            
-           <!-- Contraseña -->
            <div>
              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                <label for="password" style="font-size: 0.875rem; font-weight: 500; color: rgba(226, 232, 240, 0.9);">Contraseña</label>
@@ -67,7 +64,6 @@ const { redirect } = Astro.url.searchParams;
              <div id="password-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; display: none;"></div>
            </div>
            
-           <!-- Recordarme -->
            <div style="display: flex; align-items: center; gap: 0.5rem;">
              <input 
                type="checkbox" 
@@ -80,10 +76,8 @@ const { redirect } = Astro.url.searchParams;
              </label>
            </div>
            
-           <!-- Mensaje de error general -->
            <div id="form-error" style="color: #ef4444; font-size: 0.875rem; text-align: center; display: none; padding: 0.5rem; background-color: rgba(239, 68, 68, 0.1); border-radius: 0.5rem;"></div>
            
-           <!-- Botón de inicio de sesión -->
            <button 
              type="submit" 
              id="login-button"
@@ -129,10 +123,8 @@ const { redirect } = Astro.url.searchParams;
 </Layout>
 
 <script>
- // Modo de desarrollo - Usar simulación local en lugar de Firebase
  const USE_LOCAL_AUTH = true;
  
- // Referencias a elementos del DOM
  const loginForm = document.getElementById('login-form');
  const emailInput = document.getElementById('email');
  const passwordInput = document.getElementById('password');
@@ -146,65 +138,57 @@ const { redirect } = Astro.url.searchParams;
  const togglePasswordButton = document.getElementById('toggle-password');
  const googleLoginButton = document.getElementById('google-login');
  
- // Función para mostrar/ocultar contraseña
+ //Función para mostrar/ocultar contraseña
  togglePasswordButton.addEventListener('click', () => {
    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
    passwordInput.setAttribute('type', type);
    
-   // Cambiar el icono
    togglePasswordButton.innerHTML = type === 'password' 
      ? '<svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
      : '<svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
  });
  
- // Función para mostrar errores
+ //Función para mostrar errores
  function showError(element, message) {
    element.textContent = message;
    element.style.display = 'block';
  }
  
- // Función para ocultar errores
  function hideError(element) {
    element.textContent = '';
    element.style.display = 'none';
  }
  
- // Función para mostrar el loader en el botón
  function showLoader() {
    buttonText.style.opacity = '0';
    buttonLoader.style.opacity = '1';
    loginButton.disabled = true;
  }
  
- // Función para ocultar el loader en el botón
  function hideLoader() {
    buttonText.style.opacity = '1';
    buttonLoader.style.opacity = '0';
    loginButton.disabled = false;
  }
  
- // Simulación local de autenticación
  const localAuth = {
    users: JSON.parse(localStorage.getItem('stellar_users') || '[]'),
    
-   // Iniciar sesión
+   //Iniciar sesión
    login: function(email, password) {
      return new Promise((resolve, reject) => {
-       // Buscar usuario
        const user = this.users.find(user => user.email === email && user.password === password);
        
        if (!user) {
          return reject({ code: 'auth/user-not-found', message: 'Usuario no encontrado o contraseña incorrecta.' });
        }
        
-       // Simular retraso de red
        setTimeout(() => {
          resolve({ user: { ...user, password: undefined } });
        }, 800);
      });
    },
    
-   // Iniciar sesión con Google
    loginWithGoogle: function() {
      return new Promise((resolve, reject) => {
        // Simular usuario de Google
@@ -216,7 +200,7 @@ const { redirect } = Astro.url.searchParams;
          createdAt: new Date().toISOString()
        };
        
-       // Verificar si el usuario ya existe
+       //Verificar si el usuario ya existe
        const existingUser = this.users.find(user => user.email === googleUser.email);
        
        if (!existingUser) {
@@ -225,7 +209,6 @@ const { redirect } = Astro.url.searchParams;
          localStorage.setItem('stellar_users', JSON.stringify(this.users));
        }
        
-       // Simular retraso de red
        setTimeout(() => {
          resolve({ user: existingUser || googleUser });
        }, 800);
@@ -233,21 +216,17 @@ const { redirect } = Astro.url.searchParams;
    }
  };
  
- // Validar formulario antes de enviar
  loginForm.addEventListener('submit', async (e) => {
    e.preventDefault();
    
-   // Resetear errores
    hideError(formError);
    hideError(emailError);
    hideError(passwordError);
    
-   // Obtener valores
    const email = emailInput.value.trim();
    const password = passwordInput.value;
    const remember = rememberCheckbox.checked;
    
-   // Validar email
    if (!email) {
      showError(emailError, 'Por favor, introduce tu correo electrónico');
      emailInput.focus();
@@ -260,32 +239,26 @@ const { redirect } = Astro.url.searchParams;
      return;
    }
    
-   // Validar contraseña
+   //Validar contraseña
    if (!password) {
      showError(passwordError, 'Por favor, introduce tu contraseña');
      passwordInput.focus();
      return;
    }
    
-   // Mostrar loader
    showLoader();
    
    try {
      let userCredential;
      
      if (USE_LOCAL_AUTH) {
-       // Usar autenticación local simulada
        userCredential = await localAuth.login(email, password);
-     } else {
-       // Aquí iría el código para Firebase Auth
-       // Omitido para usar la simulación local
+     } else {al
      }
      
-     // Inicio de sesión exitoso, simular redirección
      setTimeout(() => {
        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/';
        
-       // Guardar información de sesión
        localStorage.setItem('stellar_current_user', JSON.stringify(userCredential.user));
        localStorage.setItem('stellar_auth_token', 'simulated_token_' + Date.now());
        
@@ -307,10 +280,8 @@ const { redirect } = Astro.url.searchParams;
      }, 1000);
      
    } catch (error) {
-     // Ocultar loader
      hideLoader();
      
-     // Mostrar error
      let errorMessage = 'Error al iniciar sesión. Por favor, inténtalo de nuevo.';
      
      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
@@ -326,26 +297,20 @@ const { redirect } = Astro.url.searchParams;
    }
  });
  
- // Iniciar sesión con Google
  googleLoginButton.addEventListener('click', async () => {
-   // Resetear errores
+   
    hideError(formError);
    
-   // Mostrar loader
    showLoader();
    
    try {
      let result;
      
      if (USE_LOCAL_AUTH) {
-       // Usar autenticación local simulada
        result = await localAuth.loginWithGoogle();
      } else {
-       // Aquí iría el código para Firebase Auth
-       // Omitido para usar la simulación local
      }
      
-     // Inicio de sesión exitoso, simular redirección
      setTimeout(() => {
        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/';
        
@@ -357,7 +322,6 @@ const { redirect } = Astro.url.searchParams;
          localStorage.setItem('stellar_remember_me', 'true');
        }
        
-       // Mostrar mensaje de éxito antes de redirigir
        hideLoader();
        showError(formError, '¡Inicio de sesión exitoso! Redirigiendo...');
        formError.style.color = '#10b981';
@@ -369,10 +333,8 @@ const { redirect } = Astro.url.searchParams;
      }, 1000);
      
    } catch (error) {
-     // Ocultar loader
      hideLoader();
      
-     // Mostrar error
      let errorMessage = 'Error al iniciar sesión con Google. Por favor, inténtalo de nuevo.';
      
      if (error.code === 'auth/popup-closed-by-user') {
@@ -388,7 +350,6 @@ const { redirect } = Astro.url.searchParams;
    }
  });
  
- // Animación para los inputs
  const inputs = [emailInput, passwordInput];
  inputs.forEach(input => {
    input.addEventListener('focus', () => {
@@ -400,7 +361,6 @@ const { redirect } = Astro.url.searchParams;
    });
  });
  
- // Obtener parámetros de URL
  const urlParams = new URLSearchParams(window.location.search);
  const errorParam = urlParams.get('error');
  
@@ -419,7 +379,6 @@ const { redirect } = Astro.url.searchParams;
    showError(formError, errorMessage);
  }
  
- // Comprobar si hay un usuario guardado para autocompletar
  const rememberedUser = localStorage.getItem('stellar_remember_me');
  if (rememberedUser) {
    const user = JSON.parse(localStorage.getItem('stellar_current_user') || '{}');

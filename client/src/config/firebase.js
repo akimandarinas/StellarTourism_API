@@ -1,13 +1,9 @@
-/**
- * Configuración de Firebase para la autenticación
- */
-
-// Importar funciones necesarias de Firebase
+//Importar funciones necesarias de Firebase
 import { initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
 import { getFirestore } from "firebase/firestore"
 
-// Configuración de Firebase
+//Configuración
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDNTvXjWLuqRRHKNtRDgXTMaRF7_528WXU",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "stellar-tourism-demo.firebaseapp.com",
@@ -18,16 +14,14 @@ export const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-ABCDEFGHIJ",
 }
 
-// Nota: En producción, estas claves deberían estar en variables de entorno
-// Los valores proporcionados aquí son solo para desarrollo y demostración
+//Nota. Los valores proporcionados aquí son solo para desarrollo y demostración
 
-// Verificar que la configuración sea válida
+//Verificar que la configuración sea válida
 const isConfigValid = () => {
   const requiredFields = ["apiKey", "authDomain", "projectId", "appId"]
   return requiredFields.every((field) => !!firebaseConfig[field])
 }
 
-// Inicializar Firebase solo si la configuración es válida
 let firebaseApp
 let firebaseAuth
 let firebaseFirestore
@@ -40,7 +34,6 @@ try {
       console.log("Firebase inicializado correctamente")
     }
 
-    // Inicializar servicios
     firebaseAuth = getAuth(firebaseApp)
     firebaseFirestore = getFirestore(firebaseApp)
   } else {
@@ -50,8 +43,6 @@ try {
   console.error("Error al inicializar Firebase:", error)
 }
 
-// Exportar instancias inicializadas
 export { firebaseApp, firebaseAuth, firebaseFirestore }
 
-// Exportar configuración por defecto
 export default firebaseConfig

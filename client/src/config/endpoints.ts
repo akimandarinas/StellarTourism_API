@@ -1,11 +1,7 @@
-/**
- * Configuración centralizada de endpoints de la API
- *
- * Este archivo define todos los endpoints utilizados por la aplicación,
- * asegurando consistencia y facilitando cambios globales.
- */
+/* Configuración de endpoints de la API
+   Este archivo define todos los endpoints utilizados por la aplicación 
+*/
 
-// Tipos de recursos
 export enum ResourceType {
   DESTINOS = "destinos",
   NAVES = "naves",
@@ -17,7 +13,6 @@ export enum ResourceType {
   AUTH = "auth",
 }
 
-// Acciones comunes para recursos
 export enum ResourceAction {
   LIST = "list",
   GET = "get",
@@ -27,7 +22,7 @@ export enum ResourceAction {
   SEARCH = "search",
 }
 
-// Interfaz para definir un endpoint
+//Interfaz para definir un endpoint
 export interface Endpoint {
   path: string
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
@@ -36,14 +31,13 @@ export interface Endpoint {
   version?: string
 }
 
-// Tipo para agrupar endpoints por recurso
 export type ResourceEndpoints = {
   [key in ResourceAction]?: Endpoint
 } & {
   [key: string]: Endpoint
 }
 
-// Mapa completo de endpoints
+//Mapa completo de endpoints
 export const endpoints: Record<ResourceType, ResourceEndpoints> = {
   [ResourceType.DESTINOS]: {
     [ResourceAction.LIST]: {
@@ -345,13 +339,7 @@ export const endpoints: Record<ResourceType, ResourceEndpoints> = {
   },
 }
 
-/**
- * Obtiene la ruta de un endpoint
- * @param resource Tipo de recurso
- * @param action Acción o nombre del endpoint
- * @param params Parámetros para reemplazar en la ruta
- * @returns Ruta completa del endpoint
- */
+
 export function getEndpointPath(
   resource: ResourceType,
   action: ResourceAction | string,
@@ -365,7 +353,6 @@ export function getEndpointPath(
 
   let path = endpoint.path
 
-  // Reemplazar parámetros en la ruta
   Object.entries(params).forEach(([key, value]) => {
     path = path.replace(`:${key}`, String(value))
   })
@@ -373,12 +360,6 @@ export function getEndpointPath(
   return path
 }
 
-/**
- * Obtiene la configuración completa de un endpoint
- * @param resource Tipo de recurso
- * @param action Acción o nombre del endpoint
- * @returns Configuración del endpoint
- */
 export function getEndpoint(resource: ResourceType, action: ResourceAction | string): Endpoint {
   const endpoint = endpoints[resource][action]
 

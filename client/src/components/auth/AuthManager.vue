@@ -1,6 +1,5 @@
 <template>
   <div class="auth-manager">
-    <!-- Overlay de carga durante procesos de autenticación -->
     <div v-if="isProcessing" class="auth-overlay">
       <div class="auth-loading">
         <LoadingSpinner size="lg" />
@@ -34,12 +33,10 @@ export default {
     LoadingSpinner
   },
   props: {
-    // Redirigir después de autenticación exitosa
     redirectTo: {
       type: String,
       default: '/'
     },
-    // Mostrar mensajes de éxito/error
     showNotifications: {
       type: Boolean,
       default: true
@@ -50,7 +47,6 @@ export default {
     const authStore = useAuthStore();
     const toast = useToast();
 
-    // Estado
     const isProcessing = ref(false);
     const loadingMessage = ref('Procesando...');
     const authError = ref(null);
@@ -58,22 +54,18 @@ export default {
     const maxRetries = ref(3);
     const retryCount = ref(0);
 
-    // Computed
     const isAuthenticated = computed(() => authStore.isAuthenticated);
     const isLoading = computed(() => authStore.loading);
     const user = computed(() => authStore.user);
 
-    // Proporcionar estado de autenticación a componentes hijos
     provide('isAuthenticated', isAuthenticated);
     provide('user', user);
 
-    // Métodos
     const setProcessing = (isActive, message = 'Procesando...') => {
       isProcessing.value = isActive;
       loadingMessage.value = message;
       
       if (!isActive) {
-        // Resetear contador de reintentos cuando se completa un proceso
         retryCount.value = 0;
       }
     };
@@ -83,11 +75,9 @@ export default {
       authError.value = error;
       lastAuthAction.value = action;
 
-      // Mostrar notificación de error si está habilitado
       if (props.showNotifications) {
         let errorMessage = 'Ha ocurrido un error durante la autenticación';
         
-        // Mensajes de error personalizados según el tipo de error
         if (error.code) {
           switch (error.code) {
             case 'auth/user-not-found':
@@ -136,8 +126,6 @@ export default {
       };
       
       if (actionMap[action]) {
-        // Recuperar los últimos parámetros usados (simplificado)
-        // En una implementación real, guardaríamos los parámetros
         await actionMap[action]();
       }
     };
@@ -154,7 +142,6 @@ export default {
             toast.success('Inicio de sesión exitoso', '¡Bienvenido de nuevo!');
           }
           
-          // Guardar preferencia de "recordarme"
           if (rememberMe) {
             localStorage.setItem('rememberMe', 'true');
             localStorage.setItem('lastEmail', email);
@@ -163,7 +150,7 @@ export default {
             localStorage.removeItem('lastEmail');
           }
           
-          // Redirigir al usuario
+          //Redirigir al usuario
           router.push(props.redirectTo);
           return true;
         } else {
@@ -189,7 +176,6 @@ export default {
             toast.success('Registro exitoso', '¡Bienvenido a Stellar Tourism!');
           }
           
-          // Redirigir al usuario
           router.push(props.redirectTo);
           return true;
         } else {
@@ -215,7 +201,7 @@ export default {
             toast.success('Sesión cerrada', 'Has cerrado sesión correctamente');
           }
           
-          // Redirigir al usuario a la página de inicio
+          //Redirigir al usuario a la página de inicio
           router.push('/');
           return true;
         } else {
@@ -255,7 +241,7 @@ export default {
       }
     };
 
-    // Inicializar autenticación
+    //Inicializar autenticación
     onMounted(() => {
       authStore.initAuth();
     });

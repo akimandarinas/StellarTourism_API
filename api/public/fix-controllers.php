@@ -1,15 +1,11 @@
 <?php
-// Definir la ruta base de la aplicación
 define('BASE_PATH', dirname(__DIR__));
 
-// Incluir el helper de controladores
 require_once BASE_PATH . '/utils/controller_helper.php';
 require_once BASE_PATH . '/utils/response_utils.php';
 
-// Establecer cabeceras para JSON
 header('Content-Type: application/json');
 
-// Mostrar errores en desarrollo
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -35,19 +31,16 @@ function fixAllControllersEnhanced($controllersDir) {
         $controllerName = pathinfo($file, PATHINFO_FILENAME);
         $filePath = $controllersDir . '/' . $file;
         
-        // Leer el contenido del archivo
         $content = file_get_contents($filePath);
         
         // Verificar si el controlador necesita correcciones
         $needsFix = false;
         
-        // 1. Verificar si falta la inclusión de response_utils.php
         if (strpos($content, 'response_utils.php') === false) {
             $needsFix = true;
             $content = "<?php\nrequire_once __DIR__ . '/../utils/response_utils.php';\n\n" . substr($content, 6);
         }
         
-        // 2. Verificar si faltan funciones estándar CRUD
         $hasFunctionGetAll = preg_match('/function\s+getAll\s*\(/i', $content);
         $hasFunctionGetById = preg_match('/function\s+getById\s*\(/i', $content);
         $hasFunctionCreate = preg_match('/function\s+create\s*\(/i', $content);
@@ -85,7 +78,6 @@ function fixAllControllersEnhanced($controllersDir) {
             $functionsToAdd[] = generateDeleteFunction($tableName);
         }
         
-        // Añadir las funciones al final del archivo
         if (!empty($functionsToAdd)) {
             // Encontrar la última llave de cierre
             $lastBracePos = strrpos($content, '}');
@@ -122,10 +114,9 @@ function fixAllControllersEnhanced($controllersDir) {
     return $results;
 }
 
-// Función para generar la función getAll
 function generateGetAllFunction($tableName) {
     return "/**
- * Obtiene todos los registros
+  Obtiene todos los registros
  */
 function getAll() {
     global \$conn;
@@ -152,7 +143,6 @@ function getAll() {
 }";
 }
 
-// Función para generar la función getById
 function generateGetByIdFunction($tableName) {
     return "/**
  * Obtiene un registro por su ID
@@ -186,22 +176,18 @@ function getById(\$id) {
 
 // Función para generar la función create
 function generateCreateFunction($tableName) {
-    return "/**
- * Crea un nuevo registro
- * 
- * @param array \$data Datos del registro
+    return "/*
+  Crea un nuevo registro
  */
 function create(\$data) {
     global \$conn;
     
     try {
-        // Validar datos
         if (empty(\$data)) {
             sendErrorResponse('No se proporcionaron datos', 400);
             return;
         }
         
-        // Preparar la consulta
         \$columns = array_keys(\$data);
         \$values = array_values(\$data);
         
@@ -213,7 +199,6 @@ function create(\$data) {
         \$sql = \"INSERT INTO $tableName (\$columnsStr) VALUES (\$placeholdersStr)\";
         \$stmt = \$conn->prepare(\$sql);
         
-        // Determinar los tipos de datos
         \$types = '';
         foreach (\$values as \$value) {
             if (is_int(\$value)) {
@@ -230,7 +215,6 @@ function create(\$data) {
         // Bind parameters
         \$stmt->bind_param(\$types, ...\$values);
         
-        // Ejecutar la consulta
         if (\$stmt->execute()) {
             \$newId = \$stmt->insert_id;
             sendJsonResponse([
@@ -247,13 +231,9 @@ function create(\$data) {
 }";
 }
 
-// Función para generar la función update
 function generateUpdateFunction($tableName) {
     return "/**
  * Actualiza un registro existente
- * 
- * @param int \$id ID del registro
- * @param array \$data Datos del registro
  */
 function update(\$id, \$data) {
     global \$conn;
@@ -309,7 +289,6 @@ function update(\$id, \$data) {
         // Bind parameters
         \$stmt->bind_param(\$types, ...\$values);
         
-        // Ejecutar la consulta
         if (\$stmt->execute()) {
             sendJsonResponse([
                 'status' => 'success',
@@ -325,18 +304,14 @@ function update(\$id, \$data) {
 }";
 }
 
-// Función para generar la función delete
 function generateDeleteFunction($tableName) {
-    return "/**
- * Elimina un registro
- * 
- * @param int \$id ID del registro
+    return "/*
+ Elimina un registro
  */
 function delete(\$id) {
     global \$conn;
     
     try {
-        // Verificar si el registro existe
         \$checkSql = \"SELECT id FROM $tableName WHERE id = ?\";
         \$checkStmt = \$conn->prepare(\$checkSql);
         \$checkStmt->bind_param(\"i\", \$id);
@@ -348,12 +323,10 @@ function delete(\$id) {
             return;
         }
         
-        // Preparar la consulta de eliminación
         \$sql = \"DELETE FROM $tableName WHERE id = ?\";
         \$stmt = \$conn->prepare(\$sql);
         \$stmt->bind_param(\"i\", \$id);
         
-        // Ejecutar la consulta
         if (\$stmt->execute()) {
             sendJsonResponse([
                 'status' => 'success',
@@ -373,7 +346,6 @@ function delete(\$id) {
 $controllersDir = BASE_PATH . '/controllers';
 $results = fixAllControllersEnhanced($controllersDir);
 
-// Mostrar resultados
 echo json_encode([
     'status' => 'success',
     'message' => 'Proceso de corrección de controladores completado',

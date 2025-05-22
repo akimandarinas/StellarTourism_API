@@ -109,7 +109,6 @@ const fetchDestinations = async () => {
     // En un entorno real, esto sería una llamada a la API
     // const data = await api.destinos.getAll();
     
-    // Simulamos una llamada a la API con un pequeño retraso
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     destinations.value = mockDestinations;
@@ -133,7 +132,6 @@ const formatPrice = (price) => {
   }).format(price);
 };
 
-// Ciclo de vida
 onMounted(() => {
   fetchDestinations();
 });

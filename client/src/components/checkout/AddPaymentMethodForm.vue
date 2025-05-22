@@ -138,7 +138,7 @@ import { useStripePayment } from '../../composables/useStripePayment';
 import { useAuth } from '../../composables/useAuth';
 import { PAYMENT_CONFIG } from '../../config/stripe';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-import { AlertCircle, Loader2, InfoIcon } from 'lucide-vue-next';
+import { AlertCircle, Loader2, InfoIcon } from '@/utils/lucide-adapter';
 
 const props = defineProps({
   showTestCards: {

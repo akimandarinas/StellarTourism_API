@@ -1,8 +1,6 @@
 <?php
 // Archivo para el endpoint de prueba
 header('Content-Type: application/json');
-
-// Generar datos de prueba
 $testData = [
     'string' => 'Hello, World!',
     'number' => 42,
@@ -62,7 +60,6 @@ $response = [
     )
 ];
 
-// Enviar respuesta
 echo json_encode($response, JSON_PRETTY_PRINT);
 
 // Función para obtener los headers de la petición

@@ -1,12 +1,3 @@
-/**
- * Utilidades para manejar el foco y la navegación por teclado
- */
-
-/**
- * Obtiene todos los elementos focusables dentro de un contenedor
- * @param {HTMLElement} container - Elemento contenedor
- * @returns {Array} Array de elementos focusables
- */
 export function getFocusableElements(container) {
   if (!container) return []
 
@@ -20,11 +11,6 @@ export function getFocusableElements(container) {
   })
 }
 
-/**
- * Enfoca el primer elemento focusable dentro de un contenedor
- * @param {HTMLElement} container - Elemento contenedor
- * @returns {boolean} True si se pudo enfocar un elemento
- */
 export function focusFirstElement(container) {
   const elements = getFocusableElements(container)
 
@@ -36,11 +22,6 @@ export function focusFirstElement(container) {
   return false
 }
 
-/**
- * Enfoca el último elemento focusable dentro de un contenedor
- * @param {HTMLElement} container - Elemento contenedor
- * @returns {boolean} True si se pudo enfocar un elemento
- */
 export function focusLastElement(container) {
   const elements = getFocusableElements(container)
 
@@ -52,11 +33,6 @@ export function focusLastElement(container) {
   return false
 }
 
-/**
- * Verifica si un elemento es visible para lectores de pantalla
- * @param {HTMLElement} element - Elemento a verificar
- * @returns {boolean} True si el elemento es visible para lectores de pantalla
- */
 export function isVisibleToScreenReader(element) {
   if (!element) return false
 
@@ -83,10 +59,6 @@ export function isVisibleToScreenReader(element) {
   return true
 }
 
-/**
- * Aplica estilos para hacer un elemento visible solo para lectores de pantalla
- * @param {HTMLElement} element - Elemento a modificar
- */
 export function makeScreenReaderOnly(element) {
   if (!element) return
 

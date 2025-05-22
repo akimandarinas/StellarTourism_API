@@ -1,26 +1,12 @@
 <?php
-/**
- * Funciones auxiliares para los controladores
- * 
- * Este archivo contiene funciones que ayudan a estandarizar
- * la creación y uso de controladores en la API
- */
+/*Funciones auxiliares para los controladores*/
 
-/**
- * Crea una instancia de la base de datos usando el patrón Singleton
- * 
- * @return PDO Conexión a la base de datos
- */
 function getDatabaseConnection() {
     // Usar el método getInstance en lugar de new Database()
     $database = Database::getInstance();
     return $database->getConnection();
 }
 
-/**
- * Función para aplicar a todos los controladores
- * Reemplaza la creación directa de la instancia de Database
- */
 function fixControllerDatabaseInstantiation($controllerFile) {
     if (!file_exists($controllerFile)) {
         return false;
@@ -44,12 +30,6 @@ function fixControllerDatabaseInstantiation($controllerFile) {
     return false;
 }
 
-/**
- * Corrige todos los controladores en el directorio especificado
- * 
- * @param string $controllersDir Directorio de controladores
- * @return array Resultados de la corrección
- */
 function fixAllControllers($controllersDir) {
     $results = [];
     

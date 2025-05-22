@@ -1,11 +1,9 @@
 <?php
-// Health check endpoint para la API
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// Si es una solicitud OPTIONS, terminar aquí
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -21,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-// Información básica del sistema
 $systemInfo = [
     'php_version' => PHP_VERSION,
     'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
@@ -29,13 +26,11 @@ $systemInfo = [
     'timezone' => date_default_timezone_get()
 ];
 
-// Verificar conexión a la base de datos (opcional)
 $dbStatus = [
     'status' => 'success',
     'message' => 'Conexión a la base de datos establecida correctamente'
 ];
 
-// Respuesta
 $response = [
     'status' => 'success',
     'message' => 'API funcionando correctamente',

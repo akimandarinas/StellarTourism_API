@@ -1,276 +1,261 @@
 <template>
-  <nav 
-    class="flex items-center justify-between border-t border-gray-200 px-4 sm:px-0"
-    role="navigation"
-    aria-label="Paginación"
-  >
-    <div class="hidden md:-mt-px md:flex">
-      <button
-        v-if="showFirstLast"
-        @click="onPageChange(1)"
-        :disabled="currentPage === 1"
-        class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-        :class="{ 'cursor-not-allowed opacity-50': currentPage === 1 }"
-        aria-label="Primera página"
-        :aria-disabled="currentPage === 1 ? 'true' : 'false'"
-        :tabindex="currentPage === 1 ? -1 : 0"
-      >
-        <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-          <path fill-rule="evenodd" d="M7.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L3.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-        </svg>
-        Primera
-      </button>
-      
-      <button
-        @click="onPageChange(currentPage - 1)"
-        :disabled="currentPage === 1"
-        class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-        :class="{ 'cursor-not-allowed opacity-50': currentPage === 1 }"
-        aria-label="Página anterior"
-        :aria-disabled="currentPage === 1 ? 'true' : 'false'"
-        :tabindex="currentPage === 1 ? -1 : 0"
-      >
-        <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-        </svg>
-        Anterior
-      </button>
-      
-      <template v-for="(page, index) in visiblePageNumbers" :key="`page-${index}`">
+  <nav class="pagination" aria-label="Paginación">
+    <ul class="pagination-list">
+      <!-- Botón anterior -->
+      <li class="pagination-item">
         <button
-          v-if="page !== '...'"
-          @click="onPageChange(page)"
-          @keydown="handleKeyDown($event, page)"
-          class="inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium"
-          :class="[
-            currentPage === page 
-              ? 'border-primary-500 text-primary-600' 
-              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-          ]"
-          :aria-label="`Página ${page}`"
+          @click="goToPreviousPage"
+          class="pagination-button"
+          :disabled="currentPage <= 1"
+          :aria-disabled="currentPage <= 1"
+          aria-label="Ir a la página anterior"
+        >
+          <ChevronLeftIcon class="pagination-icon" />
+        </button>
+      </li>
+      
+      <!-- Primera página -->
+      <li v-if="showFirstPage" class="pagination-item">
+        <button
+          @click="goToPage(1)"
+          class="pagination-button"
+          :class="{ active: currentPage === 1 }"
+          aria-label="Ir a la página 1"
+        >
+          1
+        </button>
+      </li>
+      
+      <!-- Elipsis izquierda -->
+      <li v-if="showLeftEllipsis" class="pagination-item">
+        <span class="pagination-ellipsis" aria-hidden="true">...</span>
+      </li>
+      
+      <!-- Páginas centrales -->
+      <li
+        v-for="page in visiblePages"
+        :key="page"
+        class="pagination-item"
+      >
+        <button
+          @click="goToPage(page)"
+          class="pagination-button"
+          :class="{ active: currentPage === page }"
           :aria-current="currentPage === page ? 'page' : undefined"
-          :tabindex="0"
+          :aria-label="`Ir a la página ${page}`"
         >
           {{ page }}
         </button>
-        <span
-          v-else
-          class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500"
-          aria-hidden="true"
+      </li>
+      
+      <!-- Elipsis derecha -->
+      <li v-if="showRightEllipsis" class="pagination-item">
+        <span class="pagination-ellipsis" aria-hidden="true">...</span>
+      </li>
+      
+      <!-- Última página -->
+      <li v-if="showLastPage" class="pagination-item">
+        <button
+          @click="goToPage(totalPages)"
+          class="pagination-button"
+          :class="{ active: currentPage === totalPages }"
+          :aria-label="`Ir a la página ${totalPages}`"
         >
-          ...
-        </span>
-      </template>
+          {{ totalPages }}
+        </button>
+      </li>
       
-      <button
-        @click="onPageChange(currentPage + 1)"
-        :disabled="currentPage === totalPages"
-        class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-        :class="{ 'cursor-not-allowed opacity-50': currentPage === totalPages }"
-        aria-label="Página siguiente"
-        :aria-disabled="currentPage === totalPages ? 'true' : 'false'"
-        :tabindex="currentPage === totalPages ? -1 : 0"
-      >
-        Siguiente
-        <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-        </svg>
-      </button>
-      
-      <button
-        v-if="showFirstLast"
-        @click="onPageChange(totalPages)"
-        :disabled="currentPage === totalPages"
-        class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
-        :class="{ 'cursor-not-allowed opacity-50': currentPage === totalPages }"
-        aria-label="Última página"
-        :aria-disabled="currentPage === totalPages ? 'true' : 'false'"
-        :tabindex="currentPage === totalPages ? -1 : 0"
-      >
-        Última
-        <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-          <path fill-rule="evenodd" d="M12.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L16.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-        </svg>
-      </button>
-    </div>
-    
-    <!-- Mobile pagination -->
-    <div class="flex w-full items-center justify-between md:hidden">
-      <button
-        @click="onPageChange(currentPage - 1)"
-        :disabled="currentPage === 1"
-        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        :class="{ 'cursor-not-allowed opacity-50': currentPage === 1 }"
-        aria-label="Página anterior"
-        :aria-disabled="currentPage === 1 ? 'true' : 'false'"
-        :tabindex="currentPage === 1 ? -1 : 0"
-      >
-        Anterior
-      </button>
-      <p class="text-sm text-gray-700" aria-live="polite">
-        Página <span class="font-medium">{{ currentPage }}</span> de <span class="font-medium">{{ totalPages }}</span>
-      </p>
-      <button
-        @click="onPageChange(currentPage + 1)"
-        :disabled="currentPage === totalPages"
-        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        :class="{ 'cursor-not-allowed opacity-50': currentPage === totalPages }"
-        aria-label="Página siguiente"
-        :aria-disabled="currentPage === totalPages ? 'true' : 'false'"
-        :tabindex="currentPage === totalPages ? -1 : 0"
-      >
-        Siguiente
-      </button>
-    </div>
-    
-    <!-- Anunciador para lectores de pantalla -->
-    <div class="sr-only" aria-live="polite" ref="announcer">
-      {{ announcement }}
-    </div>
+      <!-- Botón siguiente -->
+      <li class="pagination-item">
+        <button
+          @click="goToNextPage"
+          class="pagination-button"
+          :disabled="currentPage >= totalPages"
+          :aria-disabled="currentPage >= totalPages"
+          aria-label="Ir a la página siguiente"
+        >
+          <ChevronRightIcon class="pagination-icon" />
+        </button>
+      </li>
+    </ul>
   </nav>
 </template>
 
-<script setup>
-import { computed, ref, watch } from 'vue';
+<script>
+import { computed } from 'vue';
+import { ChevronRightIcon } from '@/utils/lucide-adapter';
 
-const props = defineProps({
-  currentPage: {
-    type: Number,
-    required: true
-  },
-  totalPages: {
-    type: Number,
-    required: true
-  },
-  maxVisiblePages: {
-    type: Number,
-    default: 5
-  },
-  showFirstLast: {
-    type: Boolean,
-    default: true
-  }
-});
-
-const emit = defineEmits(['page-change']);
-
-// Estado para anuncios a lectores de pantalla
-const announcement = ref('');
-const announcer = ref(null);
-
-// Anunciar cambios de página para lectores de pantalla
-const announce = (message) => {
-  announcement.value = message;
+export default {
+  name: 'Pagination',
   
-  // Limpiar después de un tiempo para asegurar que se anuncie nuevamente
-  setTimeout(() => {
-    announcement.value = '';
-  }, 3000);
-};
-
-// Observar cambios en la página actual
-watch(() => props.currentPage, (newPage, oldPage) => {
-  if (newPage !== oldPage) {
-    announce(`Página ${newPage} de ${props.totalPages}`);
-  }
-});
-
-// Manejar cambio de página
-const onPageChange = (page) => {
-  if (page >= 1 && page <= props.totalPages && page !== props.currentPage) {
-    emit('page-change', page);
-  }
-};
-
-// Manejar eventos de teclado para navegación accesible
-const handleKeyDown = (event, page) => {
-  // Permitir navegación con teclas de flecha
-  switch (event.key) {
-    case 'ArrowLeft':
-      event.preventDefault();
+  components: {
+    ChevronRightIcon
+  },
+  
+  props: {
+    currentPage: {
+      type: Number,
+      required: true
+    },
+    totalPages: {
+      type: Number,
+      required: true
+    },
+    siblingCount: {
+      type: Number,
+      default: 1
+    }
+  },
+  
+  emits: ['page-change'],
+  
+  setup(props, { emit }) {
+    // Calcular las páginas visibles
+    const visiblePages = computed(() => {
+      const { currentPage, totalPages, siblingCount } = props;
+      
+      // Calcular el rango de páginas a mostrar
+      const startPage = Math.max(1, currentPage - siblingCount);
+      const endPage = Math.min(totalPages, currentPage + siblingCount);
+      
+      // Crear array de páginas
+      const pages = [];
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      
+      return pages;
+    });
+    
+    // Determinar si mostrar la primera página
+    const showFirstPage = computed(() => {
+      return visiblePages.value[0] > 1;
+    });
+    
+    // Determinar si mostrar la última página
+    const showLastPage = computed(() => {
+      return visiblePages.value[visiblePages.value.length - 1] < props.totalPages;
+    });
+    
+    // Determinar si mostrar elipsis izquierda
+    const showLeftEllipsis = computed(() => {
+      return visiblePages.value[0] > 2;
+    });
+    
+    // Determinar si mostrar elipsis derecha
+    const showRightEllipsis = computed(() => {
+      return visiblePages.value[visiblePages.value.length - 1] < props.totalPages - 1;
+    });
+    
+    // Métodos para navegar entre páginas
+    const goToPage = (page) => {
+      if (page !== props.currentPage) {
+        emit('page-change', page);
+      }
+    };
+    
+    const goToPreviousPage = () => {
       if (props.currentPage > 1) {
-        onPageChange(props.currentPage - 1);
+        goToPage(props.currentPage - 1);
       }
-      break;
-    case 'ArrowRight':
-      event.preventDefault();
+    };
+    
+    const goToNextPage = () => {
       if (props.currentPage < props.totalPages) {
-        onPageChange(props.currentPage + 1);
+        goToPage(props.currentPage + 1);
       }
-      break;
-    case 'Home':
-      event.preventDefault();
-      onPageChange(1);
-      break;
-    case 'End':
-      event.preventDefault();
-      onPageChange(props.totalPages);
-      break;
-    case 'Enter':
-    case ' ':
-      event.preventDefault();
-      onPageChange(page);
-      break;
+    };
+    
+    return {
+      visiblePages,
+      showFirstPage,
+      showLastPage,
+      showLeftEllipsis,
+      showRightEllipsis,
+      goToPage,
+      goToPreviousPage,
+      goToNextPage
+    };
   }
-};
-
-// Calcular números de página visibles
-const visiblePageNumbers = computed(() => {
-  if (props.totalPages <= props.maxVisiblePages) {
-    return Array.from({ length: props.totalPages }, (_, i) => i + 1);
-  }
-
-  const halfVisiblePages = Math.floor(props.maxVisiblePages / 2);
-  let startPage = Math.max(props.currentPage - halfVisiblePages, 1);
-  let endPage = Math.min(startPage + props.maxVisiblePages - 1, props.totalPages);
-
-  if (endPage - startPage + 1 < props.maxVisiblePages) {
-    startPage = Math.max(endPage - props.maxVisiblePages + 1, 1);
-  }
-
-  const pages = [];
-
-  if (startPage > 1) {
-    pages.push(1);
-    if (startPage > 2) {
-      pages.push('...');
-    }
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i);
-  }
-
-  if (endPage < props.totalPages) {
-    if (endPage < props.totalPages - 1) {
-      pages.push('...');
-    }
-    pages.push(props.totalPages);
-  }
-
-  return pages;
-});
+}
 </script>
 
 <style scoped>
-/* Estilos de enfoque para accesibilidad */
-button:focus-visible {
-  outline: 2px solid var(--color-primary, #3b82f6);
-  outline-offset: 2px;
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
 }
 
-/* Clase para lectores de pantalla */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
+.pagination-list {
+  display: flex;
+  list-style: none;
   padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+  margin: 0;
+  gap: 0.25rem;
+}
+
+.pagination-item {
+  display: flex;
+}
+
+.pagination-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.375rem;
+  background-color: white;
+  color: var(--color-text-primary, #1a1a2e);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: var(--color-background-hover, #f1f5f9);
+  border-color: var(--color-border-hover, #cbd5e1);
+}
+
+.pagination-button.active {
+  background-color: var(--color-primary, #7c3aed);
+  color: white;
+  border-color: var(--color-primary, #7c3aed);
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.pagination-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  color: var(--color-text-secondary, #4a5568);
+}
+
+@media (max-width: 640px) {
+  .pagination-button {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+  }
+  
+  .pagination-ellipsis {
+    min-width: 2rem;
+    height: 2rem;
+  }
 }
 </style>

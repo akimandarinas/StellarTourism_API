@@ -1,35 +1,19 @@
-/**
- * Composable para rastrear eventos de análisis en la aplicación
- */
-
-// Verificar si estamos en un navegador
+//Verificar si estamos en un navegador
 const isBrowser = () => typeof window !== "undefined"
 
-// Verificar si estamos en modo de desarrollo
+//Verificar si estamos en modo de desarrollo
 const isDev = import.meta.env?.DEV || false
 
-/**
- * Simula el envío de eventos a un servicio de análisis
- * En producción, esto se reemplazaría con llamadas reales a servicios como
- * Google Analytics, Mixpanel, etc.
- */
 const sendToAnalyticsService = (eventName, eventData) => {
   if (isDev) {
     console.log(`[Analytics] ${eventName}:`, eventData)
     return Promise.resolve({ success: true })
   }
 
-  // Aquí iría la lógica para enviar el evento a un servicio real de análisis
-  // Por ejemplo, Google Analytics, Mixpanel, etc.
+  //Aquí iría la lógica para enviar el evento a un servicio real de análisis
   return Promise.resolve({ success: true })
 }
 
-/**
- * Rastrear un evento específico con datos adicionales
- * @param {string} eventName - Nombre del evento
- * @param {Object} eventData - Datos adicionales del evento
- * @returns {Promise} - Promesa que se resuelve cuando el evento se ha enviado
- */
 const trackEvent = (eventName, eventData = {}) => {
   if (!isBrowser()) return Promise.resolve({ success: false, reason: "not-browser" })
 
@@ -39,12 +23,6 @@ const trackEvent = (eventName, eventData = {}) => {
   })
 }
 
-/**
- * Rastrear una vista de página
- * @param {string} pageName - Nombre de la página
- * @param {Object} pageData - Datos adicionales de la página
- * @returns {Promise} - Promesa que se resuelve cuando el evento se ha enviado
- */
 const trackPageView = (pageName, pageData = {}) => {
   if (!isBrowser()) return Promise.resolve({ success: false, reason: "not-browser" })
 
@@ -56,12 +34,6 @@ const trackPageView = (pageName, pageData = {}) => {
   })
 }
 
-/**
- * Rastrear una conversión (compra, registro, etc.)
- * @param {string} conversionType - Tipo de conversión
- * @param {Object} conversionData - Datos adicionales de la conversión
- * @returns {Promise} - Promesa que se resuelve cuando el evento se ha enviado
- */
 const trackConversion = (conversionType, conversionData = {}) => {
   if (!isBrowser()) return Promise.resolve({ success: false, reason: "not-browser" })
 
@@ -72,13 +44,6 @@ const trackConversion = (conversionType, conversionData = {}) => {
   })
 }
 
-/**
- * Rastrear un error
- * @param {string} errorType - Tipo de error
- * @param {string} errorMessage - Mensaje de error
- * @param {Object} errorData - Datos adicionales del error
- * @returns {Promise} - Promesa que se resuelve cuando el evento se ha enviado
- */
 const trackError = (errorType, errorMessage, errorData = {}) => {
   if (!isBrowser()) return Promise.resolve({ success: false, reason: "not-browser" })
 
@@ -90,11 +55,6 @@ const trackError = (errorType, errorMessage, errorData = {}) => {
   })
 }
 
-/**
- * Establecer propiedades del usuario
- * @param {Object} properties - Propiedades del usuario
- * @returns {Promise} - Promesa que se resuelve cuando las propiedades se han establecido
- */
 const setUserProperties = (properties = {}) => {
   if (!isBrowser()) return Promise.resolve({ success: false, reason: "not-browser" })
 
@@ -104,10 +64,6 @@ const setUserProperties = (properties = {}) => {
   })
 }
 
-/**
- * Composable para rastrear eventos de análisis
- * @returns {Object} - Funciones para rastrear eventos
- */
 export const useAnalytics = () => {
   return {
     trackEvent,

@@ -2,7 +2,6 @@
   <header class="main-header" role="banner">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between h-16">
-        <!-- Logo y navegación principal -->
         <div class="flex items-center">
           <a href="/" class="logo-container" aria-label="Stellar Tourism - Página de inicio">
             <img src="/logo.svg" alt="Stellar Tourism Logo" class="logo" aria-hidden="true" />
@@ -55,29 +54,27 @@
           </nav>
         </div>
         
-        <!-- Acciones de usuario -->
         <div class="user-actions">
           <!-- Avatar de usuario (cuando está autenticado) -->
-          <div v-if="authStore.isAuthenticated" class="user-avatar-container">
+          <div v-if="isAuthenticated" class="user-avatar-container">
             <a 
               href="/perfil" 
               class="user-avatar-link"
               aria-label="Perfil de usuario"
             >
               <img 
-                v-if="authStore.userProfile?.photoURL" 
-                :src="authStore.userProfile.photoURL" 
+                v-if="userPhotoURL" 
+                :src="userPhotoURL" 
                 alt="User Profile Photo" 
                 class="user-avatar" 
                 aria-hidden="true"
               />
               <div v-else class="user-avatar user-avatar-fallback">
-                {{ authStore.displayName ? authStore.displayName.charAt(0).toUpperCase() : 'U' }}
+                {{ userDisplayName ? userDisplayName.charAt(0).toUpperCase() : 'U' }}
               </div>
             </a>
           </div>
           
-          <!-- Botones de inicio de sesión y registro (cuando no está autenticado) -->
           <div v-else class="auth-buttons">
             <a 
               href="/login"
@@ -93,7 +90,6 @@
             </a>
           </div>
           
-          <!-- Botón de menú móvil -->
           <button 
             class="mobile-menu-button"
             @click="toggleMobileMenu" 
@@ -108,7 +104,6 @@
       </div>
     </div>
     
-    <!-- Menú móvil -->
     <div 
       v-if="mobileMenuOpen" 
       class="mobile-menu" 
@@ -167,7 +162,7 @@
             </a>
           </li>
           <!-- Mostrar enlace al perfil si está autenticado, o enlaces de login/registro si no -->
-          <template v-if="authStore.isAuthenticated">
+          <template v-if="isAuthenticated">
             <li class="mobile-nav-item">
               <a 
                 href="/perfil" 
@@ -214,20 +209,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { useAuthStore } from "../../stores/auth";
+import { ref, onMounted, onUnmounted } from 'vue';
+import { Home, Planet, Rocket, User, Settings } from '@/utils/lucide-adapter';
 
-// Función para verificar si estamos en un navegador
 const isBrowser = typeof window !== 'undefined';
 
-// Estado
 const mobileMenuOpen = ref(false);
 const currentPath = ref('');
 
-// Auth store
-const authStore = useAuthStore();
+const isAuthenticated = ref(false);
+const userPhotoURL = ref(null);
+const userDisplayName = ref('');
 
-// Métodos
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value;
   
@@ -248,47 +241,52 @@ const closeMobileMenu = () => {
   }
 };
 
-// Lifecycle hooks
 onMounted(() => {
   if (isBrowser) {
-    // Actualizar la ruta actual
     currentPath.value = window.location.pathname;
     
-    // Manejar tecla Escape a nivel de documento
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && mobileMenuOpen.value) {
-        closeMobileMenu();
-      }
-    });
+    document.addEventListener('keydown', handleKeyDown);
     
-    // Manejar cambios de tamaño de ventana
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= 768 && mobileMenuOpen.value) {
-        closeMobileMenu();
+    window.addEventListener('resize', handleResize);
+    
+    try {
+      const authToken = localStorage.getItem('auth_token');
+      isAuthenticated.value = !!authToken;
+      
+      const userProfile = localStorage.getItem('user_profile');
+      if (userProfile) {
+        const profile = JSON.parse(userProfile);
+        userPhotoURL.value = profile.photoURL || null;
+        userDisplayName.value = profile.displayName || '';
       }
-    });
+    } catch (error) {
+      console.error('Error al obtener información de autenticación:', error);
+    }
   }
 });
 
 onUnmounted(() => {
   if (isBrowser) {
     // Limpiar event listeners
-    document.removeEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && mobileMenuOpen.value) {
-        closeMobileMenu();
-      }
-    });
-    
-    window.removeEventListener('resize', () => {
-      if (window.innerWidth >= 768 && mobileMenuOpen.value) {
-        closeMobileMenu();
-      }
-    });
+    document.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('resize', handleResize);
     
     // Asegurarse de que el body no quede con overflow hidden
     document.body.classList.remove('overflow-hidden');
   }
 });
+
+function handleKeyDown(e) {
+  if (e.key === 'Escape' && mobileMenuOpen.value) {
+    closeMobileMenu();
+  }
+}
+
+function handleResize() {
+  if (window.innerWidth >= 768 && mobileMenuOpen.value) {
+    closeMobileMenu();
+  }
+}
 </script>
 
 <style>

@@ -1,15 +1,9 @@
 <?php
 /**
- * Adaptador para el modelo Naves
- * Este adaptador mapea entre la estructura esperada y la estructura real de la base de datos
+ Adaptador para el modelo Naves
  */
 class NavesAdapter {
-    /**
-     * Convierte datos del formato esperado al formato de la base de datos
-     * 
-     * @param array $data Datos en formato esperado
-     * @return array Datos en formato de base de datos
-     */
+    
     public static function toDatabase($data) {
         $result = [];
 
@@ -49,12 +43,7 @@ class NavesAdapter {
         return $result;
     }
 
-    /**
-     * Convierte datos del formato de la base de datos al formato esperado
-     * 
-     * @param array $data Datos en formato de base de datos
-     * @return array Datos en formato esperado
-     */
+    
     public static function fromDatabase($data) {
         $result = [];
 

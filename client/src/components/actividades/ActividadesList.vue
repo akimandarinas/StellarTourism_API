@@ -13,7 +13,6 @@
     </div>
     
     <div v-else>
-      <!-- Filtros -->
       <div class="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filtros de categoría">
         <button 
           @click="filtroCategoria = 'todas'"
@@ -43,7 +42,6 @@
         </button>
       </div>
       
-      <!-- Lista de actividades virtualizada -->
       <div class="mb-6">
         <VirtualList
           :items="actividadesFiltradas"
@@ -128,7 +126,6 @@
         </VirtualList>
       </div>
       
-      <!-- Resumen de actividades seleccionadas -->
       <div class="bg-gray-100 rounded-lg p-4 mb-6">
         <h4 class="font-bold text-lg mb-3">Actividades Seleccionadas</h4>
         
@@ -244,17 +241,16 @@ export default {
       return resultado;
     });
 
-    // Métodos
+    //Métodos
     const fetchActividades = async () => {
       loading.value = true;
       error.value = null;
       
       try {
-        // En un entorno real, esto sería una llamada a la API
-        // Simulamos la carga de actividades
+        //En un entorno real, esto sería una llamada a la API
+        //Simulamos la carga de actividades
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Actividades de muestra
         actividades.value = [
           {
             ID: 1,
@@ -312,7 +308,6 @@ export default {
           }
         ];
         
-        // Extraer categorías únicas
         categorias.value = [...new Set(actividades.value.map(a => a.CATEGORIA))];
       } catch (err) {
         console.error('Error al cargar actividades:', err);
@@ -379,7 +374,6 @@ export default {
       emit('seleccion-confirmada', actividadesParaEmitir.value);
     };
 
-    // Cargar actividades al montar el componente
     fetchActividades();
 
     return {
@@ -428,14 +422,12 @@ export default {
   overflow: hidden;
 }
 
-/* Mejoras de accesibilidad */
 .keyboard-focus:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.2);
 }
 
-/* Clase para elementos con alto contraste */
 .high-contrast {
   color: #000000;
 }

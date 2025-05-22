@@ -1,25 +1,18 @@
 <?php
-/**
- * Clase base para todos los modelos
- * Proporciona funcionalidad común para todos los modelos
- */
+/*Clase base para todos los modelos
+Proporciona funcionalidad común para todos los modelos*/
+
 class ModelBase {
     // Propiedades de la base de datos
     protected $conn;
     protected $table_name = ''; // Debe ser sobrescrito por las clases hijas
     protected $primary_key = 'id';
     protected $adapter_class = null;
-    
-    /**
-     * Constructor
-     */
     public function __construct() {
         // Definir la ruta base si no está definida
         if (!defined('BASE_PATH')) {
             define('BASE_PATH', dirname(dirname(__FILE__)));
         }
-        
-        // Obtener conexión a la base de datos
         $database = Database::getInstance();
         $this->conn = $database->getConnection();
         
@@ -28,13 +21,7 @@ class ModelBase {
             error_log("Error: La propiedad table_name no está definida en la clase " . get_class($this));
         }
     }
-    
-    /**
-     * Obtener todos los registros
-     * 
-     * @param array $options Opciones para la consulta (orderBy, limit, offset)
-     * @return array Registros encontrados
-     */
+
     public function getAll($options = array()) {
         // Verificar que la tabla esté definida
         if (empty($this->table_name)) {
@@ -49,11 +36,7 @@ class ModelBase {
         try {
             // Crear consulta
             $query = "SELECT * FROM " . $this->table_name;
-            
-            // Añadir ORDER BY
             $query .= " ORDER BY " . $orderBy;
-            
-            // Añadir LIMIT y OFFSET si se especifican
             if ($limit > 0) {
                 $query .= " LIMIT " . $limit;
                 if ($offset > 0) {
@@ -64,11 +47,8 @@ class ModelBase {
             // Preparar y ejecutar consulta
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
-            
-            // Obtener resultados
             $results = array();
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                // Convertir datos si hay un adaptador
                 if ($this->adapter_class && class_exists($this->adapter_class)) {
                     $adapter = $this->adapter_class;
                     $row = $adapter::fromDatabase($row);
@@ -83,12 +63,6 @@ class ModelBase {
         }
     }
     
-    /**
-     * Obtener un registro por su ID
-     * 
-     * @param int $id ID del registro
-     * @return array|false Registro encontrado o false si no se encuentra
-     */
     public function getById($id) {
         // Verificar que la tabla esté definida
         if (empty($this->table_name)) {
@@ -97,22 +71,12 @@ class ModelBase {
         }
         
         try {
-            // Crear consulta
             $query = "SELECT * FROM " . $this->table_name . " WHERE " . $this->primary_key . " = :id";
             
-            // Preparar consulta
             $stmt = $this->conn->prepare($query);
-            
-            // Vincular parámetros
             $stmt->bindParam(':id', $id);
-            
-            // Ejecutar consulta
             $stmt->execute();
-            
-            // Obtener resultado
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            // Convertir datos si hay un adaptador
             if ($row && $this->adapter_class && class_exists($this->adapter_class)) {
                 $adapter = $this->adapter_class;
                 $row = $adapter::fromDatabase($row);
@@ -125,12 +89,8 @@ class ModelBase {
         }
     }
     
-    /**
-     * Crear un nuevo registro
-     * 
-     * @param array $data Datos del registro
-     * @return int|false ID del registro creado o false si falla
-     */
+    /* Crear un nuevo registro*/
+
     public function create($data) {
         // Verificar que la tabla esté definida
         if (empty($this->table_name)) {
@@ -139,7 +99,6 @@ class ModelBase {
         }
         
         try {
-            // Convertir datos si hay un adaptador
             if ($this->adapter_class && class_exists($this->adapter_class)) {
                 $adapter = $this->adapter_class;
                 $data = $adapter::toDatabase($data);
@@ -153,19 +112,13 @@ class ModelBase {
             
             $query = "INSERT INTO " . $this->table_name . " (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $placeholders) . ")";
             
-            // Preparar consulta
             $stmt = $this->conn->prepare($query);
-            
-            // Vincular parámetros
             foreach ($data as $key => $value) {
                 $stmt->bindValue(':' . $key, $value);
             }
-            
-            // Ejecutar consulta
             if ($stmt->execute()) {
                 return $this->conn->lastInsertId();
             }
-            
             return false;
         } catch (PDOException $e) {
             error_log("Error en " . get_class($this) . "::create: " . $e->getMessage());
@@ -173,15 +126,9 @@ class ModelBase {
         }
     }
     
-    /**
-     * Actualizar un registro
-     * 
-     * @param int $id ID del registro
-     * @param array $data Datos a actualizar
-     * @return bool Éxito o fracaso
-     */
+    /*Actualizar un registro*/
+
     public function update($id, $data) {
-        // Verificar que la tabla esté definida
         if (empty($this->table_name)) {
             error_log("Error: La propiedad table_name no está definida en la clase " . get_class($this));
             return false;
@@ -193,8 +140,6 @@ class ModelBase {
                 $adapter = $this->adapter_class;
                 $data = $adapter::toDatabase($data);
             }
-            
-            // Crear consulta
             $fields = array_map(function($field) {
                 return $field . ' = :' . $field;
             }, array_keys($data));
@@ -203,14 +148,10 @@ class ModelBase {
             
             // Preparar consulta
             $stmt = $this->conn->prepare($query);
-            
-            // Vincular parámetros
             $stmt->bindParam(':id', $id);
             foreach ($data as $key => $value) {
                 $stmt->bindValue(':' . $key, $value);
             }
-            
-            // Ejecutar consulta
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Error en " . get_class($this) . "::update: " . $e->getMessage());
@@ -218,43 +159,26 @@ class ModelBase {
         }
     }
     
-    /**
-     * Eliminar un registro
-     * 
-     * @param int $id ID del registro
-     * @return bool Éxito o fracaso
-     */
+    /*Eliminar un registro*/
+
     public function delete($id) {
-        // Verificar que la tabla esté definida
         if (empty($this->table_name)) {
             error_log("Error: La propiedad table_name no está definida en la clase " . get_class($this));
             return false;
         }
         
         try {
-            // Crear consulta
             $query = "DELETE FROM " . $this->table_name . " WHERE " . $this->primary_key . " = :id";
-            
-            // Preparar consulta
+           
             $stmt = $this->conn->prepare($query);
-            
-            // Vincular parámetros
             $stmt->bindParam(':id', $id);
-            
-            // Ejecutar consulta
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Error en " . get_class($this) . "::delete: " . $e->getMessage());
             return false;
         }
     }
-    
-    /**
-     * Contar registros
-     * 
-     * @param array $conditions Condiciones para la consulta
-     * @return int Número de registros
-     */
+
     public function count($conditions = array()) {
         // Verificar que la tabla esté definida
         if (empty($this->table_name)) {
@@ -263,7 +187,6 @@ class ModelBase {
         }
         
         try {
-            // Crear consulta
             $query = "SELECT COUNT(*) as total FROM " . $this->table_name;
             
             // Añadir condiciones si se especifican
@@ -275,21 +198,15 @@ class ModelBase {
                 }
                 $query .= implode(' AND ', $clauses);
             }
-            
-            // Preparar consulta
             $stmt = $this->conn->prepare($query);
-            
-            // Vincular parámetros si hay condiciones
             if (!empty($conditions)) {
                 foreach ($conditions as $field => $value) {
                     $stmt->bindValue(':' . $field, $value);
                 }
             }
             
-            // Ejecutar consulta
             $stmt->execute();
             
-            // Obtener resultado
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
             return (int)$row['total'];

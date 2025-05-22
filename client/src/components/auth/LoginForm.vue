@@ -113,7 +113,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
-import { MailIcon, LockIcon } from 'lucide-vue-next';
+import { MailIcon, LockIcon } from '@/utils/lucide-adapter';
 import Input from '../ui/Input.vue';
 import Button from '../ui/Button.vue';
 import Checkbox from '../ui/Checkbox.vue';
@@ -124,39 +124,33 @@ import { validateEmail as validateEmailFn, validatePassword as validatePasswordF
 
 const emit = defineEmits(['login-success', 'switch-to-register']);
 
-// Declarar todos los refs al inicio
 const email = ref('');
 const password = ref('');
 const loading = ref(false);
 const error = ref('');
 const rememberMe = ref(false);
 
-// Estado del formulario
 const form = reactive({
   email: '',
   password: '',
   remember: false
 });
 
-// Estado de validación
+//Estado de validación
 const errors = reactive({
   email: '',
   password: ''
 });
 
-// Estado de envío
 const attemptedSubmit = ref(false);
 const loginSuccess = ref(false);
 
-// Auth composable
 const { login, loginWithGoogle, loading: authLoading, error: authError } = useAuth();
 
-// Estado adicional
 const loadingGoogle = ref(false);
 
 const errorComputed = computed(() => authError.value?.message || '');
 
-// Validación
 const validateEmail = () => {
   errors.email = validateEmailFn(form.email);
 };
@@ -170,7 +164,6 @@ const isFormValid = computed(() => {
   return !errors.email && !errors.password && form.email && form.password;
 });
 
-// Métodos
 const clearFieldError = (field) => {
   if (errors[field]) errors[field] = '';
 };
@@ -178,14 +171,13 @@ const clearFieldError = (field) => {
 const handleSubmit = async () => {
   attemptedSubmit.value = true;
   
-  // Validar campos
   validateEmail();
   validatePassword();
   
   if (!isFormValid.value) return;
   
   try {
-    // Iniciar sesión
+    //Iniciar sesión
     const user = await login({
       email: form.email,
       password: form.password,
@@ -194,13 +186,11 @@ const handleSubmit = async () => {
     
     if (user) {
       loginSuccess.value = true;
-      // Esperar un momento antes de emitir el evento para mostrar el mensaje de éxito
       setTimeout(() => {
         emit('login-success', user);
       }, 1000);
     }
   } catch (err) {
-    // Manejar error
   }
 };
 

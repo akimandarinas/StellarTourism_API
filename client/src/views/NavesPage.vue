@@ -75,7 +75,6 @@
               <span>{{ nave.capacidad }} pasajeros</span>
             </div>
             <div class="spec-item">
-              <ZapIcon class="icon-small" />
               <span>{{ nave.velocidad }} km/h</span>
             </div>
             <div class="spec-item">
@@ -98,7 +97,6 @@
         :disabled="currentPage === 1"
         @click="changePage(currentPage - 1)"
       >
-        <ChevronLeftIcon />
       </button>
       
       <button 
@@ -125,9 +123,9 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { 
-  SearchIcon, UsersIcon, ZapIcon, CompassIcon, 
-  RocketOffIcon, ChevronLeftIcon, ChevronRightIcon 
-} from 'lucide-vue-next';
+  SearchIcon, UsersIcon, CompassIcon, 
+  RocketOffIcon, ChevronRightIcon 
+} from '@/utils/lucide-adapter';
 
 const router = useRouter();
 

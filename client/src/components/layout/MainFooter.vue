@@ -111,7 +111,7 @@ import {
   Youtube as YoutubeIcon, 
   Heart as HeartIcon,
   ArrowUp as ArrowUpIcon
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 
 const currentYear = computed(() => new Date().getFullYear());
 

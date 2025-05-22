@@ -11,7 +11,7 @@ import {
   crearReserva as apiCrearReserva,
   cancelarReserva as apiCancelarReserva,
   modificarReserva as apiModificarReserva,
-} from "../services/api"
+} from '@/services/api'
 
 export const useReservasStore = defineStore("reservas", () => {
   const toast = useToast()

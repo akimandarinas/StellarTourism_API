@@ -40,7 +40,7 @@
 import { computed } from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { CheckCircleIcon, XCircleIcon, AlertCircleIcon, RefreshCwIcon } from 'lucide-vue-next';
+import { CheckCircleIcon, XCircleIcon, AlertCircleIcon, RefreshCwIcon } from '@/utils/lucide-adapter';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 const props = defineProps({

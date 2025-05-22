@@ -116,7 +116,6 @@ export default {
       }
     };
     
-    // Guardar configuraciones
     const saveSettings = () => {
       try {
         const settings = {
@@ -133,14 +132,12 @@ export default {
       }
     };
     
-    // Actualizar configuraciones
     const updateSettings = () => {
       saveSettings();
       
       // Aplicar configuraciones
       applySettings();
       
-      // Emitir evento de actualización
       emit('update', {
         highContrast: highContrast.value,
         reducedMotion: reducedMotion.value,
@@ -150,7 +147,6 @@ export default {
       });
     };
     
-    // Aplicar configuraciones al DOM
     const applySettings = () => {
       const htmlElement = document.documentElement;
       
@@ -168,7 +164,6 @@ export default {
         htmlElement.classList.remove('reduce-motion');
       }
       
-      // Fuente para dislexia
       if (dyslexicFont.value) {
         htmlElement.classList.add('dyslexic-font');
       } else {
@@ -187,7 +182,6 @@ export default {
       }
     };
     
-    // Restablecer valores predeterminados
     const resetSettings = () => {
       highContrast.value = isHighContrastMode();
       reducedMotion.value = prefersReducedMotion();
@@ -198,7 +192,6 @@ export default {
       updateSettings();
     };
     
-    // Cargar y aplicar configuraciones al montar el componente
     onMounted(() => {
       loadSettings();
       applySettings();

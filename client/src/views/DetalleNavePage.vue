@@ -563,7 +563,103 @@ const obtenerNavePorId = (id) => {
       escudos: "Protección contra radiación y micrometeoritos",
       seguridadInfo: "La Artemisa Lunar cuenta con múltiples capas de seguridad, incluyendo refugios presurizados, sistemas de detección de fugas y protocolos de emergencia para eventos solares.",
       confortInfo: "Como asentamiento permanente, la Artemisa Lunar ofrece comodidades diseñadas para estancias prolongadas, incluyendo áreas recreativas, espacios comunitarios y alojamientos personalizables."
-    }
+    },
+'7': {
+  id: 7,
+  nombre: "Crucero Estelar",
+  tipo: "Crucero de Lujo",
+  fabricante: "Stellar Luxury Lines",
+  velocidadMaxima: 25000,
+  capacidad: 60,
+  tipoPropulsion: "Iónica de alta eficiencia",
+  anoFabricacion: 2048,
+  descripcion: "El Crucero Estelar es nuestra nave de lujo más exclusiva, diseñada para viajes de placer con todas las comodidades imaginables. Su diseño elegante y sus interiores de primera clase ofrecen una experiencia incomparable.",
+  caracteristicas: [
+    "Suites de lujo con vistas panorámicas",
+    "Restaurante gourmet con menú de degustación",
+    "Spa espacial con tratamientos anti-gravedad",
+    "Salón de observación con techo transparente",
+    "Bar de cócteles moleculares",
+    "Servicio de mayordomo personal",
+  ],
+  imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/eea7728b-18e0-4b08-8e12-128b50fbe0e2-xZASfQCe9tuHSpxcGQOGI1aNj05qsP.png",
+  longitud: 150,
+  altura: 35,
+  peso: 9800,
+  autonomia: 90,
+  alcanceMaximo: 500000,
+  sistemaPropulsion: "Propulsores iónicos de última generación",
+  sistemaNavegacion: "LuxNav Premium",
+  sistemaSoporteVital: "Atmosphere Plus",
+  comunicaciones: "Red de comunicación cuántica",
+  escudos: "Escudo de partículas avanzado",
+  seguridadInfo: "El Crucero Estelar cuenta con los sistemas de seguridad más avanzados, incluyendo múltiples capas de protección y sistemas de emergencia redundantes.",
+  confortInfo: "Diseñado para el máximo lujo, cada suite cuenta con vistas panorámicas, control ambiental personalizado y servicio de mayordomo privado."
+},
+'8': {
+  id: 8,
+  nombre: "Defensor Espacial",
+  tipo: "Nave de Escolta",
+  fabricante: "Orbital Defense Systems",
+  velocidadMaxima: 50000,
+  capacidad: 25,
+  tipoPropulsion: "Plasma comprimido",
+  anoFabricacion: 2046,
+  descripcion: "El Defensor Espacial es una nave de escolta que proporciona seguridad adicional para nuestras rutas más aventuradas. Equipada con sistemas de detección avanzados y capacidad de respuesta rápida.",
+  caracteristicas: [
+    "Sistemas de detección de largo alcance",
+    "Capacidad de respuesta rápida",
+    "Alojamiento seguro para pasajeros VIP",
+    "Sala de control táctico",
+    "Sistemas de comunicación de emergencia",
+    "Módulos de escape individuales",
+  ],
+  imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8778798-fRteSwuh3yAfsk85nOtVyq3lwjJreq.png",
+  longitud: 85,
+  altura: 22,
+  peso: 7500,
+  autonomia: 120,
+  alcanceMaximo: 1000000,
+  sistemaPropulsion: "Motores de plasma de alta densidad",
+  sistemaNavegacion: "TacticalNav 3.0",
+  sistemaSoporteVital: "Military-grade Life Support",
+  comunicaciones: "Red de comunicación encriptada",
+  escudos: "Escudo de defensa multicapa",
+  seguridadInfo: "El Defensor Espacial está diseñado para proporcionar la máxima seguridad en rutas espaciales de alto riesgo, con capacidad para detectar y neutralizar amenazas a gran distancia.",
+  confortInfo: "Aunque su diseño prioriza la funcionalidad, el Defensor ofrece alojamiento confortable para su tripulación y pasajeros, con áreas comunes bien equipadas."
+},
+'9': {
+  id: 9,
+  nombre: "Estación Comercial Nexus",
+  tipo: "Estación Comercial",
+  fabricante: "Interstellar Commerce Ltd.",
+  velocidadMaxima: 5000,
+  capacidad: 800,
+  tipoPropulsion: "Posicionamiento iónico",
+  anoFabricacion: 2043,
+  descripcion: "La Estación Comercial Nexus es un centro de negocios y entretenimiento flotante, donde se pueden realizar transacciones comerciales, disfrutar de compras duty-free y experimentar la vida en el espacio.",
+  caracteristicas: [
+    "Centro comercial con tiendas duty-free",
+    "Zona de negocios con salas de conferencias",
+    "Restaurantes de diversas especialidades",
+    "Casino espacial",
+    "Hotel con diferentes categorías de habitaciones",
+    "Centro de entretenimiento y ocio",
+  ],
+  imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bb155376-b4ec-492e-b057-614eedacff24-6vMOPBQJ7xYEu9TLIf75qX4WPfPipq.png",
+  longitud: 600,
+  altura: 400,
+  peso: 50000,
+  autonomia: 3650,
+  alcanceMaximo: 450000,
+  sistemaPropulsion: "Sistema de posicionamiento orbital",
+  sistemaNavegacion: "CommercialNav Enterprise",
+  sistemaSoporteVital: "EcoSystem Commercial",
+  comunicaciones: "Centro de comunicaciones comerciales",
+  escudos: "Sistema de protección comercial",
+  seguridadInfo: "La Estación Comercial Nexus cuenta con avanzados sistemas de seguridad y vigilancia, garantizando un entorno seguro para todas las actividades comerciales y de ocio.",
+  confortInfo: "Diseñada para largas estancias, la estación ofrece alojamiento de diversas categorías, desde habitaciones estándar hasta suites de lujo con vistas al espacio."
+}
   };
   
   return naves[id] || naves['1']; // Devolver la nave correspondiente o la primera como fallback
@@ -685,6 +781,60 @@ const obtenerDestinosPorNaveId = (id) => {
         descripcion: "Mar de la Tranquilidad, sitio del primer alunizaje humano.",
         imagen: "/placeholder.svg?height=200&width=300&query=mare+tranquillitatis+luna"
       }
+    ],
+    '7': [
+      {
+        id: 1,
+        nombre: "Luna",
+        descripcion: "El satélite natural de la Tierra, primer destino de la exploración espacial humana.",
+        imagen: "/images/luna-base.png"
+      },
+      {
+        id: 2,
+        nombre: "Marte",
+        descripcion: "El planeta rojo, hogar de las primeras colonias humanas fuera de la Tierra.",
+        imagen: "/images/marte.png"
+      },
+      {
+        id: 3,
+        nombre: "Estación Orbital Internacional",
+        descripcion: "La mayor estación espacial en órbita terrestre, centro de investigación y turismo.",
+        imagen: "/images/estacion-orbital.png"
+      }
+    ],
+    '8': [
+      {
+        id: 2,
+        nombre: "Marte",
+        descripcion: "El planeta rojo, hogar de las primeras colonias humanas fuera de la Tierra.",
+        imagen: "/images/marte.png"
+      },
+      {
+        id: 11,
+        nombre: "Venus",
+        descripcion: "El planeta más caliente del sistema solar, misiones atmosféricas.",
+        imagen: "/placeholder.svg?height=200&width=300&query=venus+planeta"
+      },
+      {
+        id: 9,
+        nombre: "Órbita Solar",
+        descripcion: "Misiones científicas para estudiar el Sol y la heliosfera.",
+        imagen: "/placeholder.svg?height=200&width=300&query=orbita+solar+nave"
+      }
+    ],
+    '9': [
+      {
+        id: 1,
+        nombre: "Luna",
+        descripcion: "El satélite natural de la Tierra, primer destino de la exploración espacial humana.",
+        imagen: "/images/luna-base.png"
+      },
+      {
+        id: 3,
+        nombre: "Estación Orbital Internacional",
+        descripcion: "La mayor estación espacial en órbita terrestre, centro de investigación y turismo.",
+        imagen: "/images/estacion-orbital.png"
+      }
     ]
   };
   
@@ -789,6 +939,48 @@ const obtenerNavesRelacionadas = (id) => {
         tipo: "Estación",
         imagenPrincipal: "/images/naves/nexus-orbital-station.png"
       }
+    ],
+    '7': [
+      {
+        id: 1,
+        nombre: "Aurora Estelar",
+        tipo: "Crucero",
+        imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/aurora-estelar-cruiser-RQ8yt03mV9GFflJm8wrfYK83vB6ImU.png"
+      },
+      {
+        id: 4,
+        nombre: "Nexus Orbital",
+        tipo: "Estación",
+        imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/nexus-orbital-station-5RJo0cfI0NUItzyPF6fCwYa04RduiQ.png"
+      }
+    ],
+    '8': [
+      {
+        id: 3,
+        nombre: "Voyager Marciano",
+        tipo: "Explorador",
+        imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/voyager-marciano-cruiser.png-1lRnc8nBmVPVlMp40AuMoMTn0DErpu.jpeg"
+      },
+      {
+        id: 5,
+        nombre: "Solar Explorer",
+        tipo: "Investigación",
+        imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/solar-explorer-research-T31AK5CsKfqxRlxZo9uHODArM3ZrGQ.png"
+      }
+    ],
+    '9': [
+      {
+        id: 4,
+        nombre: "Nexus Orbital",
+        tipo: "Estación",
+        imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/nexus-orbital-station-5RJo0cfI0NUItzyPF6fCwYa04RduiQ.png"
+      },
+      {
+        id: 7,
+        nombre: "Crucero Estelar",
+        tipo: "Crucero de Lujo",
+        imagenPrincipal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/eea7728b-18e0-4b08-8e12-128b50fbe0e2-xZASfQCe9tuHSpxcGQOGI1aNj05qsP.png"
+      }
     ]
   };
   
@@ -805,7 +997,10 @@ const badgeClass = computed(() => {
     'carguero': 'badge-destructive',
     'investigación': 'badge-primary',
     'estación': 'badge-secondary',
-    'base': 'badge-outline'
+    'base': 'badge-outline',
+    'crucero de lujo': 'badge-primary',
+    'nave de escolta': 'badge-secondary',
+    'estación comercial': 'badge-outline'
   };
   
   return tipoMap[nave.value.tipo.toLowerCase()] || 'badge-default';

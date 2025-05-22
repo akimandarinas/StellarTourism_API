@@ -67,7 +67,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { RocketIcon, CalendarIcon, ThermometerIcon } from 'lucide-vue-next';
+import { RocketIcon, CalendarIcon, ThermometerIcon } from '@/utils/lucide-adapter';
 import Badge from '../ui/Badge.vue';
 import Rating from '../ui/Rating.vue';
 import { formatPrice } from '../../utils/format';

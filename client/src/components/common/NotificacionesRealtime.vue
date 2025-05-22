@@ -137,7 +137,7 @@ import {
   BellIcon, BellOffIcon, CheckIcon, XIcon, AlertTriangleIcon,
   InfoIcon, AlertCircleIcon, CheckCircleIcon, CircleIcon,
   LoaderIcon, CreditCardIcon, MapPinIcon, CalendarIcon
-} from 'lucide-vue-next';
+} from '@/utils/lucide-adapter';
 import LoadingSpinner from './LoadingSpinner.vue';
 import { useAuth } from '../../composables/useAuth';
 import { useToast } from '../../composables/useToast';

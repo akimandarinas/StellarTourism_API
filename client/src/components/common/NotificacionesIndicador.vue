@@ -36,7 +36,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { BellIcon, RefreshCwIcon } from 'lucide-vue-next';
+import { BellIcon, RefreshCwIcon } from '@/utils/lucide-adapter';
 import Button from '../ui/Button.vue';
 import NotificacionesRealtime from './NotificacionesRealtime.vue';
 import { useNotificaciones } from '../../composables/useNotificaciones';

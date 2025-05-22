@@ -1,13 +1,12 @@
 import { ref, onMounted } from "vue"
 
-// Composable para gestionar características de accesibilidad
+//Composable para gestionar características de accesibilidad
 export function useAccessibility() {
   const highContrast = ref(false)
   const largeText = ref(false)
   const reducedMotion = ref(false)
   const screenReader = ref(false)
 
-  // Cargar preferencias del usuario
   const loadPreferences = () => {
     try {
       const savedPrefs = localStorage.getItem("accessibility_preferences")
@@ -19,7 +18,6 @@ export function useAccessibility() {
         screenReader.value = prefs.screenReader || false
         applyPreferences()
       } else {
-        // Detectar preferencias del sistema
         detectSystemPreferences()
       }
     } catch (error) {
@@ -27,23 +25,19 @@ export function useAccessibility() {
     }
   }
 
-  // Detectar preferencias del sistema
+  //Detectar preferencias del sistema
   const detectSystemPreferences = () => {
-    // Detectar preferencia de contraste
     if (window.matchMedia("(prefers-contrast: more)").matches) {
       highContrast.value = true
     }
 
-    // Detectar preferencia de movimiento reducido
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       reducedMotion.value = true
     }
-
-    // Guardar preferencias detectadas
     savePreferences()
   }
 
-  // Guardar preferencias del usuario
+  //Guardar preferencias del usuario
   const savePreferences = () => {
     try {
       const prefs = {
@@ -58,32 +52,31 @@ export function useAccessibility() {
     }
   }
 
-  // Aplicar preferencias al DOM
   const applyPreferences = () => {
     const htmlElement = document.documentElement
 
-    // Aplicar alto contraste
+    //Aplicar alto contraste
     if (highContrast.value) {
       htmlElement.classList.add("high-contrast")
     } else {
       htmlElement.classList.remove("high-contrast")
     }
 
-    // Aplicar texto grande
+    //Aplicar texto grande
     if (largeText.value) {
       htmlElement.classList.add("large-text")
     } else {
       htmlElement.classList.remove("large-text")
     }
 
-    // Aplicar movimiento reducido
+    //Aplicar movimiento reducido
     if (reducedMotion.value) {
       htmlElement.classList.add("reduced-motion")
     } else {
       htmlElement.classList.remove("reduced-motion")
     }
 
-    // Aplicar soporte para lector de pantalla
+    //Aplicar soporte para lector de pantalla
     if (screenReader.value) {
       htmlElement.classList.add("screen-reader-support")
     } else {
@@ -91,7 +84,6 @@ export function useAccessibility() {
     }
   }
 
-  // Alternar preferencias
   const toggleHighContrast = () => {
     highContrast.value = !highContrast.value
     savePreferences()
@@ -116,7 +108,6 @@ export function useAccessibility() {
     applyPreferences()
   }
 
-  // Cargar preferencias al montar el componente
   onMounted(() => {
     loadPreferences()
   })
@@ -136,6 +127,5 @@ export function useAccessibility() {
   }
 }
 
-// Exportar todos los composables de accesibilidad
 export { useFocusTrap } from "./useFocusTrap"
 export { useAnnouncer } from "./useAnnouncer"

@@ -2,24 +2,15 @@
 require_once __DIR__ . '/../utils/auth_utils.php';
 
 /**
- * Middleware de autenticación
- * Verifica que el usuario esté autenticado y tenga permisos para acceder al recurso
- * 
- * @param string $method Método HTTP
- * @param string $path Ruta solicitada
- * @return object|bool Datos del usuario o false si no está autenticado
+ Middleware de autenticación
+ Verifica que el usuario esté autenticado y tenga permisos para acceder al recurso
  */
 function authenticateRequest($method, $path) {
-    // Obtener el servicio de autenticación
     $authService = AuthService::getInstance();
-    
-    // Extraer el recurso y la acción de la ruta
     $segments = explode('/', trim($path, '/'));
     $resource = $segments[0] ?? '';
     $resourceId = $segments[1] ?? null;
     $action = $segments[2] ?? null;
-    
-    // Determinar la acción basada en el método HTTP si no está especificada
     if (!$action) {
         switch ($method) {
             case 'GET':
@@ -40,11 +31,9 @@ function authenticateRequest($method, $path) {
     }
     
     try {
-        // Requerir autenticación para el recurso
         $userData = $authService->requireAuth($resource, $action, $resourceId);
         return $userData;
     } catch (Exception $e) {
-        // Manejar error de autenticación
         header('Content-Type: application/json');
         
         if ($e->getMessage() === "No autenticado") {
@@ -62,7 +51,6 @@ function authenticateRequest($method, $path) {
                 'code' => 'permission_denied'
             ]);
         }
-        
         return false;
     }
 }

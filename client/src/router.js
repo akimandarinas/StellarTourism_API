@@ -1,7 +1,5 @@
-// Importaciones básicas
 import { createMemoryHistory } from "vue-router"
 
-// Definición de rutas
 const routes = [
   {
     path: "/",
@@ -81,7 +79,6 @@ function isClient() {
 
 // Función para crear el router
 export async function createRouter() {
-  // Importamos dinámicamente vue-router solo en el cliente
   if (isClient()) {
     const { createRouter, createWebHistory } = await import("vue-router")
 
@@ -109,7 +106,6 @@ export async function createRouter() {
   }
 }
 
-// Exportamos una función para obtener el router
 let routerInstance = null
 
 export async function getRouter() {
@@ -125,27 +121,22 @@ export async function getRouter() {
   return routerInstance
 }
 
-// Configurar navegación guards
+// Configurar navegación 
 function setupNavigationGuards(router) {
-  // Navegación guard para autenticación
   router.beforeEach(async (to, from, next) => {
-    // Actualizar el título de la página
     if (to.meta.title) {
       document.title = to.meta.title
     }
 
-    // Mostrar indicador de carga
     document.body.classList.add("page-loading")
 
     // Verificar autenticación
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
     const isGuestOnly = to.matched.some((record) => record.meta.guest)
 
-    // Importar dinámicamente el store de autenticación
     const { useAuthStore } = await import("./stores/index")
     const authStore = useAuthStore()
 
-    // Esperar a que la autenticación esté inicializada
     if (!authStore.authInitialized) {
       // Esperar a que se inicialice la autenticación (máximo 2 segundos)
       await new Promise((resolve) => {
@@ -178,9 +169,7 @@ function setupNavigationGuards(router) {
     }
   })
 
-  // Quitar indicador de carga después de la navegación
   router.afterEach(() => {
-    // Pequeño retraso para asegurar que la transición ha comenzado
     setTimeout(() => {
       document.body.classList.remove("page-loading")
     }, 100)

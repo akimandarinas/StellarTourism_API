@@ -31,12 +31,12 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useUIStore } from './stores/ui';
+import { useSafeStore } from './utils/store-utils';
 
-// Obtener el store UI
-const uiStore = useUIStore();
+const uiStore = useSafeStore(useUIStore);
 
-// Inicializar el tema al montar la aplicación
 onMounted(() => {
+  // Inicializar el tema si está disponible
   uiStore.initTheme();
 });
 </script>

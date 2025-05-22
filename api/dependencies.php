@@ -1,12 +1,7 @@
 <?php
-/**
- * Archivo de dependencias para el proyecto Stellar Tourism
- * 
- * Este archivo gestiona la carga de todas las dependencias necesarias
- * para el funcionamiento correcto de la API
- */
+/* Archivo de dependencias para el proyecto Stellar Tourism
+   Este archivo gestiona la carga de todas las dependencias necesarias */
 
-// Función para incluir archivos de manera segura
 function safe_require_once($file) {
     if (file_exists($file)) {
         require_once $file;
@@ -55,7 +50,7 @@ safe_require_once(__DIR__ . '/controllers/reserva_controller.php');
 safe_require_once(__DIR__ . '/controllers/resena_controller.php');
 safe_require_once(__DIR__ . '/controllers/ruta_controller.php');
 
-// Configurar manejador de errores personalizado
+// Configurar manejador de errores
 if (function_exists('handleError')) {
     set_error_handler('handleError');
 }
